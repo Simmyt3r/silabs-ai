@@ -101,3 +101,39 @@ A checkpoint is not promoted merely because training reached the final step. Pro
 ## Adapters and deployment
 
 Keep LoRA adapters separate while experimenting. A selected release can later be merged into a base model or served as base-plus-adapter. Do not commit either model weights or adapters to Git.
+
+
+## Rebuild and freeze the finalized corpus
+
+The canonical Silabs data finalizer is preserved in the repository:
+
+```bash
+python -m scripts.finalize_training_data_v1_2
+```
+
+It rebuilds the final train/dev split from the prepared per-dataset JSONL files,
+groups by normalized input across all datasets, and refuses to write a split if
+the same normalized input crosses train and dev.
+
+After the final split exists, freeze its exact hashes, distributions and
+deterministic smoke subset:
+
+```bash
+python -m scripts.freeze_dataset_release \
+  --train datasets/processed/final_v0_1/train.jsonl \
+  --dev datasets/processed/final_v0_1/dev.jsonl \
+  --name silabs-v1
+```
+
+This creates a tracked release manifest under `datasets/registry/releases/`
+and local ignored smoke files under `datasets/processed/smoke/`.
+
+Run the smoke recipe before the full configuration:
+
+```bash
+python -m training.train_sft --config configs/smollm2-360m-smoke.yaml
+python -m evaluation.run_eval \
+  --model outputs/silabs-ai-v1-smoke \
+  --offline \
+  --report-name smoke_candidate.json
+```
