@@ -1,0 +1,5 @@
+{"id":"conv_hello","category":"conversation","prompt":"Hello","must_not_contain":["language model that is a language model"]}
+{"id":"identity","category":"conversation","prompt":"What is your name?","must_contain":["Silabs"]}
+{"id":"math_add","category":"math","prompt":"What is 2 + 3?","must_contain":["5"]}
+{"id":"math_oranges","category":"math","prompt":"A student has 12 oranges and gives away 5. How many are left?","must_contain":["7"]}
+{"id":"instruction_short","category":"instruction","prompt":"Reply with exactly one word: blue","exact":"blue"}
