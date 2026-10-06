@@ -1,0 +1,49 @@
+name: Baseline Evaluation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/baseline-eval.yml"
+      - "evaluation/**"
+      - "silabs_ai/**"
+      - "scripts/download_base_model.py"
+  workflow_dispatch:
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install "transformers>=4.46,<5" "accelerate>=1.0,<2" "huggingface-hub>=0.26,<2" "pydantic>=2.8,<3" "pydantic-settings>=2.5,<3" safetensors sentencepiece
+
+      - name: Download untouched base model
+        run: python -m scripts.download_base_model
+
+      - name: Run deterministic baseline
+        env:
+          SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
+          SILABS_DEVICE: cpu
+          SILABS_DTYPE: float32
+        run: |
+          python -m evaluation.run_eval --offline --max-new-tokens 96 --report-name baseline_smollm2_360m.json
+
+      - name: Upload baseline report
+        uses: actions/upload-artifact@v4
+        with:
+          name: silabs-ai-baseline-smollm2-360m
+          path: reports/baseline_smollm2_360m.json
+          if-no-files-found: error
