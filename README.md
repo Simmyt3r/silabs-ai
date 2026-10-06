@@ -143,3 +143,25 @@ Reports are written under `reports/`, which is ignored by Git.
 ## Current milestone
 
 **The v1 engine foundation and local-model loading path are in place.** The next milestone is reconnecting the finalized Silabs train/dev corpus, freezing its release manifest, benchmarking the untouched base model, and running a small LoRA smoke experiment before the full training run.
+
+
+## One-command smoke pipeline
+
+Once the ignored finalized corpus is present at
+`datasets/processed/final_v0_1/train.jsonl` and `dev.jsonl`, run:
+
+```bash
+python -m scripts.run_smoke_pipeline
+```
+
+This performs preflight, freezes the dataset release manifest, creates the
+deterministic 400/100 smoke subset, evaluates the untouched base model, runs the
+LoRA smoke fine-tune, evaluates the candidate, and writes a base-vs-candidate
+comparison report.
+
+If the prepared per-dataset JSONL files are present but the finalized split
+needs rebuilding first:
+
+```bash
+python -m scripts.run_smoke_pipeline --finalize
+```
