@@ -1,0 +1,56 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Environments
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Models and caches
+models/
+checkpoints/
+outputs/
+cache/
+.huggingface/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.gguf
+*.onnx
+
+# Datasets
+datasets/raw/
+datasets/processed/
+datasets/evaluation/private/
+datasets/**/*.jsonl
+!datasets/registry/*.json
+
+# Reports / experiment logs
+reports/
+runs/
+wandb/
+tensorboard/
+*.log
+
+# Local RAG indexes
+indexes/
+vector_store/
