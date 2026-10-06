@@ -29,21 +29,32 @@ For the first serious run:
 
 CPU execution exists as a code path, but a complete 360M-parameter training run is realistically a GPU workload.
 
-## Accepted data format
+## Finalized Silabs corpus schema
 
-Preferred canonical JSONL record:
+The existing finalized Silabs data uses these top-level fields:
 
-```json
-{"messages":[{"role":"user","content":"What is 2 + 3?"},{"role":"assistant","content":"2 + 3 = 5."}]}
+```text
+id, dataset, task, domain, instruction, input, output, metadata
 ```
 
-Migration formats are also accepted:
+The trainer intentionally preserves **both** `instruction` and `input`. This matters because some records use a general instruction while the actual user question is stored in `input`.
+
+Example:
 
 ```json
-{"instruction":"What is 2 + 3?","output":"2 + 3 = 5."}
-{"prompt":"What is 2 + 3?","response":"2 + 3 = 5."}
-{"question":"What is 2 + 3?","answer":"2 + 3 = 5."}
+{
+  "id": "example_001",
+  "dataset": "source-name",
+  "task": "conversation",
+  "domain": "general",
+  "instruction": "Respond helpfully and accurately to the user.",
+  "input": "What is 2 + 3?",
+  "output": "5",
+  "metadata": {"split": "train"}
+}
 ```
+
+The loader also accepts role/content `messages`, prompt/response and question/answer records for future or imported datasets.
 
 ## Preflight
 
