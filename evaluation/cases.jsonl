@@ -1,5 +1,20 @@
-{"id":"conv_hello","category":"conversation","prompt":"Hello","must_not_contain":["language model that is a language model"]}
-{"id":"identity","category":"conversation","prompt":"What is your name?","must_contain":["Silabs"]}
-{"id":"math_add","category":"math","prompt":"What is 2 + 3?","must_contain":["5"]}
-{"id":"math_oranges","category":"math","prompt":"A student has 12 oranges and gives away 5. How many are left?","must_contain":["7"]}
-{"id":"instruction_short","category":"instruction","prompt":"Reply with exactly one word: blue","exact":"blue"}
+{"id":"conv_hello","category":"conversation","prompt":"Hello","min_words":1,"must_not_contain":["language model that is a language model"]}
+{"id":"identity_name","category":"identity","prompt":"What is your name?","must_contain":["Silabs"]}
+{"id":"identity_builder","category":"identity","prompt":"Who built you?","must_match":["(?i)(Simeon|Silabs|Laborator)"]}
+{"id":"math_add","category":"math","prompt":"What is 2 + 3? Reply with only the number.","exact":"5"}
+{"id":"math_oranges","category":"math","prompt":"A student has 12 oranges and gives away 5. How many are left? Reply with only the number.","exact":"7"}
+{"id":"math_multiply","category":"math","prompt":"What is 14 multiplied by 6? Reply with only the number.","exact":"84"}
+{"id":"math_fraction","category":"math","prompt":"What is one half of 18? Reply with only the number.","exact":"9"}
+{"id":"algebra_linear","category":"reasoning","prompt":"Solve 3x + 5 = 20. Reply with only the value of x.","exact":"5"}
+{"id":"logic_sequence","category":"reasoning","prompt":"Complete the sequence: 2, 4, 8, 16, ?. Reply with only the number.","exact":"32"}
+{"id":"logic_comparison","category":"reasoning","prompt":"Ada is taller than Bola. Bola is taller than Chidi. Who is tallest? Reply with only the name.","exact":"Ada"}
+{"id":"science_water","category":"science","prompt":"At standard atmospheric pressure, at what temperature in degrees Celsius does pure water freeze? Reply with only the number.","exact":"0"}
+{"id":"science_planet","category":"science","prompt":"Which planet is known as the Red Planet? Reply with only the planet name.","exact":"Mars"}
+{"id":"science_photosynthesis","category":"science","prompt":"Plants mainly absorb which gas from the atmosphere for photosynthesis? Reply with only the gas name.","must_match":["(?i)^carbon dioxide[.!]?$"]}
+{"id":"instruction_one_word","category":"instruction","prompt":"Reply with exactly one word: blue","exact":"blue"}
+{"id":"instruction_uppercase","category":"instruction","prompt":"Write the word nigeria in uppercase and nothing else.","exact":"NIGERIA"}
+{"id":"instruction_three_items","category":"instruction","prompt":"Give exactly three comma-separated primary colors and no explanation.","must_match":["^[^,\\n]+,[^,\\n]+,[^,\\n]+[.!]?$"],"max_words":6}
+{"id":"coding_python","category":"coding","prompt":"In Python, what keyword defines a function? Reply with only the keyword.","exact":"def"}
+{"id":"coding_js","category":"coding","prompt":"In JavaScript, which operator checks strict equality? Reply with only the operator.","exact":"==="}
+{"id":"coding_sql","category":"coding","prompt":"Which SQL keyword retrieves rows from a table? Reply with only the keyword.","exact":"SELECT"}
+{"id":"robust_repeat","category":"robustness","prompt":"Explain recursion in one short sentence.","max_words":30,"must_not_contain":["language model that is a language model"]}
