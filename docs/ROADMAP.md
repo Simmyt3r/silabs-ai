@@ -25,10 +25,10 @@ Exit criterion: one reproducible, auditable corpus approved for training.
 
 ## Phase 2 - Baseline
 
-- [ ] download the untouched base model
-- [ ] run behavioral evaluation on the base
-- [ ] add broader academic/reasoning cases
-- [ ] retain baseline report
+- [x] download and full-load the untouched base model in a clean runner
+- [x] expand deterministic behavioral evaluation
+- [x] add academic/reasoning/coding cases
+- [ ] freeze the successful baseline report and score
 
 Exit criterion: measurable baseline before Silabs fine-tuning.
 
