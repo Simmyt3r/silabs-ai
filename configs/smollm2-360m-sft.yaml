@@ -1,7 +1,7 @@
 model:
   id: HuggingFaceTB/SmolLM2-360M-Instruct
   dtype: auto
-  device_map: auto
+  device_map: null
 
 data:
   train: datasets/processed/silabs_train.jsonl
