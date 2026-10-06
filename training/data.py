@@ -14,7 +14,7 @@ def _text(value: Any) -> str:
 
 
 def normalize_record(record: dict[str, Any]) -> list[dict[str, str]]:
-    """Normalize common instruction-data schemas to role/content messages."""
+    """Normalize common Silabs/instruction-data schemas to chat messages."""
     raw_messages = record.get("messages")
     if isinstance(raw_messages, list) and raw_messages:
         messages: list[dict[str, str]] = []
@@ -31,27 +31,54 @@ def normalize_record(record: dict[str, Any]) -> list[dict[str, str]]:
         return messages
 
     system = _text(record.get("system"))
-    pairs = [
-        ("instruction", "output"),
-        ("prompt", "response"),
-        ("question", "answer"),
-        ("input", "output"),
-    ]
-    for left, right in pairs:
-        prompt = _text(record.get(left))
-        answer = _text(record.get(right))
-        if prompt and answer:
-            messages = []
-            if system:
-                messages.append({"role": "system", "content": system})
-            messages.extend([
-                {"role": "user", "content": prompt},
-                {"role": "assistant", "content": answer},
-            ])
-            return messages
+    instruction = _text(record.get("instruction"))
+    input_text = _text(record.get("input"))
+    output = _text(record.get("output"))
+
+    # Canonical finalized Silabs records contain instruction + input + output.
+    # Both instruction and input must survive normalization: for some sources the
+    # instruction is generic while the actual user question is stored in input.
+    if output and (instruction or input_text):
+        if instruction and input_text:
+            user_content = f"{instruction}\n\n{input_text}"
+        else:
+            user_content = instruction or input_text
+
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.extend([
+            {"role": "user", "content": user_content},
+            {"role": "assistant", "content": output},
+        ])
+        return messages
+
+    prompt = _text(record.get("prompt"))
+    response = _text(record.get("response"))
+    if prompt and response:
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.extend([
+            {"role": "user", "content": prompt},
+            {"role": "assistant", "content": response},
+        ])
+        return messages
+
+    question = _text(record.get("question"))
+    answer = _text(record.get("answer"))
+    if question and answer:
+        messages = []
+        if system:
+            messages.append({"role": "system", "content": system})
+        messages.extend([
+            {"role": "user", "content": question},
+            {"role": "assistant", "content": answer},
+        ])
+        return messages
 
     raise DatasetFormatError(
-        "record must contain messages or a supported prompt/answer field pair"
+        "record must contain messages or a supported prompt/answer field set"
     )
 
 
