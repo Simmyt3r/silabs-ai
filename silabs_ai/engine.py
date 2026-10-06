@@ -8,6 +8,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .config import Settings, get_settings
+from .model_source import resolve_model_source
 from .prompting import build_chat_messages, ensure_system_message
 from .retrieval import NullRetriever, Retriever
 from .schemas import Message
@@ -59,25 +60,39 @@ class SilabsAIEngine:
             if self.loaded:
                 return
 
-            logger.info("Loading Silabs AI base model: %s", self.settings.model_id)
+            source = resolve_model_source(
+                local_path=self.settings.model_path,
+                remote_id=self.settings.model_id,
+                allow_remote=self.settings.allow_remote_model_download,
+            )
+            logger.info(
+                "Loading Silabs AI base model from %s (%s)",
+                source.value,
+                "local" if source.is_local else "remote",
+            )
+
+            common_kwargs = {
+                "trust_remote_code": self.settings.trust_remote_code,
+                "local_files_only": source.is_local,
+            }
+            if not source.is_local:
+                common_kwargs["revision"] = self.settings.model_revision
+                common_kwargs["cache_dir"] = self.settings.model_cache
+
             self._tokenizer = AutoTokenizer.from_pretrained(
-                self.settings.model_id,
-                revision=self.settings.model_revision,
-                cache_dir=self.settings.model_cache,
-                trust_remote_code=self.settings.trust_remote_code,
+                source.value,
+                **common_kwargs,
             )
 
             model_kwargs = {
-                "revision": self.settings.model_revision,
-                "cache_dir": self.settings.model_cache,
-                "trust_remote_code": self.settings.trust_remote_code,
+                **common_kwargs,
                 "torch_dtype": self._torch_dtype(),
             }
             if self.settings.device == "auto":
                 model_kwargs["device_map"] = "auto"
 
             self._model = AutoModelForCausalLM.from_pretrained(
-                self.settings.model_id,
+                source.value,
                 **model_kwargs,
             )
 
