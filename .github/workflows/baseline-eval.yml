@@ -5,8 +5,13 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/baseline-eval.yml"
-      - "evaluation/**"
-      - "silabs_ai/**"
+      - "evaluation/run_eval.py"
+      - "evaluation/cases.jsonl"
+      - "silabs_ai/config.py"
+      - "silabs_ai/engine.py"
+      - "silabs_ai/model_source.py"
+      - "silabs_ai/prompting.py"
+      - "silabs_ai/retrieval.py"
       - "scripts/download_base_model.py"
   workflow_dispatch:
 
