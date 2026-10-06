@@ -2,11 +2,12 @@
 
 Silabs AI is the shared AI engine for Silabs products. Version 1 moves the project from tiny from-scratch experiments to a reproducible pretrained-model fine-tuning architecture with inference, training, evaluation and future RAG behind one stable interface.
 
-The first supported base model is `HuggingFaceTB/SmolLM2-360M-Instruct`. The model is configuration, not the architecture, so later models can replace it without rewriting product integrations.
+The first supported base model is `HuggingFaceTB/SmolLM2-360M-Instruct`. The engine prefers a repo-local materialized copy at `models/base/SmolLM2-360M-Instruct/`, while model weights remain outside Git history.
 
 ## What is implemented
 
 - lazy-loading Transformers inference engine;
+- repo-local base-model loading with controlled Hugging Face fallback;
 - configurable base model and optional PEFT/LoRA adapter;
 - versioned FastAPI health, model, chat and generation endpoints;
 - native model chat-template prompting;
@@ -26,6 +27,7 @@ configs/                versioned training recipes
 datasets/registry/      dataset provenance/status metadata
 docs/                   engineering documentation
 evaluation/             behavioral regression suite
+models/                  model registry + local weight location
 scripts/                operational utilities
 silabs_ai/              core engine
 training/               data and SFT pipeline
@@ -44,6 +46,8 @@ py -m venv .venv
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 Copy-Item .env.example .env
+python -m scripts.download_base_model
+python -m scripts.verify_model --load-weights
 python -m scripts.preflight
 uvicorn api.main:app --reload
 ```
@@ -56,19 +60,30 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 cp .env.example .env
+python -m scripts.download_base_model
+python -m scripts.verify_model --load-weights
 python -m scripts.preflight
 uvicorn api.main:app --reload
 ```
 
 Open `http://127.0.0.1:8000/docs` for interactive API documentation.
 
-Starting the API does **not** download the model. It loads on the first generation request unless `SILABS_PRELOAD_MODEL=true`.
+Starting the API does **not** load weights into RAM unless `SILABS_PRELOAD_MODEL=true`. On the first generation request, the engine prefers the local model directory. If it is absent and `SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD=true`, it falls back to the configured Hugging Face model.
 
-## Download the base model
+## Materialize the base model
 
 ```bash
 python -m scripts.download_base_model
+python -m scripts.verify_model --load-weights
 ```
+
+The downloaded model lives at:
+
+```text
+models/base/SmolLM2-360M-Instruct/
+```
+
+Its identity and provenance are recorded in [models/registry.json](models/registry.json). Weight binaries are ignored by Git on purpose.
 
 ## Validate the finalized corpus
 
@@ -87,7 +102,7 @@ Review `configs/smollm2-360m-sft.yaml` and `docs/TRAINING.md` first.
 python -m training.train_sft --config configs/smollm2-360m-sft.yaml
 ```
 
-LoRA is the default. A complete training run on a 360M-parameter model should be treated as a GPU workload even though CPU execution is technically possible.
+Training also prefers the repo-local base model. LoRA is the default. A complete training run on a 360M-parameter model should be treated as a GPU workload even though CPU execution is technically possible.
 
 ## Evaluate a model
 
@@ -123,7 +138,8 @@ Reports are written under `reports/`, which is ignored by Git.
 - [Architecture decisions](docs/DECISIONS.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Third-party components](docs/THIRD_PARTY.md)
+- [Local model handling](models/README.md)
 
 ## Current milestone
 
-**v1 engine foundation is in place.** The next milestone is reconnecting the finalized Silabs train/dev corpus, freezing its release manifest, benchmarking the untouched base model, and running a small LoRA smoke experiment before the full training run.
+**The v1 engine foundation and local-model loading path are in place.** The next milestone is reconnecting the finalized Silabs train/dev corpus, freezing its release manifest, benchmarking the untouched base model, and running a small LoRA smoke experiment before the full training run.
