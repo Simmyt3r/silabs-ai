@@ -1,0 +1,1 @@
+"""Silabs AI evaluation package."""
