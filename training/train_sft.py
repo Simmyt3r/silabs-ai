@@ -9,6 +9,7 @@ from datasets import Dataset
 from peft import LoraConfig, get_peft_model
 from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
 
+from silabs_ai.model_source import resolve_model_source
 from .data import load_messages
 
 
@@ -109,12 +110,19 @@ def main() -> None:
     args = parser.parse_args()
     cfg = load_config(args.config)
 
-    model_id = cfg["model"]["id"]
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model_cfg = cfg["model"]
+    source = resolve_model_source(
+        local_path=model_cfg.get("local_path"),
+        remote_id=model_cfg["id"],
+        allow_remote=bool(model_cfg.get("allow_remote", True)),
+    )
+    source_kwargs = {"local_files_only": source.is_local}
+
+    tokenizer = AutoTokenizer.from_pretrained(source.value, **source_kwargs)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    dtype_name = cfg["model"].get("dtype", "auto")
+    dtype_name = model_cfg.get("dtype", "auto")
     dtype_map = {
         "float32": torch.float32,
         "float16": torch.float16,
@@ -124,11 +132,18 @@ def main() -> None:
     if dtype_name not in dtype_map:
         raise ValueError(f"Unsupported dtype: {dtype_name}")
 
-    model_kwargs = {"torch_dtype": dtype_map[dtype_name]}
-    if cfg["model"].get("device_map") == "auto":
+    model_kwargs = {
+        "torch_dtype": dtype_map[dtype_name],
+        **source_kwargs,
+    }
+    if model_cfg.get("device_map") == "auto":
         model_kwargs["device_map"] = "auto"
 
-    model = AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs)
+    print(
+        "Loading training base model from "
+        f"{source.value} ({'local' if source.is_local else 'remote'})"
+    )
+    model = AutoModelForCausalLM.from_pretrained(source.value, **model_kwargs)
     model.config.use_cache = False
 
     lora_cfg = cfg.get("lora", {})
