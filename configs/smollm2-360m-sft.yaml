@@ -1,0 +1,42 @@
+model:
+  id: HuggingFaceTB/SmolLM2-360M-Instruct
+  dtype: auto
+  device_map: auto
+
+data:
+  train: datasets/processed/silabs_train.jsonl
+  dev: datasets/processed/silabs_dev.jsonl
+  max_length: 1024
+
+lora:
+  enabled: true
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  output_dir: outputs/silabs-ai-v1
+  epochs: 2
+  batch_size: 1
+  eval_batch_size: 1
+  gradient_accumulation_steps: 16
+  learning_rate: 0.0002
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  logging_steps: 10
+  eval_steps: 200
+  save_steps: 200
+  save_total_limit: 2
+  gradient_checkpointing: true
+  fp16: false
+  bf16: false
+  report_to: none
+  seed: 42
