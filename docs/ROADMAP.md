@@ -28,13 +28,19 @@ Exit criterion: one reproducible, auditable corpus approved for training.
 - [x] download and full-load the untouched base model in a clean runner
 - [x] expand deterministic behavioral evaluation
 - [x] add academic/reasoning/coding cases
-- [ ] freeze the successful baseline report and score
+- [x] freeze the successful baseline report and score
 
-Exit criterion: measurable baseline before Silabs fine-tuning.
+Baseline: 18/20 (90.0%). The clear weakness in this suite is strict
+instruction-format compliance.
+
+Exit criterion: measurable baseline before Silabs fine-tuning. **Complete.**
 
 ## Phase 3 - Training
 
-- [ ] run a 100-500 record smoke experiment
+- [x] add deterministic smoke-subset generation
+- [x] add a 400/100 LoRA smoke-training recipe
+- [x] add base-versus-candidate report comparison
+- [ ] run the smoke experiment on the finalized corpus
 - [ ] evaluate the smoke checkpoint
 - [ ] run LoRA SFT on the finalized corpus
 - [ ] inspect train/eval loss and checkpoints
