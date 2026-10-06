@@ -7,13 +7,7 @@ import torch
 import yaml
 from datasets import Dataset
 from peft import LoraConfig, get_peft_model
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    DataCollatorForLanguageModeling,
-    Trainer,
-    TrainingArguments,
-)
+from transformers import AutoModelForCausalLM, AutoTokenizer, Trainer, TrainingArguments
 
 from .data import load_messages
 
@@ -26,17 +20,83 @@ def load_config(path: Path) -> dict:
     return config
 
 
-def render_dataset(path: str, tokenizer) -> Dataset:
+def build_tokenized_dataset(path: str, tokenizer, max_length: int) -> Dataset:
+    """Build causal-LM examples while masking prompt tokens from the loss."""
     rows = load_messages(path)
-    texts = [
-        tokenizer.apply_chat_template(
+    examples: list[dict[str, list[int]]] = []
+    skipped = 0
+
+    for messages in rows:
+        if not messages or messages[-1]["role"] != "assistant":
+            skipped += 1
+            continue
+
+        full_ids = tokenizer.apply_chat_template(
             messages,
-            tokenize=False,
+            tokenize=True,
             add_generation_prompt=False,
         )
-        for messages in rows
-    ]
-    return Dataset.from_dict({"text": texts})
+        prompt_ids = tokenizer.apply_chat_template(
+            messages[:-1],
+            tokenize=True,
+            add_generation_prompt=True,
+        )
+
+        full_ids = list(full_ids[:max_length])
+        prompt_length = min(len(prompt_ids), len(full_ids))
+        labels = full_ids.copy()
+        labels[:prompt_length] = [-100] * prompt_length
+
+        if not full_ids or all(label == -100 for label in labels):
+            skipped += 1
+            continue
+
+        examples.append({
+            "input_ids": full_ids,
+            "attention_mask": [1] * len(full_ids),
+            "labels": labels,
+        })
+
+    if not examples:
+        raise ValueError(f"No trainable examples remain after tokenization: {path}")
+    if skipped:
+        print(f"Skipped {skipped} records with no trainable assistant tokens from {path}")
+
+    return Dataset.from_list(examples)
+
+
+class CausalLMCollator:
+    """Pad input tensors and preserve -100 label masking."""
+
+    def __init__(self, tokenizer) -> None:
+        self.tokenizer = tokenizer
+
+    def __call__(self, features: list[dict]) -> dict[str, torch.Tensor]:
+        input_features = [
+            {
+                "input_ids": feature["input_ids"],
+                "attention_mask": feature["attention_mask"],
+            }
+            for feature in features
+        ]
+        batch = self.tokenizer.pad(input_features, padding=True, return_tensors="pt")
+
+        max_length = batch["input_ids"].shape[1]
+        labels = torch.full(
+            (len(features), max_length),
+            -100,
+            dtype=torch.long,
+        )
+
+        for row, feature in enumerate(features):
+            values = torch.tensor(feature["labels"], dtype=torch.long)
+            if self.tokenizer.padding_side == "left":
+                labels[row, -len(values) :] = values
+            else:
+                labels[row, : len(values)] = values
+
+        batch["labels"] = labels
+        return batch
 
 
 def main() -> None:
@@ -65,7 +125,7 @@ def main() -> None:
         raise ValueError(f"Unsupported dtype: {dtype_name}")
 
     model_kwargs = {"torch_dtype": dtype_map[dtype_name]}
-    if cfg["model"].get("device_map", "auto") == "auto":
+    if cfg["model"].get("device_map") == "auto":
         model_kwargs["device_map"] = "auto"
 
     model = AutoModelForCausalLM.from_pretrained(model_id, **model_kwargs)
@@ -82,28 +142,22 @@ def main() -> None:
             target_modules=lora_cfg.get(
                 "target_modules",
                 [
-                    "q_proj", "k_proj", "v_proj", "o_proj",
-                    "gate_proj", "up_proj", "down_proj",
+                    "q_proj",
+                    "k_proj",
+                    "v_proj",
+                    "o_proj",
+                    "gate_proj",
+                    "up_proj",
+                    "down_proj",
                 ],
             ),
         )
         model = get_peft_model(model, peft_config)
         model.print_trainable_parameters()
 
-    train_data = render_dataset(cfg["data"]["train"], tokenizer)
-    eval_data = render_dataset(cfg["data"]["dev"], tokenizer)
     max_length = int(cfg["data"].get("max_length", 1024))
-
-    def tokenize(batch):
-        return tokenizer(
-            batch["text"],
-            truncation=True,
-            max_length=max_length,
-            padding=False,
-        )
-
-    train_data = train_data.map(tokenize, batched=True, remove_columns=["text"])
-    eval_data = eval_data.map(tokenize, batched=True, remove_columns=["text"])
+    train_data = build_tokenized_dataset(cfg["data"]["train"], tokenizer, max_length)
+    eval_data = build_tokenized_dataset(cfg["data"]["dev"], tokenizer, max_length)
 
     training = cfg["training"]
     training_args = TrainingArguments(
@@ -135,7 +189,7 @@ def main() -> None:
         args=training_args,
         train_dataset=train_data,
         eval_dataset=eval_data,
-        data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
+        data_collator=CausalLMCollator(tokenizer),
     )
 
     trainer.train()
