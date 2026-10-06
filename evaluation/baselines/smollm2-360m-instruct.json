@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "name": "SmolLM2-360M-Instruct untouched baseline",
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "evaluation_suite": "evaluation/cases.jsonl",
+  "suite_commit": "3064174374f47509fea2bf9d8a499af35d7538ba",
+  "workflow_run_id": 37491670989,
+  "workflow_job_id": 112365696093,
+  "score": 0.9,
+  "passed": 18,
+  "total": 20,
+  "elapsed_seconds": 90.27,
+  "category_scores": {
+    "coding": {"passed": 3, "total": 3, "score": 1.0},
+    "conversation": {"passed": 1, "total": 1, "score": 1.0},
+    "identity": {"passed": 2, "total": 2, "score": 1.0},
+    "instruction": {"passed": 1, "total": 3, "score": 0.3333333333},
+    "math": {"passed": 4, "total": 4, "score": 1.0},
+    "reasoning": {"passed": 3, "total": 3, "score": 1.0},
+    "robustness": {"passed": 1, "total": 1, "score": 1.0},
+    "science": {"passed": 3, "total": 3, "score": 1.0}
+  },
+  "failed_cases": [
+    "instruction_uppercase",
+    "instruction_three_items"
+  ],
+  "promotion_note": "Candidate models should be compared against the raw workflow artifact using evaluation/compare_reports.py. This summary freezes the headline baseline metrics in source control."
+}
