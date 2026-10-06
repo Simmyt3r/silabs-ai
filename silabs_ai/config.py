@@ -19,9 +19,14 @@ class Settings(BaseSettings):
 
     app_name: str = "Silabs AI"
     env: str = "development"
+
+    # Base-model identity and local materialization path.
     model_id: str = "HuggingFaceTB/SmolLM2-360M-Instruct"
     model_revision: str = "main"
+    model_path: str | None = "models/base/SmolLM2-360M-Instruct"
     model_cache: str | None = None
+    allow_remote_model_download: bool = True
+
     adapter_path: str | None = None
     device: str = "auto"
     dtype: Literal["auto", "float32", "float16", "bfloat16"] = "auto"
@@ -41,7 +46,7 @@ class Settings(BaseSettings):
     api_port: int = 8000
     log_level: str = "INFO"
 
-    @field_validator("model_cache", "adapter_path", mode="before")
+    @field_validator("model_path", "model_cache", "adapter_path", mode="before")
     @classmethod
     def blank_path_is_none(cls, value):
         if isinstance(value, str) and not value.strip():
