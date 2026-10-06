@@ -24,7 +24,9 @@ env/
 Thumbs.db
 
 # Models and caches
-models/
+models/**
+!models/README.md
+!models/registry.json
 checkpoints/
 outputs/
 cache/
