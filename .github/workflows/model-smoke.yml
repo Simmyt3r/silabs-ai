@@ -1,0 +1,38 @@
+name: Model Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/model-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  load-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install model runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install "transformers>=4.46,<5" "accelerate>=1.0,<2" "huggingface-hub>=0.26,<2" "pydantic>=2.8,<3" "pydantic-settings>=2.5,<3" safetensors sentencepiece
+
+      - name: Download base model
+        run: python -m scripts.download_base_model
+
+      - name: Load full model weights
+        env:
+          SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
+          SILABS_DEVICE: cpu
+          SILABS_DTYPE: float32
+        run: python -m scripts.verify_model --load-weights
