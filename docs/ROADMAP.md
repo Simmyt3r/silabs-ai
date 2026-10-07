@@ -15,13 +15,18 @@
 
 ## Phase 1 - Reconnect the finalized corpus
 
-- [ ] place finalized train/dev data under ignored local storage
-- [ ] validate against the canonical schema
-- [ ] regenerate source manifest
-- [ ] rerun leakage and quality checks
-- [ ] freeze an exact v1 dataset release
+- [x] rebuild public source data in GitHub Actions
+- [x] validate against the canonical schema
+- [x] regenerate source/download manifest
+- [x] rerun exact and same-input leakage checks
+- [x] freeze a reproducible v1 research dataset artifact
+- [x] generate deterministic 400/100 smoke subsets
 
-Exit criterion: one reproducible, auditable corpus approved for training.
+Research rebuild: 122,473 total records, 120,024 train, 2,449 dev,
+zero same-input train/dev leakage.
+
+Exit criterion: one reproducible, auditable corpus approved for research
+training. **Complete.**
 
 ## Phase 2 - Baseline
 
