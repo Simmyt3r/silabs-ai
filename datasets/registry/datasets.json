@@ -1,18 +1,86 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
+  "verified_on": "2026-10-07",
   "policy": {
     "raw_data_committed_to_git": false,
     "processed_data_committed_to_git": false,
-    "license_review_required_before_commercial_training": true
+    "workflow_rebuild_preferred": true,
+    "license_review_required_before_commercial_training": true,
+    "research_profile": "Reproduces the historical eight-source Silabs corpus for research/evaluation.",
+    "commercial_profile": "Omits sources currently marked noncommercial or license-review-required."
   },
   "datasets": [
-    {"name":"oasst1","status":"prepared","max_records":30000,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"gsm8k","status":"prepared","max_records":7473,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"arc_easy","status":"prepared","max_records":2251,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"arc_challenge","status":"prepared","max_records":1119,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"sciq","status":"prepared","max_records":11679,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"openbookqa","status":"prepared","max_records":4957,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"hotpotqa","status":"prepared","max_records":25000,"license_status":"VERIFY_CURRENT_SOURCE"},
-    {"name":"openmathinstruct2","status":"prepared","max_records":40000,"license_status":"VERIFY_CURRENT_SOURCE"}
+    {
+      "name": "oasst1",
+      "repo_id": "OpenAssistant/oasst1",
+      "config": null,
+      "split": "train",
+      "max_records": 30000,
+      "license": "apache-2.0",
+      "commercial_status": "allowed"
+    },
+    {
+      "name": "gsm8k",
+      "repo_id": "openai/gsm8k",
+      "config": "main",
+      "split": "train",
+      "max_records": 7473,
+      "license": "mit",
+      "commercial_status": "allowed"
+    },
+    {
+      "name": "arc_easy",
+      "repo_id": "allenai/ai2_arc",
+      "config": "ARC-Easy",
+      "split": "train",
+      "max_records": 2251,
+      "license": "cc-by-sa-4.0",
+      "commercial_status": "allowed_with_attribution_sharealike_review"
+    },
+    {
+      "name": "arc_challenge",
+      "repo_id": "allenai/ai2_arc",
+      "config": "ARC-Challenge",
+      "split": "train",
+      "max_records": 1119,
+      "license": "cc-by-sa-4.0",
+      "commercial_status": "allowed_with_attribution_sharealike_review"
+    },
+    {
+      "name": "sciq",
+      "repo_id": "allenai/sciq",
+      "config": null,
+      "split": "train",
+      "max_records": 11679,
+      "license": "cc-by-nc-3.0",
+      "commercial_status": "research_only"
+    },
+    {
+      "name": "openbookqa",
+      "repo_id": "allenai/openbookqa",
+      "config": "main",
+      "split": "train",
+      "max_records": 4957,
+      "license": "unknown_on_huggingface_card",
+      "commercial_status": "review_required"
+    },
+    {
+      "name": "hotpotqa",
+      "repo_id": "hotpotqa/hotpot_qa",
+      "config": "distractor",
+      "split": "train",
+      "max_records": 25000,
+      "license": "cc-by-sa-4.0",
+      "commercial_status": "allowed_with_attribution_sharealike_review"
+    },
+    {
+      "name": "openmathinstruct2",
+      "repo_id": "nvidia/OpenMathInstruct-2",
+      "config": null,
+      "split": "train_1M",
+      "max_records": 40000,
+      "license": "cc-by-4.0",
+      "commercial_status": "allowed_with_attribution"
+    }
   ]
 }
