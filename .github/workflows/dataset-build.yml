@@ -5,6 +5,13 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/dataset-build.yml"
+      - "scripts/download_training_datasets.py"
+      - "scripts/finalize_training_data_v1_2.py"
+      - "scripts/freeze_dataset_release.py"
+      - "training/train_sft.py"
+      - "configs/smollm2-360m-smoke.yaml"
+      - "evaluation/run_eval.py"
+      - "evaluation/compare_reports.py"
   workflow_dispatch:
     inputs:
       profile:
