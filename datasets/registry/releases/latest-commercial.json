@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "release": "silabs-v1-commercial",
+  "build_type": "github_actions_commercially_screened_rebuild",
+  "workflow_run_id": 37682910495,
+  "workflow_job_id": 113003260273,
+  "source_commit": "f47b11060f7e0962b92f00cdc786aff3e8834198",
+  "screening_policy": {
+    "excluded_sources": [
+      "sciq",
+      "openbookqa"
+    ],
+    "reason": "SciQ is marked noncommercial and OpenBookQA requires license review before product-oriented training."
+  },
+  "corpus": {
+    "total_records": 105842,
+    "train_records": 103725,
+    "dev_records": 2117,
+    "same_input_train_dev_leakage": 0
+  },
+  "smoke_subset": {
+    "train_records": 400,
+    "dev_records": 100
+  },
+  "artifact": {
+    "id": 11509602551,
+    "name": "silabs-ai-dataset-commercial",
+    "size_bytes": 93158914,
+    "sha256": "bbd26324bed31df7f7306db52fd5c1c9fa7063027c126a8a0bc988db54221637",
+    "expires_at": "2026-10-21T20:36:25Z"
+  },
+  "validation": {
+    "train_schema": "PASS",
+    "dev_schema": "PASS",
+    "commercial_exclusion_check": "PASS"
+  }
+}
