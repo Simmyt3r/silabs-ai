@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "experiment": "silabs-ai-fast-smoke-2026-10-07",
+  "purpose": "Validate that LoRA fine-tuning can improve the untouched SmolLM2 behavioral baseline without regressions.",
+  "workflow": {
+    "name": "Fast Smoke Training",
+    "run_id": 37622774290,
+    "job_id": 112796907991,
+    "source_commit": "56f79181b9c1d508723bd1a943f8e20403ffab51"
+  },
+  "model": {
+    "base": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "base_parameters": 361821120,
+    "trainable_lora_parameters": 1638400,
+    "trainable_percent": 0.4508
+  },
+  "data": {
+    "research_corpus_total": 122473,
+    "research_corpus_train": 120024,
+    "research_corpus_dev": 2449,
+    "smoke_train_selected": 100,
+    "smoke_dev_selected": 25,
+    "train_records_skipped_after_tokenization": 22,
+    "dev_records_skipped_after_tokenization": 7
+  },
+  "training": {
+    "epochs": 1.0,
+    "train_runtime_seconds": 422.2506,
+    "train_loss": 1.2129960298538207
+  },
+  "evaluation": {
+    "baseline_score": 0.90,
+    "candidate_score": 0.95,
+    "score_delta": 0.05,
+    "improvements": 1,
+    "regressions": 0,
+    "newly_passing_case": "instruction_three_items",
+    "remaining_failed_case": "instruction_uppercase"
+  },
+  "artifact": {
+    "id": 11483830379,
+    "name": "silabs-ai-fast-smoke",
+    "size_bytes": 26724044,
+    "sha256": "28c145bc55080d58ced22768598dc3ac673689333a65b7036eafb7e7aae01bf2",
+    "expires_at": "2026-10-21T12:55:01Z"
+  },
+  "decision": "Promising. Do not promote as Silabs AI v1 yet. Validate on a larger 400/100 extended smoke run and eliminate long-example token-loss before full-corpus training."
+}
