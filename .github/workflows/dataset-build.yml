@@ -96,7 +96,7 @@ jobs:
           retention-days: 14
 
   smoke:
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_smoke }}
+    if: ${{ github.event_name == 'push' || inputs.run_smoke }}
     needs: build-data
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -105,7 +105,7 @@ jobs:
       SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
       SILABS_DEVICE: cpu
       SILABS_DTYPE: float32
-      SILABS_DATA_PROFILE: ${{ inputs.profile }}
+      SILABS_DATA_PROFILE: ${{ github.event_name == 'workflow_dispatch' && inputs.profile || 'research' }}
 
     steps:
       - name: Checkout
