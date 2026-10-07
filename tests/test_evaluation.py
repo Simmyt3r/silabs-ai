@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from evaluation.promotion_gate import assess
 from evaluation.run_eval import judge, load_cases, resolve_settings
 
 
@@ -51,3 +52,30 @@ def test_extended_evaluation_suite_is_valid_and_unique():
 
     assert len(cases) == 50
     assert len(ids) == len(set(ids))
+
+
+
+def test_promotion_gate_accepts_improvement_without_regressions():
+    passed, reasons = assess(
+        {
+            "baseline_score": 0.90,
+            "candidate_score": 0.95,
+            "score_delta": 0.05,
+            "regressions": [],
+        }
+    )
+    assert passed is True
+    assert reasons == []
+
+
+def test_promotion_gate_rejects_regression():
+    passed, reasons = assess(
+        {
+            "baseline_score": 0.90,
+            "candidate_score": 0.95,
+            "score_delta": 0.05,
+            "regressions": [{"id": "math_add"}],
+        }
+    )
+    assert passed is False
+    assert any("regressions" in reason for reason in reasons)
