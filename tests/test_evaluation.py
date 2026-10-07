@@ -1,4 +1,6 @@
-from evaluation.run_eval import judge, resolve_settings
+from pathlib import Path
+
+from evaluation.run_eval import judge, load_cases, resolve_settings
 
 
 def test_exact_judge_is_case_insensitive():
@@ -40,3 +42,12 @@ def test_local_adapter_uses_base_model_and_adapter_path(tmp_path):
     assert settings.adapter_path == str(checkpoint)
     assert settings.model_path == "models/base/SmolLM2-360M-Instruct"
     assert settings.allow_remote_model_download is False
+
+
+
+def test_extended_evaluation_suite_is_valid_and_unique():
+    cases = load_cases(Path("evaluation/cases_extended.jsonl"))
+    ids = [case["id"] for case in cases]
+
+    assert len(cases) == 50
+    assert len(ids) == len(set(ids))
