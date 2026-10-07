@@ -30,7 +30,7 @@ on:
 
 concurrency:
   group: silabs-ai-dataset-build
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build-data:
@@ -68,7 +68,9 @@ jobs:
             --train datasets/processed/final_v0_1/train.jsonl \
             --dev datasets/processed/final_v0_1/dev.jsonl \
             --name "silabs-v1-$SILABS_DATA_PROFILE" \
-            --manifest "datasets/registry/releases/silabs-v1-$SILABS_DATA_PROFILE.json"
+            --manifest "datasets/registry/releases/silabs-v1-$SILABS_DATA_PROFILE.json" \
+            --smoke-train 100 \
+            --smoke-dev 25
 
       - name: Validate finalized splits
         run: |
