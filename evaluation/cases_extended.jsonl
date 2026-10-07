@@ -10,7 +10,7 @@
 {"id":"instruction_yes_only","category":"instruction","prompt":"Is 10 greater than 3? Reply only yes or no.","exact":"yes"}
 {"id":"instruction_exact_phrase","category":"instruction","prompt":"Reply with exactly: Silabs AI ready","exact":"Silabs AI ready"}
 {"id":"instruction_three_items","category":"instruction","prompt":"Give exactly three comma-separated primary colors and no explanation.","must_match":["(?i)^(red|blue|yellow)\\s*,\\s*(red|blue|yellow)\\s*,\\s*(red|blue|yellow)[.!]?$"],"max_words":3}
-{"id":"instruction_json","category":"instruction","prompt":"Return exactly this JSON and nothing else: {\"status\":\"ok\"}","exact":"{"status":"ok"}"}
+{"id":"instruction_json","category":"instruction","prompt":"Return exactly this JSON and nothing else: {\"status\":\"ok\"}","exact":"{\"status\":\"ok\"}"}
 {"id":"instruction_two_words","category":"instruction","prompt":"Reply with exactly two words: machine learning","exact":"machine learning"}
 {"id":"instruction_short_sentence","category":"instruction","prompt":"Define a computer in one sentence of at most 15 words.","max_words":15,"min_words":4}
 {"id":"math_add","category":"math","prompt":"What is 2 + 3?","must_match":["(?:^|\\D)5(?:\\D|$)"]}
