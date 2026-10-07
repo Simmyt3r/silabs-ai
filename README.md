@@ -165,3 +165,20 @@ needs rebuilding first:
 ```bash
 python -m scripts.run_smoke_pipeline --finalize
 ```
+
+
+## Build the corpus in GitHub Actions
+
+The repository can rebuild its training data without manually uploading
+`train.jsonl` or `dev.jsonl`.
+
+Open **Actions → Dataset Build and Smoke → Run workflow** and choose:
+
+- `research` to reproduce the full research corpus;
+- `commercial` to omit sources whose current licensing is not cleared for
+  commercial training;
+- optionally enable the LoRA smoke run.
+
+The workflow streams/caps large sources such as OpenMathInstruct-2 instead of
+cloning the full multi-gigabyte dataset, then uploads the finalized corpus as a
+GitHub Actions artifact.
