@@ -311,11 +311,20 @@ def main():
         self_copy = 0
 
         if dataset == "oasst1":
-            rows, self_copy = flatten_oasst(rows)
-            print(
-                f" Source {source:,} | extracted {len(rows):,} "
-                f"| self-copy rejected {self_copy:,}"
+            has_raw_trees = any(
+                (row.get("metadata") or {}).get("raw_prompt_tree")
+                for row in rows
             )
+            if has_raw_trees:
+                rows, self_copy = flatten_oasst(rows)
+                print(
+                    f" Source {source:,} | extracted {len(rows):,} "
+                    f"| self-copy rejected {self_copy:,}"
+                )
+            else:
+                print(
+                    f" Source {source:,} | using already-normalized OASST pairs"
+                )
 
         before = len(rows)
         rows = [row for row in rows if quality(row)]
