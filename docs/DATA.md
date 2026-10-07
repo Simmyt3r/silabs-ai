@@ -56,5 +56,13 @@ The research profile currently includes SciQ for research/evaluation only.
 The commercial profile excludes SciQ and OpenBookQA until their intended use is
 cleared under the applicable source terms.
 
+Validated 2026-10-07 releases:
+
+- research: 122,473 total records; 120,024 train; 2,449 dev;
+- commercially screened: 105,842 total records; 103,725 train; 2,117 dev.
+
+Both releases passed schema validation and global same-input train/dev isolation.
+Their latest build provenance is stored in `datasets/registry/releases/`.
+
 Generated corpora remain outside normal Git history. Source identity and policy
 are versioned in `datasets/registry/datasets.json`.
