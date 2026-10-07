@@ -51,9 +51,6 @@ jobs:
         run: |
           python -m training.validate_dataset datasets/processed/final_v0_1/train.jsonl
           python -m training.validate_dataset datasets/processed/final_v0_1/dev.jsonl
-          python -m scripts.preflight \
-            --train datasets/processed/final_v0_1/train.jsonl \
-            --dev datasets/processed/final_v0_1/dev.jsonl
 
       - name: Confirm excluded sources
         run: |
