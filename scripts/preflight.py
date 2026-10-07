@@ -5,8 +5,15 @@ import platform
 import sys
 from pathlib import Path
 
-import torch
-from transformers import __version__ as transformers_version
+try:
+    import torch
+except ImportError:
+    torch = None
+
+try:
+    from transformers import __version__ as transformers_version
+except ImportError:
+    transformers_version = "not-installed"
 
 from silabs_ai.config import get_settings
 from training.data import iter_jsonl, normalize_record
@@ -30,10 +37,11 @@ def main() -> None:
     print("SILABS AI PREFLIGHT")
     print(f"python: {sys.version.split()[0]}")
     print(f"platform: {platform.platform()}")
-    print(f"torch: {torch.__version__}")
+    print(f"torch: {torch.__version__ if torch is not None else 'not-installed'}")
     print(f"transformers: {transformers_version}")
-    print(f"cuda_available: {torch.cuda.is_available()}")
-    if torch.cuda.is_available():
+    cuda_available = bool(torch is not None and torch.cuda.is_available())
+    print(f"cuda_available: {cuda_available}")
+    if cuda_available:
         print(f"gpu: {torch.cuda.get_device_name(0)}")
     print(f"model: {settings.model_id}")
 
