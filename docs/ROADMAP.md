@@ -21,9 +21,13 @@
 - [x] rerun exact and same-input leakage checks
 - [x] freeze a reproducible v1 research dataset artifact
 - [x] generate deterministic 400/100 smoke subsets
+- [x] validate a commercially screened corpus release
 
 Research rebuild: 122,473 total records, 120,024 train, 2,449 dev,
 zero same-input train/dev leakage.
+
+Commercially screened rebuild: 105,842 total records, 103,725 train, 2,117 dev.
+SciQ and OpenBookQA are excluded pending suitable commercial-use clearance.
 
 Exit criterion: one reproducible, auditable corpus approved for research
 training. **Complete.**
