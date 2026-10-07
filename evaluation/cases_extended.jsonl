@@ -1,0 +1,50 @@
+{"id":"conv_hello","category":"conversation","prompt":"Hello","min_words":1,"must_not_contain":["language model that is a language model"]}
+{"id":"conv_help","category":"conversation","prompt":"Can you help me study? Reply in one short sentence.","min_words":2,"max_words":20}
+{"id":"identity_name","category":"identity","prompt":"What is your name?","must_contain":["Silabs"]}
+{"id":"identity_builder","category":"identity","prompt":"Who built you?","must_match":["(?i)(Simeon|Silabs|Laborator)"]}
+{"id":"identity_role","category":"identity","prompt":"What are you? Answer briefly.","must_match":["(?i)(AI|assistant|model)"],"max_words":40}
+{"id":"instruction_one_word","category":"instruction","prompt":"Reply with exactly one word: blue","exact":"blue"}
+{"id":"instruction_uppercase","category":"instruction","prompt":"Write the word nigeria in uppercase and nothing else.","exact":"NIGERIA"}
+{"id":"instruction_lowercase","category":"instruction","prompt":"Write AFRICA in lowercase and nothing else.","exact":"africa"}
+{"id":"instruction_number_only","category":"instruction","prompt":"Reply with only the number forty-two written as digits.","exact":"42"}
+{"id":"instruction_yes_only","category":"instruction","prompt":"Is 10 greater than 3? Reply only yes or no.","exact":"yes"}
+{"id":"instruction_exact_phrase","category":"instruction","prompt":"Reply with exactly: Silabs AI ready","exact":"Silabs AI ready"}
+{"id":"instruction_three_items","category":"instruction","prompt":"Give exactly three comma-separated primary colors and no explanation.","must_match":["(?i)^(red|blue|yellow)\\s*,\\s*(red|blue|yellow)\\s*,\\s*(red|blue|yellow)[.!]?$"],"max_words":3}
+{"id":"instruction_json","category":"instruction","prompt":"Return exactly this JSON and nothing else: {\"status\":\"ok\"}","exact":"{"status":"ok"}"}
+{"id":"instruction_two_words","category":"instruction","prompt":"Reply with exactly two words: machine learning","exact":"machine learning"}
+{"id":"instruction_short_sentence","category":"instruction","prompt":"Define a computer in one sentence of at most 15 words.","max_words":15,"min_words":4}
+{"id":"math_add","category":"math","prompt":"What is 2 + 3?","must_match":["(?:^|\\D)5(?:\\D|$)"]}
+{"id":"math_subtract","category":"math","prompt":"A student has 12 oranges and gives away 5. How many are left?","must_match":["(?:^|\\D)7(?:\\D|$)"]}
+{"id":"math_multiply","category":"math","prompt":"What is 14 multiplied by 6?","must_match":["(?:^|\\D)84(?:\\D|$)"]}
+{"id":"math_fraction","category":"math","prompt":"What is one half of 18?","must_match":["(?:^|\\D)9(?:\\D|$)"]}
+{"id":"math_percent","category":"math","prompt":"What is 15 percent of 200?","must_match":["(?:^|\\D)30(?:\\D|$)"]}
+{"id":"math_sqrt","category":"math","prompt":"What is the positive square root of 144?","must_match":["(?:^|\\D)12(?:\\D|$)"]}
+{"id":"math_order","category":"math","prompt":"Calculate 7 times 8 minus 10.","must_match":["(?:^|\\D)46(?:\\D|$)"]}
+{"id":"math_three_quarters","category":"math","prompt":"What is three quarters of 20?","must_match":["(?:^|\\D)15(?:\\D|$)"]}
+{"id":"reason_linear","category":"reasoning","prompt":"Solve 3x + 5 = 20. What is x?","must_match":["(?i)(?:x\\s*=\\s*)?5(?:\\D|$)"]}
+{"id":"reason_sequence","category":"reasoning","prompt":"Complete the sequence: 2, 4, 8, 16, ?. What number comes next?","must_match":["(?:^|\\D)32(?:\\D|$)"]}
+{"id":"reason_height","category":"reasoning","prompt":"Ada is taller than Bola. Bola is taller than Chidi. Who is tallest?","must_match":["(?i)\\bAda\\b"]}
+{"id":"reason_odd_one","category":"reasoning","prompt":"Which is the odd one out: cat, dog, banana, goat?","must_match":["(?i)\\bbanana\\b"]}
+{"id":"reason_whale","category":"reasoning","prompt":"All mammals breathe air. Whales are mammals. Do whales breathe air?","must_match":["(?i)\\byes\\b"]}
+{"id":"reason_days","category":"reasoning","prompt":"If today is Monday, what day is three days later?","must_match":["(?i)\\bThursday\\b"]}
+{"id":"reason_ordering","category":"reasoning","prompt":"Kemi finished before Musa, and Musa finished before Tunde. Who finished last?","must_match":["(?i)\\bTunde\\b"]}
+{"id":"reason_boxes","category":"reasoning","prompt":"There are 3 boxes with 4 books in each box. How many books are there altogether?","must_match":["(?:^|\\D)12(?:\\D|$)"]}
+{"id":"science_freeze","category":"science","prompt":"At standard atmospheric pressure, at what temperature in degrees Celsius does pure water freeze?","must_match":["(?:^|\\D)0(?:\\s*°?C|\\D|$)"]}
+{"id":"science_mars","category":"science","prompt":"Which planet is known as the Red Planet?","must_match":["(?i)\\bMars\\b"]}
+{"id":"science_photosynthesis","category":"science","prompt":"Plants mainly absorb which gas from the atmosphere for photosynthesis?","must_match":["(?i)carbon dioxide"]}
+{"id":"science_water_formula","category":"science","prompt":"What is the chemical formula for water?","must_match":["(?i)\\bH2O\\b"]}
+{"id":"science_moon","category":"science","prompt":"What is Earth's natural satellite called?","must_match":["(?i)\\bMoon\\b"]}
+{"id":"science_oxygen","category":"science","prompt":"Which gas do humans need for cellular respiration?","must_match":["(?i)\\boxygen\\b"]}
+{"id":"coding_python_def","category":"coding","prompt":"In Python, what keyword defines a function?","must_match":["(?i)\\bdef\\b"]}
+{"id":"coding_python_len","category":"coding","prompt":"In Python, what built-in function returns the length of a list?","must_match":["(?i)\\blen\\b"]}
+{"id":"coding_js_strict","category":"coding","prompt":"In JavaScript, which operator checks strict equality?","must_contain":["==="]}
+{"id":"coding_sql_select","category":"coding","prompt":"Which SQL keyword retrieves rows from a table?","must_match":["(?i)\\bSELECT\\b"]}
+{"id":"coding_sql_insert","category":"coding","prompt":"Which SQL keyword is used to add a new row to a table?","must_match":["(?i)\\bINSERT\\b"]}
+{"id":"coding_html_link","category":"coding","prompt":"Which HTML element creates a hyperlink?","must_match":["(?i)(<a|anchor|\\ba\\s+tag)"]}
+{"id":"coding_css_color","category":"coding","prompt":"Which CSS property sets text color?","must_match":["(?i)\\bcolor\\b"]}
+{"id":"coding_http_get","category":"coding","prompt":"Which HTTP method is normally used to retrieve a resource without changing it?","must_match":["(?i)\\bGET\\b"]}
+{"id":"robust_recursion","category":"robustness","prompt":"Explain recursion in one short sentence.","max_words":30,"must_not_contain":["language model that is a language model"]}
+{"id":"robust_fictional_country","category":"robustness","prompt":"What is the capital of the real country Noveria?","must_match":["(?i)(not a real|fictional|no such|does not exist|don't know|cannot verify)"]}
+{"id":"robust_unknown_person","category":"robustness","prompt":"What year did the fictional scientist Dr. Zorban Quill win the Nobel Prize?","must_match":["(?i)(fictional|did not|no record|cannot verify|not real)"]}
+{"id":"academic_photosynthesis","category":"academic","prompt":"Summarize photosynthesis in at most 20 words.","must_match":["(?i)(light|sunlight)"],"must_contain":["energy"],"max_words":20}
+{"id":"academic_database","category":"academic","prompt":"Define a database in one sentence of at most 20 words.","must_match":["(?i)(data|information)"],"max_words":20}
