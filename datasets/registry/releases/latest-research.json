@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "release": "silabs-v1-research",
+  "build_type": "github_actions_reproducible_rebuild",
+  "workflow_run_id": 37618965872,
+  "workflow_job_id": 112784114715,
+  "source_commit": "3a0a19fa884f58101c1ba0167dbfb1951d571488",
+  "artifact": {
+    "id": 11481410907,
+    "name": "silabs-ai-dataset-research",
+    "size_bytes": 96990303,
+    "sha256": "43b1dafeafd6ff180f20f6d971ccdea5a11e449a0c23a4d8d62ad9b86529b22d",
+    "retention_days": 14,
+    "expires_at": "2026-10-21T12:12:47Z"
+  },
+  "corpus": {
+    "total_records": 122473,
+    "train_records": 120024,
+    "dev_records": 2449,
+    "same_input_train_dev_leakage": 0
+  },
+  "smoke_subset": {
+    "train_records": 400,
+    "dev_records": 100
+  },
+  "notes": [
+    "The dataset binaries are not committed to normal Git.",
+    "The workflow rebuilds the corpus from registered public sources.",
+    "The research profile includes sources that are not cleared for commercial training; use the commercial workflow profile for product-oriented experiments."
+  ]
+}
