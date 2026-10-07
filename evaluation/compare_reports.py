@@ -55,6 +55,7 @@ def main() -> None:
     comparison = {
         "baseline_model": baseline.get("model"),
         "candidate_model": candidate.get("model"),
+        "candidate_adapter": candidate.get("adapter_path"),
         "baseline_score": base_score,
         "candidate_score": candidate_score,
         "score_delta": candidate_score - base_score,
