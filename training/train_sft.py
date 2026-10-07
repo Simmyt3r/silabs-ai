@@ -21,50 +21,101 @@ def load_config(path: Path) -> dict:
     return config
 
 
+def _truncate_supervised_example(
+    prompt_ids: list[int],
+    full_ids: list[int],
+    max_length: int,
+) -> tuple[list[int], list[int]] | None:
+    """Fit a chat example while preserving assistant tokens for supervised loss."""
+    if max_length < 8:
+        raise ValueError("max_length must be at least 8 tokens")
+
+    prompt_ids = list(prompt_ids)
+    full_ids = list(full_ids)
+    if not full_ids:
+        return None
+
+    common = 0
+    common_limit = min(len(prompt_ids), len(full_ids))
+    while common < common_limit and prompt_ids[common] == full_ids[common]:
+        common += 1
+
+    response_ids = full_ids[common:]
+    if not response_ids:
+        return None
+
+    min_prompt_budget = min(64, max(8, max_length // 4))
+    max_response_budget = max_length - min_prompt_budget
+    response_ids = response_ids[:max_response_budget]
+    prompt_budget = max_length - len(response_ids)
+
+    prompt_prefix = prompt_ids[:common]
+    if len(prompt_prefix) > prompt_budget:
+        tail = min(16, max(2, prompt_budget // 4))
+        head = max(0, prompt_budget - tail)
+        prompt_prefix = prompt_prefix[:head] + prompt_prefix[-tail:]
+
+    input_ids = prompt_prefix + response_ids
+    labels = [-100] * len(prompt_prefix) + response_ids.copy()
+    if not input_ids or all(label == -100 for label in labels):
+        return None
+    return input_ids, labels
+
+
 def build_tokenized_dataset(path: str, tokenizer, max_length: int) -> Dataset:
     """Build causal-LM examples while masking prompt tokens from the loss."""
     rows = load_messages(path)
     examples: list[dict[str, list[int]]] = []
     skipped = 0
+    truncated = 0
 
     for messages in rows:
         if not messages or messages[-1]["role"] != "assistant":
             skipped += 1
             continue
 
-        full_ids = tokenizer.apply_chat_template(
-            messages,
-            tokenize=True,
-            add_generation_prompt=False,
+        full_ids = list(
+            tokenizer.apply_chat_template(
+                messages,
+                tokenize=True,
+                add_generation_prompt=False,
+            )
         )
-        prompt_ids = tokenizer.apply_chat_template(
-            messages[:-1],
-            tokenize=True,
-            add_generation_prompt=True,
+        prompt_ids = list(
+            tokenizer.apply_chat_template(
+                messages[:-1],
+                tokenize=True,
+                add_generation_prompt=True,
+            )
         )
 
-        full_ids = list(full_ids[:max_length])
-        prompt_length = min(len(prompt_ids), len(full_ids))
-        labels = full_ids.copy()
-        labels[:prompt_length] = [-100] * prompt_length
-
-        if not full_ids or all(label == -100 for label in labels):
+        was_long = len(full_ids) > max_length
+        packed = _truncate_supervised_example(prompt_ids, full_ids, max_length)
+        if packed is None:
             skipped += 1
             continue
 
+        input_ids, labels = packed
+        if was_long:
+            truncated += 1
+
         examples.append({
-            "input_ids": full_ids,
-            "attention_mask": [1] * len(full_ids),
+            "input_ids": input_ids,
+            "attention_mask": [1] * len(input_ids),
             "labels": labels,
         })
 
     if not examples:
         raise ValueError(f"No trainable examples remain after tokenization: {path}")
+    if truncated:
+        print(
+            f"Truncated {truncated} long records while preserving assistant "
+            f"tokens from {path}"
+        )
     if skipped:
         print(f"Skipped {skipped} records with no trainable assistant tokens from {path}")
 
     return Dataset.from_list(examples)
-
 
 class CausalLMCollator:
     """Pad input tensors and preserve -100 label masking."""
@@ -197,7 +248,7 @@ def main() -> None:
         eval_steps=int(training.get("eval_steps", 200)),
         save_steps=int(training.get("save_steps", 200)),
         save_total_limit=int(training.get("save_total_limit", 2)),
-        load_best_model_at_end=True,
+        load_best_model_at_end=load_best_model_at_end,
         metric_for_best_model="eval_loss",
         greater_is_better=False,
         fp16=bool(training.get("fp16", False)),
