@@ -1,0 +1,98 @@
+name: Fast Smoke Training
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/fast-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
+      SILABS_DEVICE: cpu
+      SILABS_DTYPE: float32
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CPU runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.4"
+          pip install -r requirements.txt
+
+      - name: Rebuild research corpus from public sources
+        run: |
+          python -m scripts.download_training_datasets --profile research
+          python -m scripts.finalize_training_data_v1_2
+          python -m scripts.freeze_dataset_release \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl \
+            --name silabs-v1-research \
+            --manifest datasets/registry/releases/silabs-v1-research.json \
+            --smoke-train 100 \
+            --smoke-dev 25
+
+      - name: Preflight corpus
+        run: |
+          python -m scripts.preflight \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl
+
+      - name: Download and verify base model
+        run: |
+          python -m scripts.download_base_model
+          python -m scripts.verify_model --load-weights
+
+      - name: Evaluate untouched base
+        run: |
+          python -m evaluation.run_eval \
+            --offline \
+            --max-new-tokens 96 \
+            --report-name baseline_smollm2_360m.json
+
+      - name: Train fast LoRA smoke adapter
+        run: |
+          python -m training.train_sft --config configs/smollm2-360m-smoke.yaml
+
+      - name: Evaluate smoke adapter
+        run: |
+          python -m evaluation.run_eval \
+            --model outputs/silabs-ai-v1-smoke \
+            --offline \
+            --max-new-tokens 96 \
+            --report-name smoke_candidate.json
+
+      - name: Compare against baseline
+        run: |
+          python -m evaluation.compare_reports \
+            reports/baseline_smollm2_360m.json \
+            reports/smoke_candidate.json \
+            --output reports/smoke_comparison.json
+
+      - name: Upload smoke adapter and reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: silabs-ai-fast-smoke
+          path: |
+            outputs/silabs-ai-v1-smoke/
+            reports/baseline_smollm2_360m.json
+            reports/smoke_candidate.json
+            reports/smoke_comparison.json
+            reports/final_training_data_report.json
+            datasets/registry/releases/silabs-v1-research.json
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 14
