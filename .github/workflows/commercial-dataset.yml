@@ -1,0 +1,87 @@
+name: Commercial Dataset Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/commercial-dataset.yml"
+  workflow_dispatch:
+
+jobs:
+  build-commercial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dataset tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install "datasets>=3.0,<5" "huggingface-hub>=0.26,<2" "pyarrow>=17,<22"
+
+      - name: Download commercially screened sources
+        run: |
+          python -m scripts.download_training_datasets --profile commercial
+
+      - name: Build canonical split
+        run: |
+          python -m scripts.finalize_training_data_v1_2
+
+      - name: Freeze commercial release
+        run: |
+          python -m scripts.freeze_dataset_release \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl \
+            --name silabs-v1-commercial \
+            --manifest datasets/registry/releases/silabs-v1-commercial.json \
+            --smoke-train 400 \
+            --smoke-dev 100
+
+      - name: Validate commercial split
+        run: |
+          python -m training.validate_dataset datasets/processed/final_v0_1/train.jsonl
+          python -m training.validate_dataset datasets/processed/final_v0_1/dev.jsonl
+          python -m scripts.preflight \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl
+
+      - name: Confirm excluded sources
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(
+              Path("reports/dataset_download_manifest.json").read_text()
+          )
+          for name in ("sciq", "openbookqa"):
+              item = manifest["datasets"][name]
+              if item.get("status") != "excluded_by_profile":
+                  raise SystemExit(f"{name} was not excluded from commercial profile")
+          print("Commercial profile exclusion check: PASS")
+          PY
+
+      - name: Upload commercial corpus
+        uses: actions/upload-artifact@v4
+        with:
+          name: silabs-ai-dataset-commercial
+          path: |
+            datasets/processed/final_v0_1/
+            datasets/processed/smoke/
+            datasets/registry/releases/silabs-v1-commercial.json
+            reports/dataset_download_manifest.json
+            reports/final_training_data_report.json
+            reports/training_preflight.json
+          if-no-files-found: error
+          compression-level: 9
+          retention-days: 14
