@@ -1,4 +1,5 @@
 name: Extended LoRA Smoke
+# Experiment revision: 2 (Trainer strategy fix)
 
 on:
   push:
