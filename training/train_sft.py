@@ -170,11 +170,19 @@ def main() -> None:
         model = get_peft_model(model, peft_config)
         model.print_trainable_parameters()
 
+    training = cfg["training"]
+    gradient_checkpointing = bool(
+        training.get("gradient_checkpointing", True)
+    )
+    if gradient_checkpointing and hasattr(model, "enable_input_require_grads"):
+        # PEFT freezes the base model. Gradient checkpointing still needs a
+        # gradient-bearing input path so LoRA parameters receive gradients.
+        model.enable_input_require_grads()
+
     max_length = int(cfg["data"].get("max_length", 1024))
     train_data = build_tokenized_dataset(cfg["data"]["train"], tokenizer, max_length)
     eval_data = build_tokenized_dataset(cfg["data"]["dev"], tokenizer, max_length)
 
-    training = cfg["training"]
     training_args = TrainingArguments(
         output_dir=training["output_dir"],
         num_train_epochs=float(training.get("epochs", 2)),
@@ -194,7 +202,10 @@ def main() -> None:
         greater_is_better=False,
         fp16=bool(training.get("fp16", False)),
         bf16=bool(training.get("bf16", False)),
-        gradient_checkpointing=bool(training.get("gradient_checkpointing", True)),
+        gradient_checkpointing=gradient_checkpointing,
+        gradient_checkpointing_kwargs={"use_reentrant": False}
+        if gradient_checkpointing
+        else None,
         report_to=training.get("report_to", "none"),
         seed=int(training.get("seed", 42)),
     )
