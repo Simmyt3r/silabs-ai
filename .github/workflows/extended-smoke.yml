@@ -1,0 +1,146 @@
+name: Extended LoRA Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/extended-smoke.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: silabs-ai-extended-smoke
+  cancel-in-progress: true
+
+jobs:
+  extended-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
+      SILABS_DEVICE: cpu
+      SILABS_DTYPE: float32
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CPU runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.4"
+          pip install -r requirements.txt
+
+      - name: Rebuild validated research corpus
+        run: |
+          python -m scripts.download_training_datasets --profile research
+          python -m scripts.finalize_training_data_v1_2
+          python -m scripts.freeze_dataset_release \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl \
+            --name silabs-v1-research-extended-smoke \
+            --manifest datasets/registry/releases/silabs-v1-research-extended-smoke.json \
+            --smoke-train 400 \
+            --smoke-dev 100
+
+      - name: Full corpus preflight
+        run: |
+          python -m scripts.preflight \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl
+
+      - name: Download and verify base model
+        run: |
+          python -m scripts.download_base_model
+          python -m scripts.verify_model --load-weights
+
+      - name: Evaluate untouched base
+        run: |
+          python -m evaluation.run_eval \
+            --offline \
+            --max-new-tokens 96 \
+            --report-name extended_baseline.json
+
+      - name: Train 400-example LoRA adapter
+        run: |
+          python -m training.train_sft \
+            --config configs/smollm2-360m-extended-smoke.yaml
+
+      - name: Evaluate extended smoke adapter
+        run: |
+          python -m evaluation.run_eval \
+            --model outputs/silabs-ai-v1-extended-smoke \
+            --offline \
+            --max-new-tokens 96 \
+            --report-name extended_candidate.json
+
+      - name: Compare candidate against baseline
+        run: |
+          python -m evaluation.compare_reports \
+            reports/extended_baseline.json \
+            reports/extended_candidate.json \
+            --output reports/extended_comparison.json
+
+      - name: Write run summary
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          data = json.loads(Path("reports/extended_comparison.json").read_text())
+          summary = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          with summary.open("a", encoding="utf-8") as handle:
+              handle.write("# Silabs AI Extended LoRA Smoke\n\n")
+              handle.write(f"- Baseline: {data['baseline_score']:.1%}\n")
+              handle.write(f"- Candidate: {data['candidate_score']:.1%}\n")
+              handle.write(f"- Delta: {data['score_delta']:+.1%}\n")
+              handle.write(f"- Improvements: {len(data['improvements'])}\n")
+              handle.write(f"- Regressions: {len(data['regressions'])}\n")
+          PY
+
+      - name: Upload adapter and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silabs-ai-extended-smoke
+          path: |
+            outputs/silabs-ai-v1-extended-smoke/
+            reports/extended_baseline.json
+            reports/extended_candidate.json
+            reports/extended_comparison.json
+            reports/training_preflight.json
+            reports/final_training_data_report.json
+            datasets/registry/releases/silabs-v1-research-extended-smoke.json
+          if-no-files-found: warn
+          compression-level: 9
+          retention-days: 14
+
+      - name: Promotion safety gate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("reports/extended_comparison.json").read_text())
+          regressions = len(data["regressions"])
+          baseline = float(data["baseline_score"])
+          candidate = float(data["candidate_score"])
+
+          print(f"baseline={baseline:.1%}")
+          print(f"candidate={candidate:.1%}")
+          print(f"regressions={regressions}")
+
+          if regressions:
+              raise SystemExit("GATE FAIL: candidate introduced behavioral regressions")
+          if candidate < baseline:
+              raise SystemExit("GATE FAIL: candidate score is below baseline")
+
+          print("PROMOTION SAFETY GATE: PASS")
+          PY
