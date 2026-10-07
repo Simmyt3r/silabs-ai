@@ -234,6 +234,10 @@ def main() -> None:
     train_data = build_tokenized_dataset(cfg["data"]["train"], tokenizer, max_length)
     eval_data = build_tokenized_dataset(cfg["data"]["dev"], tokenizer, max_length)
 
+    eval_strategy = training.get("eval_strategy", "steps")
+    save_strategy = training.get("save_strategy", eval_strategy)
+    load_best_model_at_end = bool(training.get("load_best_model_at_end", True))
+
     training_args = TrainingArguments(
         output_dir=training["output_dir"],
         num_train_epochs=float(training.get("epochs", 2)),
@@ -244,7 +248,8 @@ def main() -> None:
         warmup_ratio=float(training.get("warmup_ratio", 0.03)),
         weight_decay=float(training.get("weight_decay", 0.01)),
         logging_steps=int(training.get("logging_steps", 10)),
-        eval_strategy="steps",
+        eval_strategy=eval_strategy,
+        save_strategy=save_strategy,
         eval_steps=int(training.get("eval_steps", 200)),
         save_steps=int(training.get("save_steps", 200)),
         save_total_limit=int(training.get("save_total_limit", 2)),
@@ -258,6 +263,10 @@ def main() -> None:
         if gradient_checkpointing
         else None,
         report_to=training.get("report_to", "none"),
+        dataloader_pin_memory=bool(
+            training.get("dataloader_pin_memory", torch.cuda.is_available())
+        ),
+        max_steps=int(training.get("max_steps", -1)),
         seed=int(training.get("seed", 42)),
     )
 
