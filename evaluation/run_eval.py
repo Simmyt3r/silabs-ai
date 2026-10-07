@@ -77,6 +77,11 @@ def resolve_settings(model_arg: str | None, offline: bool) -> Settings:
 
     candidate = Path(model_arg).expanduser()
     if candidate.exists():
+        if (candidate / "adapter_config.json").is_file():
+            return Settings(
+                adapter_path=str(candidate),
+                allow_remote_model_download=not offline,
+            )
         return Settings(
             model_id=model_arg,
             model_path=str(candidate),
@@ -157,6 +162,7 @@ def main() -> None:
         "schema_version": 1,
         "model": settings.model_id,
         "model_path": settings.model_path,
+        "adapter_path": settings.adapter_path,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "passed": passes,
         "total": len(cases),
