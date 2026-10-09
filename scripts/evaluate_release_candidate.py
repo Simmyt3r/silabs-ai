@@ -40,7 +40,7 @@ def main() -> None:
         "evaluation.run_eval",
         "--offline",
         "--cases",
-        "evaluation/cases_extended.jsonl",
+        "evaluation/cases_extended_v2.jsonl",
         "--report-name",
         capability_base,
     )
@@ -51,7 +51,7 @@ def main() -> None:
         model,
         "--offline",
         "--cases",
-        "evaluation/cases_extended.jsonl",
+        "evaluation/cases_extended_v2.jsonl",
         "--report-name",
         capability_candidate,
     )
