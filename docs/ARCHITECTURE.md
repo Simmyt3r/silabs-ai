@@ -71,11 +71,19 @@ Development uses Transformers directly. Production can later add a dedicated inf
 
 ## Runtime behavior contract
 
-The default system prompt is part of the Silabs AI engine contract, not merely
-branding. It establishes concise instruction following, uncertainty rather than
-fabrication, privacy protection, refusal of credential theft/phishing/malware,
-urgent-medical escalation, and avoidance of guaranteed financial or legal
-outcomes.
+Silabs AI uses two layers instead of forcing a small model to carry every rule
+inside one oversized system prompt.
 
-These runtime guardrails are evaluated independently from model fine-tuning.
-A model adapter is not allowed to weaken them during promotion.
+The default system prompt establishes identity, precise instruction following,
+brevity when requested, factual accuracy, and uncertainty instead of
+fabrication.
+
+`silabs_ai.guardrails.BasicGuardrail` handles narrow high-risk classes before
+retrieval or model inference, including credentials/private PII, malicious
+phishing/malware/ransomware requests, urgent medical escalation, diagnosis
+certainty, guaranteed financial/legal outcomes, forced false claims and exact
+future certainty.
+
+This separation keeps the model prompt shorter while making critical behavior
+deterministic. Model adapters are still evaluated independently and are not
+allowed to regress capability or raw-model safety during promotion.
