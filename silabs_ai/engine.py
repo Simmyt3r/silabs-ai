@@ -8,6 +8,7 @@ import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from .config import Settings, get_settings
+from .guardrails import BasicGuardrail
 from .model_source import resolve_model_source
 from .prompting import build_chat_messages, ensure_system_message
 from .retrieval import NullRetriever, Retriever
@@ -21,6 +22,8 @@ class GenerationResult:
     text: str
     input_tokens: int
     output_tokens: int
+    finish_reason: str = "stop"
+    guardrail_category: str | None = None
 
 
 class SilabsAIEngine:
@@ -30,9 +33,11 @@ class SilabsAIEngine:
         self,
         settings: Settings | None = None,
         retriever: Retriever | None = None,
+        guardrail: BasicGuardrail | None = None,
     ) -> None:
         self.settings = settings or get_settings()
         self.retriever = retriever or NullRetriever()
+        self.guardrail = guardrail or BasicGuardrail()
         self._tokenizer = None
         self._model = None
         self._load_lock = threading.Lock()
@@ -51,6 +56,32 @@ class SilabsAIEngine:
         if requested == "bfloat16":
             return torch.bfloat16
         return "auto"
+
+    def _apply_guardrail(self, text: str) -> GenerationResult | None:
+        if not self.settings.enable_guardrails:
+            return None
+
+        decision = self.guardrail.evaluate(text)
+        if decision is None:
+            return None
+
+        logger.info("Guardrail intercepted request: %s", decision.category)
+        return GenerationResult(
+            text=decision.response,
+            input_tokens=0,
+            output_tokens=0,
+            finish_reason="guardrail",
+            guardrail_category=decision.category,
+        )
+
+    @staticmethod
+    def _latest_user_content(messages: list[dict[str, str]]) -> str | None:
+        for message in reversed(messages):
+            if message.get("role") == "user":
+                content = message.get("content", "").strip()
+                if content:
+                    return content
+        return None
 
     def load(self) -> None:
         if self.loaded:
@@ -122,6 +153,12 @@ class SilabsAIEngine:
         temperature: float | None = None,
         top_p: float | None = None,
     ) -> GenerationResult:
+        user_content = self._latest_user_content(messages)
+        if user_content:
+            guarded = self._apply_guardrail(user_content)
+            if guarded is not None:
+                return guarded
+
         self.load()
         assert self._model is not None
         assert self._tokenizer is not None
@@ -173,6 +210,10 @@ class SilabsAIEngine:
         temperature: float | None = None,
         top_p: float | None = None,
     ) -> GenerationResult:
+        guarded = self._apply_guardrail(message)
+        if guarded is not None:
+            return guarded
+
         chunks = self.retriever.retrieve(message, limit=4)
         messages = build_chat_messages(
             message,
