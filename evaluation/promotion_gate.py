@@ -10,6 +10,7 @@ def assess(
     *,
     min_score_delta: float = 0.0,
     max_regressions: int = 0,
+    min_candidate_score: float = 0.0,
 ) -> tuple[bool, list[str]]:
     reasons: list[str] = []
 
@@ -18,6 +19,11 @@ def assess(
     delta = float(comparison.get("score_delta", candidate - baseline))
     regressions = comparison.get("regressions", [])
 
+    if candidate < min_candidate_score:
+        reasons.append(
+            f"candidate score {candidate:.1%} is below required "
+            f"{min_candidate_score:.1%}"
+        )
     if delta < min_score_delta:
         reasons.append(
             f"score delta {delta:+.1%} is below required {min_score_delta:+.1%}"
@@ -37,6 +43,7 @@ def main() -> None:
     parser.add_argument("comparison", type=Path)
     parser.add_argument("--min-score-delta", type=float, default=0.0)
     parser.add_argument("--max-regressions", type=int, default=0)
+    parser.add_argument("--min-candidate-score", type=float, default=0.0)
     args = parser.parse_args()
 
     data = json.loads(args.comparison.read_text(encoding="utf-8"))
@@ -44,6 +51,7 @@ def main() -> None:
         data,
         min_score_delta=args.min_score_delta,
         max_regressions=args.max_regressions,
+        min_candidate_score=args.min_candidate_score,
     )
 
     print(f"baseline: {float(data.get('baseline_score', 0.0)):.1%}")
