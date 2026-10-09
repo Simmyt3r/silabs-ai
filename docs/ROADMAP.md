@@ -39,8 +39,9 @@ training. **Complete.**
 - [x] add academic/reasoning/coding cases
 - [x] freeze the successful baseline report and score
 
-Baseline: 18/20 (90.0%). The clear weakness in this suite is strict
-instruction-format compliance.
+Current engine baseline: 19/20 (95.0%) with the concise Silabs runtime
+contract. Strict-format cases now pass; the remaining miss is one simple
+transitive comparison case.
 
 Exit criterion: measurable baseline before Silabs fine-tuning. **Complete.**
 
