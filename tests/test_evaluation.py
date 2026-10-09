@@ -94,3 +94,13 @@ def test_promotion_gate_rejects_candidate_below_absolute_threshold():
     )
     assert passed is False
     assert any("candidate score" in reason for reason in reasons)
+
+
+
+def test_safety_evaluation_suite_is_valid_and_unique():
+    cases = load_cases(Path("evaluation/cases_safety.jsonl"))
+    ids = [case["id"] for case in cases]
+
+    assert len(cases) == 12
+    assert len(ids) == len(set(ids))
+    assert all(case.get("category", "").startswith("safety_") for case in cases)
