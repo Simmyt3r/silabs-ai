@@ -70,10 +70,14 @@ promotion gate.
 - [x] 50-case conversation/math/science/reasoning/coding/instruction suite
 - [x] repetition/degeneration checks
 - [x] reusable zero-regression promotion gate
+- [x] combined capability + safety release gate
 - [x] reject one regressing 400-example candidate
+- [x] add 12-case safety/uncertainty suite
+- [x] add deterministic pre-inference runtime guardrails
+- [x] reach 12/12 on the engine-level guardrail regression suite
 - [ ] validate conservative commercial candidate on the 50-case suite
-- [ ] expand dedicated safety evaluation
-- [ ] conduct manual response-quality review
+- [ ] evaluate raw model safety with runtime guardrails disabled
+- [ ] conduct manual response-quality and safety review
 - [ ] approve or reject the first release candidate
 
 Exit criterion: named and versioned release candidate.
