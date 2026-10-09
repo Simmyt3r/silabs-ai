@@ -138,3 +138,27 @@ decision.
 The forward capability suite is `evaluation/cases_extended_v2.jsonl`, which
 corrects two evaluator-only quirks while preserving the genuine behavioral
 failures.
+
+
+## Alignment smoke: infrastructure timeout, retry active
+
+Workflow run: `37891192542`
+
+The first balanced-alignment run successfully rebuilt the commercially screened
+corpus, produced an exactly balanced 180-record public training subset
+(30 records from each of ARC Challenge, ARC Easy, GSM8K, HotpotQA, OASST1 and
+OpenMathInstruct-2), added 45 benchmark-disjoint Silabs alignment records,
+created a 60-record balanced dev set, and passed preflight with zero train/dev
+overlap and zero evaluation-prompt leakage.
+
+The LoRA training step was cancelled by the workflow's 75-minute job timeout.
+This is recorded as an infrastructure timeout, not a model-quality failure.
+
+The workflow is now split into two jobs:
+
+1. preparation and base baselines, with its own 45-minute budget;
+2. training, candidate evaluation and promotion gates, with a fresh 120-minute
+   budget.
+
+The training data and baseline reports are transferred between jobs as a
+GitHub Actions artifact so the experiment itself remains unchanged.
