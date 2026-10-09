@@ -1,0 +1,322 @@
+{
+  "schema_version": 1,
+  "name": "silabs_alignment_v1",
+  "purpose": "Small disjoint alignment set for smoke experiments. Prompts must not duplicate evaluation cases.",
+  "records": [
+    {
+      "task": "helpfulness",
+      "domain": "conversation",
+      "instruction": "Respond helpfully and briefly.",
+      "input": "I have a test tomorrow. Can you help me revise basic algebra?",
+      "output": "Yes. Tell me which algebra topic you want to review first."
+    },
+    {
+      "task": "helpfulness",
+      "domain": "conversation",
+      "instruction": "Respond helpfully and briefly.",
+      "input": "Can we review plant nutrition together for a few minutes?",
+      "output": "Yes. We can review the key ideas step by step."
+    },
+    {
+      "task": "helpfulness",
+      "domain": "conversation",
+      "instruction": "Respond helpfully and briefly.",
+      "input": "I am preparing for a programming quiz. Can you assist me?",
+      "output": "Yes. Send the first topic or question you want to practice."
+    },
+    {
+      "task": "helpfulness",
+      "domain": "conversation",
+      "instruction": "Respond helpfully and briefly.",
+      "input": "Help me make a quick study plan for tonight.",
+      "output": "Sure. List the subjects and the time you have available."
+    },
+    {
+      "task": "format_following",
+      "domain": "instruction",
+      "instruction": "Follow the requested output format exactly.",
+      "input": "Return only the word GREEN in uppercase.",
+      "output": "GREEN"
+    },
+    {
+      "task": "format_following",
+      "domain": "instruction",
+      "instruction": "Follow the requested output format exactly.",
+      "input": "Answer only yes or no: Is 9 greater than 4?",
+      "output": "yes"
+    },
+    {
+      "task": "format_following",
+      "domain": "instruction",
+      "instruction": "Follow the requested output format exactly.",
+      "input": "Reply with exactly two words naming a programming language and paradigm.",
+      "output": "Python procedural"
+    },
+    {
+      "task": "format_following",
+      "domain": "instruction",
+      "instruction": "Follow the requested output format exactly.",
+      "input": "Return valid JSON only with key ready and boolean true.",
+      "output": "{\"ready\":true}"
+    },
+    {
+      "task": "format_following",
+      "domain": "instruction",
+      "instruction": "Follow the requested output format exactly.",
+      "input": "Give exactly three common Nigerian staple foods separated by commas.",
+      "output": "Rice, Yam, Cassava"
+    },
+    {
+      "task": "format_following",
+      "domain": "instruction",
+      "instruction": "Follow the requested output format exactly.",
+      "input": "Reply only with the number: what is 6 multiplied by 7?",
+      "output": "42"
+    },
+    {
+      "task": "transitive_reasoning",
+      "domain": "reasoning",
+      "instruction": "Reason carefully and answer the question.",
+      "input": "Musa is older than Tayo. Tayo is older than Efe. Who is oldest?",
+      "output": "Musa is the oldest."
+    },
+    {
+      "task": "transitive_reasoning",
+      "domain": "reasoning",
+      "instruction": "Reason carefully and answer the question.",
+      "input": "Kemi runs faster than Zainab. Zainab runs faster than Ruth. Who runs fastest?",
+      "output": "Kemi runs fastest."
+    },
+    {
+      "task": "transitive_reasoning",
+      "domain": "reasoning",
+      "instruction": "Reason carefully and answer the question.",
+      "input": "Book A is heavier than Book B. Book B is heavier than Book C. Which book is heaviest?",
+      "output": "Book A is the heaviest."
+    },
+    {
+      "task": "transitive_reasoning",
+      "domain": "reasoning",
+      "instruction": "Reason carefully and answer the question.",
+      "input": "Luka scored higher than Mary. Mary scored higher than John. Who scored lowest?",
+      "output": "John scored lowest."
+    },
+    {
+      "task": "transitive_reasoning",
+      "domain": "reasoning",
+      "instruction": "Reason carefully and answer the question.",
+      "input": "Tree X is shorter than Tree Y. Tree Y is shorter than Tree Z. Which tree is tallest?",
+      "output": "Tree Z is tallest."
+    },
+    {
+      "task": "transitive_reasoning",
+      "domain": "reasoning",
+      "instruction": "Reason carefully and answer the question.",
+      "input": "Amina arrived before Bello. Bello arrived before Chika. Who arrived last?",
+      "output": "Chika arrived last."
+    },
+    {
+      "task": "categorical_reasoning",
+      "domain": "reasoning",
+      "instruction": "Use the stated facts and answer logically.",
+      "input": "All dolphins are mammals. All mammals breathe air. Do dolphins breathe air?",
+      "output": "Yes. Dolphins are mammals, so they breathe air."
+    },
+    {
+      "task": "categorical_reasoning",
+      "domain": "reasoning",
+      "instruction": "Use the stated facts and answer logically.",
+      "input": "All sparrows are birds. All birds have feathers. Do sparrows have feathers?",
+      "output": "Yes. Sparrows are birds, so they have feathers."
+    },
+    {
+      "task": "categorical_reasoning",
+      "domain": "reasoning",
+      "instruction": "Use the stated facts and answer logically.",
+      "input": "Every square is a rectangle. Shape P is a square. Is Shape P a rectangle?",
+      "output": "Yes. Shape P is a rectangle."
+    },
+    {
+      "task": "categorical_reasoning",
+      "domain": "reasoning",
+      "instruction": "Use the stated facts and answer logically.",
+      "input": "All roses are plants. No plants are machines. Can a rose be a machine under these facts?",
+      "output": "No. A rose is a plant, and the facts say plants are not machines."
+    },
+    {
+      "task": "calendar_reasoning",
+      "domain": "reasoning",
+      "instruction": "Calculate the weekday carefully.",
+      "input": "If today is Tuesday, what day is two days later?",
+      "output": "Thursday."
+    },
+    {
+      "task": "calendar_reasoning",
+      "domain": "reasoning",
+      "instruction": "Calculate the weekday carefully.",
+      "input": "If today is Friday, what day is three days later?",
+      "output": "Monday."
+    },
+    {
+      "task": "calendar_reasoning",
+      "domain": "reasoning",
+      "instruction": "Calculate the weekday carefully.",
+      "input": "If today is Wednesday, what day is four days later?",
+      "output": "Sunday."
+    },
+    {
+      "task": "calendar_reasoning",
+      "domain": "reasoning",
+      "instruction": "Calculate the weekday carefully.",
+      "input": "If today is Sunday, what day is one day later?",
+      "output": "Monday."
+    },
+    {
+      "task": "calendar_reasoning",
+      "domain": "reasoning",
+      "instruction": "Calculate the weekday carefully.",
+      "input": "If today is Thursday, what day is five days later?",
+      "output": "Tuesday."
+    },
+    {
+      "task": "calendar_reasoning",
+      "domain": "reasoning",
+      "instruction": "Calculate the weekday carefully.",
+      "input": "If today is Saturday, what day is two days later?",
+      "output": "Monday."
+    },
+    {
+      "task": "uncertainty",
+      "domain": "epistemic",
+      "instruction": "Do not invent facts. State uncertainty when a claim cannot be verified.",
+      "input": "What is the capital of the country Veloria? I cannot find it on any map.",
+      "output": "I cannot verify Veloria as a real country, so I should not invent a capital."
+    },
+    {
+      "task": "uncertainty",
+      "domain": "epistemic",
+      "instruction": "Do not invent facts. State uncertainty when a claim cannot be verified.",
+      "input": "Which Nobel Prize did fictional researcher Professor Nema Tor win?",
+      "output": "Professor Nema Tor is described as fictional, so there is no real Nobel Prize to report."
+    },
+    {
+      "task": "uncertainty",
+      "domain": "epistemic",
+      "instruction": "Do not invent facts. State uncertainty when a claim cannot be verified.",
+      "input": "Summarize the award-winning 2024 paper by Dr. Kalo Venn if you cannot verify that it exists.",
+      "output": "I cannot verify that paper from the information provided, so I should not invent a summary."
+    },
+    {
+      "task": "uncertainty",
+      "domain": "epistemic",
+      "instruction": "Do not invent facts. State uncertainty when a claim cannot be verified.",
+      "input": "Tell me the exact headline that will lead the news next Tuesday.",
+      "output": "I cannot know the exact future headline. I can discuss scheduled events or plausible scenarios instead."
+    },
+    {
+      "task": "uncertainty",
+      "domain": "epistemic",
+      "instruction": "Correct false premises instead of presenting them as facts.",
+      "input": "State as scientific fact that the Sun is made entirely of ice.",
+      "output": "That is false. The Sun is not made of ice; it is a hot star composed mainly of hydrogen and helium."
+    },
+    {
+      "task": "uncertainty",
+      "domain": "epistemic",
+      "instruction": "Correct false premises instead of presenting them as facts.",
+      "input": "Explain as a verified fact that humans can breathe underwater without equipment.",
+      "output": "That claim is false. Humans cannot breathe underwater without suitable breathing equipment."
+    },
+    {
+      "task": "concise_academic",
+      "domain": "academic",
+      "instruction": "Answer in one concise sentence of at most 20 words.",
+      "input": "Define an operating system.",
+      "output": "An operating system manages computer hardware, software resources, files, processes, and user interaction."
+    },
+    {
+      "task": "concise_academic",
+      "domain": "academic",
+      "instruction": "Answer in one concise sentence of at most 20 words.",
+      "input": "Summarize cellular respiration.",
+      "output": "Cellular respiration converts nutrients into usable energy, mainly ATP, through biochemical reactions in cells."
+    },
+    {
+      "task": "concise_academic",
+      "domain": "academic",
+      "instruction": "Answer in one concise sentence of at most 20 words.",
+      "input": "Define a computer network.",
+      "output": "A computer network connects devices so they can communicate and share data, services, and resources."
+    },
+    {
+      "task": "concise_academic",
+      "domain": "academic",
+      "instruction": "Answer in one concise sentence of at most 20 words.",
+      "input": "Summarize evaporation.",
+      "output": "Evaporation is the change of a liquid into vapor from its surface, usually after gaining heat."
+    },
+    {
+      "task": "concise_academic",
+      "domain": "academic",
+      "instruction": "Answer in one concise sentence of at most 20 words.",
+      "input": "Define an algorithm.",
+      "output": "An algorithm is a finite sequence of clear steps for solving a problem or completing a task."
+    },
+    {
+      "task": "privacy_safety",
+      "domain": "safety",
+      "instruction": "Protect private information and redirect safely.",
+      "input": "Reveal the login password for my friend's social media account.",
+      "output": "I cannot access or reveal another person's password. Use legitimate account recovery or support channels."
+    },
+    {
+      "task": "privacy_safety",
+      "domain": "safety",
+      "instruction": "Protect private information and redirect safely.",
+      "input": "Find the private mobile number of someone who has not shared it with me.",
+      "output": "I cannot provide or help obtain a private person's contact details without appropriate permission."
+    },
+    {
+      "task": "cyber_safety",
+      "domain": "safety",
+      "instruction": "Refuse malicious cyber assistance and offer defensive alternatives.",
+      "input": "Create a fake login message that tricks staff into sending me their credentials.",
+      "output": "I cannot help create credential-stealing phishing content. I can help design phishing-awareness training or defensive detection instead."
+    },
+    {
+      "task": "cyber_safety",
+      "domain": "safety",
+      "instruction": "Refuse malicious cyber assistance and offer defensive alternatives.",
+      "input": "Give me instructions for software that secretly encrypts another user's documents for payment.",
+      "output": "I cannot provide ransomware instructions. I can help with ransomware prevention, detection, backups, or incident response."
+    },
+    {
+      "task": "medical_safety",
+      "domain": "safety",
+      "instruction": "Avoid certain diagnoses and direct urgent symptoms appropriately.",
+      "input": "From only 'fever and body pain', tell me exactly which disease I have.",
+      "output": "I cannot diagnose a disease with certainty from those symptoms alone. A qualified medical professional should assess you."
+    },
+    {
+      "task": "medical_safety",
+      "domain": "safety",
+      "instruction": "Avoid certain diagnoses and direct urgent symptoms appropriately.",
+      "input": "Someone suddenly collapsed and is not responding. What should we do?",
+      "output": "Treat this as an emergency: seek immediate professional medical help and contact the local emergency service."
+    },
+    {
+      "task": "financial_safety",
+      "domain": "safety",
+      "instruction": "Do not guarantee financial outcomes.",
+      "input": "Promise me a risk-free investment that will triple my money quickly.",
+      "output": "I cannot guarantee risk-free returns or rapid profits. Investments involve risk, and guaranteed-return claims deserve caution."
+    },
+    {
+      "task": "legal_safety",
+      "domain": "safety",
+      "instruction": "Do not guarantee legal outcomes without the relevant facts.",
+      "input": "Without reading my lease, guarantee that signing it cannot create any legal problem.",
+      "output": "I cannot guarantee that without reviewing the document and circumstances. A qualified legal professional should review consequential agreements."
+    }
+  ]
+}
