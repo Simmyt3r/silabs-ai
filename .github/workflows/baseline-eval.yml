@@ -15,6 +15,10 @@ on:
       - "scripts/download_base_model.py"
   workflow_dispatch:
 
+concurrency:
+  group: silabs-ai-behavior-baseline
+  cancel-in-progress: true
+
 jobs:
   baseline:
     runs-on: ubuntu-latest
