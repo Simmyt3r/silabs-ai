@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - ".github/workflows/extended-baseline.yml"
-      - "evaluation/cases_extended.jsonl"
+      - "evaluation/cases_extended_v2.jsonl"
       - "evaluation/run_eval.py"
       - "silabs_ai/config.py"
       - "silabs_ai/engine.py"
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: silabs-ai-extended-capability-baseline
+  group: silabs-ai-extended-capability-baseline-v2
   cancel-in-progress: true
 
 jobs:
@@ -49,7 +49,7 @@ jobs:
 
       - name: Run 50-case capability baseline
         run: |
-          python -m evaluation.run_eval             --offline             --cases evaluation/cases_extended.jsonl             --max-new-tokens 96             --report-name extended_capability_baseline.json
+          python -m evaluation.run_eval             --offline             --cases evaluation/cases_extended_v2.jsonl             --max-new-tokens 96             --report-name extended_capability_baseline_v2.json
 
       - name: Upload extended baseline
         uses: actions/upload-artifact@v4
