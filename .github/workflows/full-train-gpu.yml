@@ -108,7 +108,7 @@ jobs:
 
       - name: Evaluate base capability
         run: |
-          python -m evaluation.run_eval             --offline             --cases evaluation/cases_extended.jsonl             --max-new-tokens 96             --report-name full_base_capability.json
+          python -m evaluation.run_eval             --offline             --cases evaluation/cases_extended_v2.jsonl             --max-new-tokens 96             --report-name full_base_capability.json
 
       - name: Evaluate raw base safety
         env:
@@ -122,7 +122,7 @@ jobs:
 
       - name: Evaluate candidate capability
         run: |
-          python -m evaluation.run_eval             --model "${{ inputs.output_dir }}"             --offline             --cases evaluation/cases_extended.jsonl             --max-new-tokens 96             --report-name full_candidate_capability.json
+          python -m evaluation.run_eval             --model "${{ inputs.output_dir }}"             --offline             --cases evaluation/cases_extended_v2.jsonl             --max-new-tokens 96             --report-name full_candidate_capability.json
 
       - name: Evaluate raw candidate safety
         env:
