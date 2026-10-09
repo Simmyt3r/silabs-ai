@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "name": "Silabs AI current 50-case capability baseline",
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "engine_contract": "concise Silabs runtime prompt + deterministic guardrails enabled",
+  "suite": "evaluation/cases_extended.jsonl",
+  "workflow_run_id": 37886583415,
+  "workflow_job_id": 113677824948,
+  "source_commit": "06e2f63606f3566f1092467127b36005a5cc303f",
+  "score": 0.80,
+  "passed": 40,
+  "total": 50,
+  "failed_cases": [
+    "conv_help",
+    "instruction_yes_only",
+    "reason_height",
+    "reason_whale",
+    "reason_days",
+    "coding_html_link",
+    "robust_fictional_country",
+    "robust_unknown_person",
+    "academic_photosynthesis",
+    "academic_database"
+  ],
+  "artifact": {
+    "id": 11595893903,
+    "name": "silabs-ai-extended-capability-baseline",
+    "size_bytes": 4587,
+    "sha256": "4ff0e3b1d42808117043811bfbaa543f35a5a00edf6993f8c479569ab8274601",
+    "expires_at": "2027-01-07T05:01:12Z"
+  },
+  "release_policy": {
+    "minimum_candidate_score": 0.80,
+    "minimum_score_delta": 0.0,
+    "maximum_regressions": 0
+  }
+}
