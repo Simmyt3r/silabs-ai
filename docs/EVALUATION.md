@@ -55,7 +55,7 @@ must also receive manual review and broader academic, safety and domain testing.
 
 ## Expanded capability suite
 
-`evaluation/cases_extended.jsonl` contains 50 deterministic cases covering
+`evaluation/cases_extended_v2.jsonl` contains 50 deterministic cases covering
 conversation, Silabs identity, strict instruction following, arithmetic,
 reasoning, science, coding, robustness and short academic responses.
 
@@ -64,7 +64,7 @@ Use it for candidate decisions rather than relying only on the original
 
 ```bash
 python -m evaluation.run_eval \
-  --cases evaluation/cases_extended.jsonl \
+  --cases evaluation/cases_extended_v2.jsonl \
   --offline \
   --report-name capability_50.json
 ```
@@ -93,3 +93,12 @@ an explicit reviewed exception is recorded.
 
 Passing automated gates is still not sufficient for release. Manual response
 quality review remains mandatory before a named Silabs AI version is promoted.
+
+
+### Historical v1 suite
+
+`evaluation/cases_extended.jsonl` remains committed so older experiment
+reports can be reproduced exactly. New promotion decisions use
+`evaluation/cases_extended_v2.jsonl`, which corrects two evaluator-only
+false negatives without weakening the substantive reasoning, robustness,
+academic or coding checks.
