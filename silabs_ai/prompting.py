@@ -41,8 +41,21 @@ def ensure_system_message(
     messages: list[dict[str, str]],
     system_prompt: str | None,
 ) -> list[dict[str, str]]:
+    """Ensure the engine's base system contract cannot be replaced by clients."""
     if not system_prompt:
         return messages
+
+    base = system_prompt.strip()
     if messages and messages[0].get("role") == "system":
-        return messages
-    return [{"role": "system", "content": system_prompt.strip()}, *messages]
+        existing = messages[0].get("content", "").strip()
+        if not existing or existing == base:
+            return [{"role": "system", "content": base}, *messages[1:]]
+
+        prefix = base + "\n\nAdditional application instructions:\n"
+        if existing.startswith(prefix):
+            return messages
+
+        combined = prefix + existing
+        return [{"role": "system", "content": combined}, *messages[1:]]
+
+    return [{"role": "system", "content": base}, *messages]
