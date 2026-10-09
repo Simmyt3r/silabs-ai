@@ -17,3 +17,17 @@ def test_model_status():
     response = client.get("/v1/model")
     assert response.status_code == 200
     assert "model_id" in response.json()
+
+
+
+def test_default_system_prompt_contains_runtime_guardrails():
+    from silabs_ai.config import Settings
+
+    prompt = Settings().system_prompt.lower()
+
+    assert "do not invent facts" in prompt
+    assert "private information" in prompt
+    assert "phishing" in prompt
+    assert "ransomware" in prompt
+    assert "urgent medical" in prompt
+    assert "financial or legal outcomes" in prompt
