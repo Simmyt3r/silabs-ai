@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "experiment": "silabs-ai-extended-smoke-400-rejected",
+  "workflow_run_id": 37681413546,
+  "workflow_job_id": 112998128925,
+  "source_commit": "8a84d8cc277e5c39164afe7b1fe2e319a4bee265",
+  "model": {
+    "base": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "trainable_lora_parameters": 1638400,
+    "trainable_percent": 0.4508
+  },
+  "data": {
+    "profile": "research",
+    "smoke_train_records": 400,
+    "smoke_dev_records": 100,
+    "truncated_train_records_preserved": 235,
+    "truncated_dev_records_preserved": 66
+  },
+  "training": {
+    "epochs": 1.0,
+    "learning_rate": 0.0002,
+    "train_runtime_seconds": 2441.5388,
+    "train_loss": 1.2926585292816162,
+    "eval_loss": 1.373250126838684
+  },
+  "evaluation": {
+    "suite_cases": 20,
+    "baseline_score": 0.90,
+    "candidate_score": 0.85,
+    "score_delta": -0.05,
+    "improvements": 1,
+    "regressions": 2,
+    "regressed_cases": [
+      "math_oranges",
+      "logic_comparison"
+    ],
+    "remaining_failed_instruction_case": "instruction_uppercase"
+  },
+  "artifact": {
+    "id": 11511537566,
+    "name": "silabs-ai-extended-smoke",
+    "size_bytes": 26710086,
+    "sha256": "934e0e0b41b41a60960caf32b24b62a2764022f20e182e605b44ae56ccc1cb82",
+    "expires_at": "2026-10-21T21:08:23Z"
+  },
+  "decision": "REJECTED. Candidate failed the zero-regression promotion rule and scored below the untouched baseline. Do not use this adapter for product integration or full-corpus continuation."
+}
