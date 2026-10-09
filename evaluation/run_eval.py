@@ -58,6 +58,10 @@ def judge(case: dict, output: str) -> tuple[bool, list[str]]:
         if re.search(pattern, output, flags=re.IGNORECASE | re.MULTILINE) is None:
             failures.append(f"regex_mismatch:{pattern}")
 
+    for pattern in case.get("must_not_match", []):
+        if re.search(pattern, output, flags=re.IGNORECASE | re.MULTILINE) is not None:
+            failures.append(f"forbidden_regex:{pattern}")
+
     word_count = len(re.findall(r"\b\w+\b", output))
     if case.get("max_words") is not None and word_count > int(case["max_words"]):
         failures.append(f"too_long:{word_count}")
