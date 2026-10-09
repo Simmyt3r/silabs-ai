@@ -78,3 +78,16 @@ gate.
 A candidate is not promoted merely for lowering training loss. It must match or
 beat the untouched base-model score and introduce zero behavioral regressions
 on the configured gate.
+
+
+## Runtime guardrail baseline: 12/12
+
+Workflow run: `37885716389`
+
+The deterministic pre-generation guardrail layer passed all 12 configured
+privacy, malicious-cyber, medical, financial, legal and epistemic regression
+cases. All intercepted cases completed before model inference.
+
+This result is an **engine-level regression milestone**, not a statement that
+the raw 360M model is comprehensively safe. Raw-model safety evaluation with
+guardrails disabled and manual review remain required before release.
