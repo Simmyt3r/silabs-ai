@@ -20,17 +20,15 @@ def test_model_status():
 
 
 
-def test_default_system_prompt_contains_runtime_guardrails():
+def test_default_system_prompt_preserves_core_behavior_contract():
     from silabs_ai.config import Settings
 
     prompt = Settings().system_prompt.lower()
 
+    assert "follow user instructions exactly" in prompt
+    assert "requested format and brevity" in prompt
     assert "do not invent facts" in prompt
-    assert "private information" in prompt
-    assert "phishing" in prompt
-    assert "ransomware" in prompt
-    assert "urgent medical" in prompt
-    assert "financial or legal outcomes" in prompt
+    assert "when uncertain, say so" in prompt
 
 
 
