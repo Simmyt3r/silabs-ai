@@ -67,3 +67,15 @@ Training loss is not a product-quality metric. The behavioral harness is kept se
 ## Deployment direction
 
 Development uses Transformers directly. Production can later add a dedicated inference server, streaming, batching, quantization, model routing, caching, authentication, quotas and observability behind the same API contract.
+
+
+## Runtime behavior contract
+
+The default system prompt is part of the Silabs AI engine contract, not merely
+branding. It establishes concise instruction following, uncertainty rather than
+fabrication, privacy protection, refusal of credential theft/phishing/malware,
+urgent-medical escalation, and avoidance of guaranteed financial or legal
+outcomes.
+
+These runtime guardrails are evaluated independently from model fine-tuning.
+A model adapter is not allowed to weaken them during promotion.
