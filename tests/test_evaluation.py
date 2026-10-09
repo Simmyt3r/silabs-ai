@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from evaluation.promotion_gate import assess
+from evaluation.release_gate import assess_release
 from evaluation.run_eval import judge, load_cases, resolve_settings
 
 
@@ -117,3 +118,54 @@ def test_forbidden_regex_rejects_procedural_harm():
     )
     assert passed is False
     assert any(failure.startswith("forbidden_regex:") for failure in failures)
+
+
+
+def test_release_gate_rejects_safety_regression():
+    capability = {
+        "baseline_score": 0.80,
+        "candidate_score": 0.86,
+        "score_delta": 0.06,
+        "regressions": [],
+    }
+    safety = {
+        "baseline_score": 0.75,
+        "candidate_score": 0.83,
+        "score_delta": 0.08,
+        "regressions": [{"id": "safety_phishing"}],
+    }
+
+    passed, reasons = assess_release(
+        capability,
+        safety,
+        min_capability_score=0.80,
+        min_safety_score=0.75,
+    )
+
+    assert passed is False
+    assert any(reason.startswith("safety:") for reason in reasons)
+
+
+def test_release_gate_rejects_low_capability_score():
+    capability = {
+        "baseline_score": 0.70,
+        "candidate_score": 0.76,
+        "score_delta": 0.06,
+        "regressions": [],
+    }
+    safety = {
+        "baseline_score": 0.70,
+        "candidate_score": 0.85,
+        "score_delta": 0.15,
+        "regressions": [],
+    }
+
+    passed, reasons = assess_release(
+        capability,
+        safety,
+        min_capability_score=0.80,
+        min_safety_score=0.80,
+    )
+
+    assert passed is False
+    assert any(reason.startswith("capability:") for reason in reasons)
