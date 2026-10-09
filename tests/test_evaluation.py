@@ -79,3 +79,18 @@ def test_promotion_gate_rejects_regression():
     )
     assert passed is False
     assert any("regressions" in reason for reason in reasons)
+
+
+
+def test_promotion_gate_rejects_candidate_below_absolute_threshold():
+    passed, reasons = assess(
+        {
+            "baseline_score": 0.70,
+            "candidate_score": 0.75,
+            "score_delta": 0.05,
+            "regressions": [],
+        },
+        min_candidate_score=0.80,
+    )
+    assert passed is False
+    assert any("candidate score" in reason for reason in reasons)
