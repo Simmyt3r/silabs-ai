@@ -92,6 +92,8 @@ def generate(payload: GenerateRequest) -> GenerationResponse:
     return GenerationResponse(
         text=result.text,
         model=settings.model_id,
+        finish_reason=result.finish_reason,
+        guardrail_category=result.guardrail_category,
         input_tokens=result.input_tokens,
         output_tokens=result.output_tokens,
     )
