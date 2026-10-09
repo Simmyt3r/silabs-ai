@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "name": "SmolLM2-360M-Instruct with concise Silabs runtime contract",
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "evaluation_suite": "evaluation/cases.jsonl",
+  "workflow_run_id": 37886083838,
+  "workflow_job_id": 113676292389,
+  "source_commit": "3e9ff0e1c75e4aafc02d7eae0bcd4594eadea068",
+  "score": 0.95,
+  "passed": 19,
+  "total": 20,
+  "elapsed_seconds": 35.80,
+  "failed_cases": [
+    "logic_comparison"
+  ],
+  "artifact": {
+    "id": 11595759927,
+    "name": "silabs-ai-baseline-smollm2-360m",
+    "size_bytes": 2228,
+    "sha256": "c75dc5a1c88340d1ee9777bcfdd059468a9c3672feeca79698225ad522804bbe",
+    "expires_at": "2027-01-07T04:54:52Z"
+  },
+  "notes": [
+    "The concise runtime contract improved the original 20-case engine baseline from 90% to 95%.",
+    "Strict uppercase and three-item formatting cases now pass.",
+    "The remaining miss is a simple transitive comparison case."
+  ]
+}
