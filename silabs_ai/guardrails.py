@@ -78,7 +78,7 @@ class BasicGuardrail:
         if self._credential.search(prompt) and self._credential_intent.search(prompt):
             return GuardrailDecision(
                 "credentials",
-                "I can’t access, reveal, or help steal passwords or other account "
+                "I cannot access, reveal, or help steal passwords or other account "
                 "credentials. Use the service’s official account-recovery or support "
                 "process if you need to regain access.",
             )
@@ -86,7 +86,7 @@ class BasicGuardrail:
         if self._private_pii.search(prompt):
             return GuardrailDecision(
                 "private_information",
-                "I can’t provide or help obtain a private person’s home address or "
+                "I cannot provide or help obtain a private person’s home address or "
                 "private contact details. I can help with legitimate public contact "
                 "channels instead.",
             )
@@ -94,7 +94,7 @@ class BasicGuardrail:
         if self._cyber_object.search(prompt) and self._cyber_harm_intent.search(prompt):
             return GuardrailDecision(
                 "malicious_cyber",
-                "I can’t provide instructions or content for phishing, credential "
+                "I cannot provide instructions or content for phishing, credential "
                 "theft, malware, ransomware, or attacks on other people’s systems. "
                 "I can help with detection, prevention, secure testing, incident "
                 "response, or recovery.",
@@ -111,7 +111,7 @@ class BasicGuardrail:
         if self._diagnosis_certainty.search(prompt):
             return GuardrailDecision(
                 "medical_uncertainty",
-                "I can’t diagnose an illness with certainty from a short description. "
+                "I cannot diagnose an illness with certainty from a short description. "
                 "Symptoms such as fever and headache have many possible causes. A "
                 "qualified medical professional should assess you, especially if "
                 "symptoms are severe, persistent, or worsening.",
@@ -120,7 +120,7 @@ class BasicGuardrail:
         if self._financial_guarantee.search(prompt):
             return GuardrailDecision(
                 "financial_guarantee",
-                "I can’t guarantee an investment return or promise that money will "
+                "I cannot guarantee an investment return or promise that money will "
                 "double. Investments involve risk, and claims of guaranteed rapid "
                 "returns should be treated cautiously.",
             )
@@ -128,7 +128,7 @@ class BasicGuardrail:
         if self._legal_certainty.search(prompt):
             return GuardrailDecision(
                 "legal_certainty",
-                "I can’t guarantee that a legal decision is safe without reviewing "
+                "I cannot guarantee that a legal decision is safe without reviewing "
                 "the relevant facts and documents. For a consequential contract or "
                 "legal decision, have a qualified legal professional review it.",
             )
@@ -136,7 +136,7 @@ class BasicGuardrail:
         if self._future_certainty.search(prompt):
             return GuardrailDecision(
                 "future_certainty",
-                "I can’t know or guarantee exactly what future news event will happen. "
+                "I cannot know or guarantee exactly what future news event will happen. "
                 "I can discuss scheduled events, forecasts, or scenarios when reliable "
                 "current sources are available.",
             )
@@ -144,7 +144,7 @@ class BasicGuardrail:
         if self._forced_false_claim.search(prompt):
             return GuardrailDecision(
                 "unverified_claim",
-                "I can’t present an unverified claim as a verified fact. I can help "
+                "I cannot present an unverified claim as a verified fact. I can help "
                 "check the evidence and distinguish established facts from myths or "
                 "unsupported claims.",
             )
@@ -152,7 +152,7 @@ class BasicGuardrail:
         if self._unverified_award_study.search(prompt):
             return GuardrailDecision(
                 "source_verification",
-                "I can’t verify that specific award-winning study from the information "
+                "I cannot verify that specific award-winning study from the information "
                 "provided. Please provide a citation or use a retrieval-enabled source "
                 "check before treating the claim as factual.",
             )
