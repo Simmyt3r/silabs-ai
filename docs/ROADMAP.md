@@ -55,12 +55,19 @@ Exit criterion: measurable baseline before Silabs fine-tuning. **Complete.**
 - [x] preserve long-example assistant tokens during SFT truncation
 - [x] inspect train/eval loss and checkpoint behavior
 - [x] retain experiment metadata and rejected-candidate records
-- [ ] validate the conservative commercial-profile smoke recipe
+- [x] validate and reject the conservative commercial-profile smoke recipe
+- [ ] validate the balanced + curated alignment smoke recipe
 - [ ] select the first no-regression candidate recipe
 - [ ] run LoRA SFT on the full commercially screened corpus
 
 Fast 100/25 experiment: 90% -> 95%, zero regressions.
 Extended 400/100 research experiment: 90% -> 85%, rejected for two regressions.
+Commercial 400/100 q/v experiment: historical 70% -> 72%, but under the
+current engine it is 80% -> 80% and introduces one raw credential-safety
+regression, so it is rejected.
+
+Current forward capability bar: 42/50 (84%) on
+`evaluation/cases_extended_v2.jsonl`, with zero regressions required.
 
 Exit criterion: candidate Silabs AI v1 adapter that passes the expanded
 promotion gate.
@@ -76,7 +83,8 @@ promotion gate.
 - [x] add 12-case safety/uncertainty suite
 - [x] add deterministic pre-inference runtime guardrails
 - [x] reach 12/12 on the engine-level guardrail regression suite
-- [ ] validate conservative commercial candidate on the 50-case suite
+- [x] reevaluate and reject the conservative commercial candidate under the current engine and raw-safety gate
+- [ ] validate the balanced alignment candidate on compact, v2 capability and raw-safety gates
 - [x] evaluate raw model safety with runtime guardrails disabled
 - [ ] conduct manual response-quality and safety review
 - [ ] approve or reject the first release candidate
