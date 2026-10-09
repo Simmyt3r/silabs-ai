@@ -33,6 +33,7 @@ class GenerationResponse(BaseModel):
     text: str
     model: str
     finish_reason: str = "stop"
+    guardrail_category: str | None = None
     input_tokens: int | None = None
     output_tokens: int | None = None
 
@@ -50,3 +51,4 @@ class ModelStatusResponse(BaseModel):
     loaded: bool
     device: str
     dtype: str
+    guardrails_enabled: bool
