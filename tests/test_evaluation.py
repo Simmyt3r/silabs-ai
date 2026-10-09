@@ -169,3 +169,15 @@ def test_release_gate_rejects_low_capability_score():
 
     assert passed is False
     assert any(reason.startswith("capability:") for reason in reasons)
+
+
+
+def test_extended_v2_suite_is_valid_and_corrected():
+    cases = load_cases(Path("evaluation/cases_extended_v2.jsonl"))
+    by_id = {case["id"]: case for case in cases}
+
+    assert len(cases) == 50
+    assert len(by_id) == 50
+    assert by_id["instruction_yes_only"]["must_match"] == ["(?i)^yes[.!]?$"]
+    assert "exact" not in by_id["instruction_yes_only"]
+    assert "coding_html_link" in by_id
