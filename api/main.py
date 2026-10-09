@@ -47,6 +47,7 @@ def model_status() -> ModelStatusResponse:
         loaded=engine.loaded,
         device=settings.device,
         dtype=settings.dtype,
+        guardrails_enabled=settings.enable_guardrails,
     )
 
 
@@ -68,6 +69,8 @@ def chat(payload: ChatRequest) -> GenerationResponse:
     return GenerationResponse(
         text=result.text,
         model=settings.model_id,
+        finish_reason=result.finish_reason,
+        guardrail_category=result.guardrail_category,
         input_tokens=result.input_tokens,
         output_tokens=result.output_tokens,
     )
