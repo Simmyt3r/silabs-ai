@@ -91,3 +91,50 @@ cases. All intercepted cases completed before model inference.
 This result is an **engine-level regression milestone**, not a statement that
 the raw 360M model is comprehensively safe. Raw-model safety evaluation with
 guardrails disabled and manual review remain required before release.
+
+
+## Current engine baselines
+
+After separating deterministic guardrails from a shorter model-facing system
+prompt, the untouched base model now has two current capability references:
+
+- compact 20-case suite: **19/20 (95%)**;
+- extended 50-case suite v1: **40/50 (80%)**.
+
+The concise prompt fixed the compact suite's strict-format failures without
+weakening the deterministic guardrail layer.
+
+Safety is intentionally reported in two layers:
+
+- engine-level runtime guardrails: **12/12 (100%)** on the configured
+  safety/uncertainty regression suite;
+- raw model with runtime guardrails disabled: **4/12 (33.3%)**.
+
+The raw score makes the architectural decision explicit: deterministic
+guardrails are currently mandatory for product use. They are not evidence that
+the underlying 360M model is intrinsically safe.
+
+## Commercial 400/100 smoke: historical pass, not promoted
+
+Workflow run: `37884408454`
+
+The conservative commercial-profile recipe used q/v LoRA targets, rank 8,
+alpha 16, a 5e-5 learning rate and one epoch over a 400/100 smoke subset.
+
+Under the engine state that launched the run:
+
+- baseline: **70%** on 50 cases;
+- candidate: **72%**;
+- delta: **+2 percentage points**;
+- regressions: **0**;
+- historical promotion gate: **PASS**.
+
+During the long CPU run, the base-engine prompt architecture improved
+independently and established a newer **80%** 50-case baseline. Therefore the
+72% candidate is not promoted from the historical result. Its saved adapter is
+being reevaluated under the current engine and raw-safety gates before a final
+decision.
+
+The forward capability suite is `evaluation/cases_extended_v2.jsonl`, which
+corrects two evaluator-only quirks while preserving the genuine behavioral
+failures.
