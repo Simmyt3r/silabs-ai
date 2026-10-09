@@ -218,7 +218,7 @@ class SilabsAIEngine:
         messages = build_chat_messages(
             message,
             history,
-            system_prompt=system_prompt or self.settings.system_prompt,
+            system_prompt=system_prompt,
             retrieved_context=[chunk.text for chunk in chunks],
         )
         return self.generate(
