@@ -47,25 +47,34 @@ Exit criterion: measurable baseline before Silabs fine-tuning. **Complete.**
 ## Phase 3 - Training
 
 - [x] add deterministic smoke-subset generation
-- [x] add a 400/100 LoRA smoke-training recipe
+- [x] add 100/25 and 400/100 LoRA smoke recipes
 - [x] add base-versus-candidate report comparison
-- [ ] run the smoke experiment on the finalized corpus
-- [ ] evaluate the smoke checkpoint
-- [ ] run LoRA SFT on the finalized corpus
-- [ ] inspect train/eval loss and checkpoints
-- [ ] retain candidate metadata
+- [x] run smoke experiments on finalized research corpora
+- [x] evaluate smoke checkpoints
+- [x] preserve long-example assistant tokens during SFT truncation
+- [x] inspect train/eval loss and checkpoint behavior
+- [x] retain experiment metadata and rejected-candidate records
+- [ ] validate the conservative commercial-profile smoke recipe
+- [ ] select the first no-regression candidate recipe
+- [ ] run LoRA SFT on the full commercially screened corpus
 
-Exit criterion: candidate Silabs AI v1 adapter.
+Fast 100/25 experiment: 90% -> 95%, zero regressions.
+Extended 400/100 research experiment: 90% -> 85%, rejected for two regressions.
+
+Exit criterion: candidate Silabs AI v1 adapter that passes the expanded
+promotion gate.
 
 ## Phase 4 - Evaluation and promotion
 
-- [ ] base-versus-candidate comparison
-- [ ] conversation quality review
-- [ ] math/science/reasoning evaluation
-- [ ] instruction-following evaluation
-- [ ] repetition/degeneration checks
-- [ ] safety review
-- [ ] approve or reject candidate
+- [x] base-versus-candidate comparison tooling
+- [x] 50-case conversation/math/science/reasoning/coding/instruction suite
+- [x] repetition/degeneration checks
+- [x] reusable zero-regression promotion gate
+- [x] reject one regressing 400-example candidate
+- [ ] validate conservative commercial candidate on the 50-case suite
+- [ ] expand dedicated safety evaluation
+- [ ] conduct manual response-quality review
+- [ ] approve or reject the first release candidate
 
 Exit criterion: named and versioned release candidate.
 
