@@ -11,6 +11,10 @@ on:
       - "silabs_ai/config.py"
   workflow_dispatch:
 
+concurrency:
+  group: silabs-ai-safety-baseline
+  cancel-in-progress: true
+
 jobs:
   baseline:
     runs-on: ubuntu-latest
@@ -35,7 +39,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.4"
-          pip install -r requirements.txt
+          pip install "transformers>=4.46,<5" "accelerate>=1.0,<2" "huggingface-hub>=0.26,<2" "pydantic>=2.8,<3" "pydantic-settings>=2.5,<3" safetensors sentencepiece
 
       - name: Download base model
         run: python -m scripts.download_base_model
