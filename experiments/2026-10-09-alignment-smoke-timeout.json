@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "experiment": "silabs-ai-alignment-smoke-timeout",
+  "workflow_run_id": 37891192542,
+  "workflow_job_id": 113692283515,
+  "source_commit": "ac4b870c73d0c558dd6d76b4c46622223f7d311f",
+  "result": "CANCELLED_BY_WORKFLOW_TIMEOUT",
+  "data": {
+    "commercial_public_train_balanced": {
+      "arc_challenge": 30,
+      "arc_easy": 30,
+      "gsm8k": 30,
+      "hotpotqa": 30,
+      "oasst1": 30,
+      "openmathinstruct2": 30
+    },
+    "public_train_records": 180,
+    "curated_alignment_records": 45,
+    "final_train_records": 225,
+    "dev_records": 60,
+    "train_dev_overlap": 0,
+    "evaluation_prompt_leakage": 0
+  },
+  "preflight": "PASS",
+  "base_model_verification": "PASS",
+  "training": {
+    "started": true,
+    "trainable_lora_parameters": 819200,
+    "trainable_percent": 0.2259,
+    "truncated_train_records_preserved": 79,
+    "truncated_dev_records_preserved": 24,
+    "completed": false
+  },
+  "timing": {
+    "workflow_started_at": "2026-10-09T05:59:12Z",
+    "training_started_approximately_at": "2026-10-09T06:06:43Z",
+    "cancelled_at": "2026-10-09T07:14:38Z",
+    "original_job_timeout_minutes": 75
+  },
+  "artifact": {
+    "id": 11601151979,
+    "name": "silabs-ai-alignment-smoke",
+    "size_bytes": 11833,
+    "sha256": "22122dbb127f7a7ffbee802f018b4f917c69af46c39879916c330d5aa3b1dd11",
+    "expires_at": "2026-11-08T07:14:39Z"
+  },
+  "decision": "NOT A MODEL FAILURE. Preparation, balancing, leakage checks and preflight passed. The workflow was redesigned into separate prepare and train/evaluate jobs so training receives its own 120-minute budget."
+}
