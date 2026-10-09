@@ -75,6 +75,15 @@ class BasicGuardrail:
     def evaluate(self, text: str) -> GuardrailDecision | None:
         prompt = " ".join(text.split())
 
+        if self._cyber_object.search(prompt) and self._cyber_harm_intent.search(prompt):
+            return GuardrailDecision(
+                "malicious_cyber",
+                "I cannot provide instructions or content for phishing, credential "
+                "theft, malware, ransomware, or attacks on other people’s systems. "
+                "I can help with detection, prevention, secure testing, incident "
+                "response, or recovery.",
+            )
+
         if self._credential.search(prompt) and self._credential_intent.search(prompt):
             return GuardrailDecision(
                 "credentials",
@@ -89,15 +98,6 @@ class BasicGuardrail:
                 "I cannot provide or help obtain a private person’s home address or "
                 "private contact details. I can help with legitimate public contact "
                 "channels instead.",
-            )
-
-        if self._cyber_object.search(prompt) and self._cyber_harm_intent.search(prompt):
-            return GuardrailDecision(
-                "malicious_cyber",
-                "I cannot provide instructions or content for phishing, credential "
-                "theft, malware, ransomware, or attacks on other people’s systems. "
-                "I can help with detection, prevention, secure testing, incident "
-                "response, or recovery.",
             )
 
         if self._medical_emergency.search(prompt):
