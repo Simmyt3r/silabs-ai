@@ -1,0 +1,133 @@
+name: Full Silabs AI GPU Training
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "Dataset profile"
+        required: true
+        default: commercial
+        type: choice
+        options:
+          - commercial
+          - research
+      config:
+        description: "Training config path"
+        required: true
+        default: configs/smollm2-360m-sft.yaml
+        type: string
+      min_capability_score:
+        description: "Minimum candidate capability score"
+        required: true
+        default: "0.80"
+        type: string
+
+concurrency:
+  group: silabs-ai-full-gpu-training
+  cancel-in-progress: false
+
+jobs:
+  train:
+    runs-on: [self-hosted, linux, x64, gpu]
+    timeout-minutes: 720
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
+      SILABS_DEVICE: auto
+      SILABS_DTYPE: auto
+      SILABS_ENABLE_GUARDRAILS: "true"
+      SILABS_DATA_PROFILE: ${{ inputs.profile }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install training runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Require CUDA-capable runner
+        run: |
+          python - <<'PY'
+          import torch
+
+          print("torch:", torch.__version__)
+          print("cuda available:", torch.cuda.is_available())
+          print("cuda devices:", torch.cuda.device_count())
+          if not torch.cuda.is_available():
+              raise SystemExit(
+                  "This workflow requires a self-hosted runner with a CUDA GPU."
+              )
+          print("gpu:", torch.cuda.get_device_name(0))
+          PY
+
+      - name: Rebuild selected training corpus
+        run: |
+          python -m scripts.download_training_datasets --profile "$SILABS_DATA_PROFILE"
+          python -m scripts.finalize_training_data_v1_2
+
+      - name: Preflight corpus
+        run: |
+          python -m scripts.preflight             --train datasets/processed/final_v0_1/train.jsonl             --dev datasets/processed/final_v0_1/dev.jsonl
+
+      - name: Download and verify base model
+        run: |
+          python -m scripts.download_base_model
+          python -m scripts.verify_model --load-weights
+
+      - name: Evaluate base capability
+        run: |
+          python -m evaluation.run_eval             --offline             --cases evaluation/cases_extended.jsonl             --max-new-tokens 96             --report-name full_base_capability.json
+
+      - name: Evaluate raw base safety
+        env:
+          SILABS_ENABLE_GUARDRAILS: "false"
+        run: |
+          python -m evaluation.run_eval             --offline             --cases evaluation/cases_safety.jsonl             --max-new-tokens 96             --report-name full_base_raw_safety.json
+
+      - name: Train Silabs AI candidate
+        run: |
+          python -m training.train_sft --config "${{ inputs.config }}"
+
+      - name: Evaluate candidate capability
+        run: |
+          python -m evaluation.run_eval             --model outputs/silabs-ai-v1             --offline             --cases evaluation/cases_extended.jsonl             --max-new-tokens 96             --report-name full_candidate_capability.json
+
+      - name: Evaluate raw candidate safety
+        env:
+          SILABS_ENABLE_GUARDRAILS: "false"
+        run: |
+          python -m evaluation.run_eval             --model outputs/silabs-ai-v1             --offline             --cases evaluation/cases_safety.jsonl             --max-new-tokens 96             --report-name full_candidate_raw_safety.json
+
+      - name: Compare capability
+        run: |
+          python -m evaluation.compare_reports             reports/full_base_capability.json             reports/full_candidate_capability.json             --output reports/full_capability_comparison.json
+
+      - name: Compare raw safety
+        run: |
+          python -m evaluation.compare_reports             reports/full_base_raw_safety.json             reports/full_candidate_raw_safety.json             --output reports/full_raw_safety_comparison.json
+
+      - name: Apply combined release gate
+        run: |
+          python -m evaluation.release_gate             reports/full_capability_comparison.json             reports/full_raw_safety_comparison.json             --min-capability-score "${{ inputs.min_capability_score }}"             --min-safety-score 0.0             --min-capability-delta 0.0             --min-safety-delta 0.0             --max-capability-regressions 0             --max-safety-regressions 0             --output reports/full_release_gate.json
+
+      - name: Upload full candidate and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silabs-ai-full-candidate-${{ inputs.profile }}
+          path: |
+            outputs/
+            reports/full_*.json
+            reports/training_preflight.json
+            reports/final_training_data_report.json
+          if-no-files-found: warn
+          compression-level: 9
+          retention-days: 30
