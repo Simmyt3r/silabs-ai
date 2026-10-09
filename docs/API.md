@@ -57,3 +57,26 @@ Input validation errors use the standard FastAPI 422 response. Inference failure
 - structured retrieval citations;
 - model routing;
 - privacy-conscious usage telemetry.
+
+
+## Guardrail completions
+
+Both `POST /v1/chat` and `POST /v1/generate` apply the configured runtime
+guardrail layer before model loading. When a request is intercepted, the normal
+response schema is preserved with:
+
+```json
+{
+  "finish_reason": "guardrail",
+  "guardrail_category": "malicious_cyber",
+  "input_tokens": 0,
+  "output_tokens": 0
+}
+```
+
+The text field contains the safe redirect/refusal. Model-status responses expose
+`guardrails_enabled` so product clients can verify the runtime safety mode.
+
+Guardrails can be disabled for controlled research with
+`SILABS_ENABLE_GUARDRAILS=false`, but production deployments should keep them
+enabled.
