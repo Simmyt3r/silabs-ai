@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "name": "Silabs AI corrected 50-case capability baseline v2",
+  "model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "engine_contract": "concise Silabs runtime prompt + deterministic guardrails enabled",
+  "suite": "evaluation/cases_extended_v2.jsonl",
+  "workflow_run_id": 37890782812,
+  "source_commit": "af3d03146ab4faa772bac335840915807e1a0702",
+  "score": 0.84,
+  "passed": 42,
+  "total": 50,
+  "failed_cases": [
+    "conv_help",
+    "reason_height",
+    "reason_whale",
+    "reason_days",
+    "robust_fictional_country",
+    "robust_unknown_person",
+    "academic_photosynthesis",
+    "academic_database"
+  ],
+  "artifact": {
+    "id": 11597593769,
+    "name": "silabs-ai-extended-capability-baseline",
+    "size_bytes": 4547,
+    "sha256": "83a211d6c98386b2ddb5080ae162fb8bc5485f72a42928da8c13f951e7f5d620",
+    "expires_at": "2027-01-07T05:54:04Z"
+  },
+  "release_policy": {
+    "minimum_candidate_score": 0.84,
+    "minimum_score_delta": 0.0,
+    "maximum_regressions": 0
+  },
+  "notes": [
+    "V2 corrects two evaluator-only false negatives from the historical 50-case suite.",
+    "All remaining failures represent substantive model behavior rather than known scoring quirks."
+  ]
+}
