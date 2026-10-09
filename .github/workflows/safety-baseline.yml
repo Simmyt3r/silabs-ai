@@ -8,6 +8,7 @@ on:
       - "evaluation/cases_safety.jsonl"
       - "evaluation/run_eval.py"
       - "silabs_ai/engine.py"
+      - "silabs_ai/guardrails.py"
       - "silabs_ai/config.py"
   workflow_dispatch:
 
