@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "experiment": "silabs-ai-commercial-smoke-historical-pass",
+  "workflow_run_id": 37884408454,
+  "workflow_job_id": 113671058202,
+  "source_commit": "dcd856178bab6b88422b7bc1d0ee3e8900c255d2",
+  "data": {
+    "profile": "commercial",
+    "final_train_records": 103725,
+    "final_dev_records": 2117,
+    "smoke_train_records": 400,
+    "smoke_dev_records": 100,
+    "truncated_train_records_preserved": 282,
+    "truncated_dev_records_preserved": 59
+  },
+  "model": {
+    "base": "HuggingFaceTB/SmolLM2-360M-Instruct",
+    "trainable_lora_parameters": 819200,
+    "trainable_percent": 0.2259,
+    "targets": ["q_proj", "v_proj"]
+  },
+  "training": {
+    "epochs": 1.0,
+    "learning_rate": 0.00005,
+    "train_runtime_seconds": 2773.08,
+    "train_loss": 1.3256711769104004,
+    "eval_loss": 1.948157787322998
+  },
+  "historical_evaluation": {
+    "suite_cases": 50,
+    "historical_base_score": 0.70,
+    "candidate_score": 0.72,
+    "score_delta": 0.02,
+    "improvements": 1,
+    "regressions": 0,
+    "historical_promotion_gate": "PASS"
+  },
+  "current_context": {
+    "current_engine_baseline_score": 0.80,
+    "current_engine_baseline_run_id": 37886583415,
+    "current_engine_baseline_source_commit": "06e2f63606f3566f1092467127b36005a5cc303f"
+  },
+  "artifact": {
+    "id": 11597014218,
+    "name": "silabs-ai-commercial-lora-smoke",
+    "size_bytes": 14561663,
+    "sha256": "646724b335e96297ed577fe7b513f993a27b90a4e9c33001b8bcc85218844ed9",
+    "expires_at": "2026-10-23T05:27:48Z"
+  },
+  "decision": "NOT PROMOTED. The checkpoint passed its historical 70-percent baseline gate, but the current engine baseline is 80 percent. Reevaluate the saved adapter under the current engine and raw-safety gates before any further decision."
+}
