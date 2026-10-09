@@ -9,6 +9,7 @@ on:
       - "evaluation/cases.jsonl"
       - "silabs_ai/config.py"
       - "silabs_ai/engine.py"
+      - "silabs_ai/guardrails.py"
       - "silabs_ai/model_source.py"
       - "silabs_ai/prompting.py"
       - "silabs_ai/retrieval.py"
