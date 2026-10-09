@@ -55,6 +55,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: silabs-ai-extended-capability-baseline
-          path: reports/extended_capability_baseline.json
+          path: reports/extended_capability_baseline_v2.json
           if-no-files-found: error
           retention-days: 90
