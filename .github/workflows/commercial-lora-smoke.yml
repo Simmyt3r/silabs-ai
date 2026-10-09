@@ -1,0 +1,114 @@
+name: Commercial LoRA Smoke
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/commercial-lora-smoke.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: silabs-ai-commercial-lora-smoke
+  cancel-in-progress: true
+
+jobs:
+  commercial-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD: "false"
+      SILABS_DEVICE: cpu
+      SILABS_DTYPE: float32
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install CPU runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu "torch>=2.4"
+          pip install -r requirements.txt
+
+      - name: Build commercially screened corpus
+        run: |
+          python -m scripts.download_training_datasets --profile commercial
+          python -m scripts.finalize_training_data_v1_2
+          python -m scripts.freeze_dataset_release \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl \
+            --name silabs-v1-commercial-smoke \
+            --manifest datasets/registry/releases/silabs-v1-commercial-smoke.json \
+            --smoke-train 400 \
+            --smoke-dev 100
+
+      - name: Preflight commercially screened corpus
+        run: |
+          python -m scripts.preflight \
+            --train datasets/processed/final_v0_1/train.jsonl \
+            --dev datasets/processed/final_v0_1/dev.jsonl
+
+      - name: Download and verify base model
+        run: |
+          python -m scripts.download_base_model
+          python -m scripts.verify_model --load-weights
+
+      - name: Evaluate untouched base on 50-case suite
+        run: |
+          python -m evaluation.run_eval \
+            --offline \
+            --cases evaluation/cases_extended.jsonl \
+            --max-new-tokens 96 \
+            --report-name commercial_baseline_50.json
+
+      - name: Train conservative 400-example LoRA adapter
+        run: |
+          python -m training.train_sft \
+            --config configs/smollm2-360m-commercial-smoke.yaml
+
+      - name: Evaluate candidate on 50-case suite
+        run: |
+          python -m evaluation.run_eval \
+            --model outputs/silabs-ai-v1-commercial-smoke \
+            --offline \
+            --cases evaluation/cases_extended.jsonl \
+            --max-new-tokens 96 \
+            --report-name commercial_candidate_50.json
+
+      - name: Compare candidate against base
+        run: |
+          python -m evaluation.compare_reports \
+            reports/commercial_baseline_50.json \
+            reports/commercial_candidate_50.json \
+            --output reports/commercial_comparison_50.json
+
+      - name: Apply promotion gate
+        run: |
+          python -m evaluation.promotion_gate \
+            reports/commercial_comparison_50.json \
+            --min-score-delta 0.0 \
+            --max-regressions 0
+
+      - name: Upload adapter and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: silabs-ai-commercial-lora-smoke
+          path: |
+            outputs/silabs-ai-v1-commercial-smoke/
+            reports/commercial_baseline_50.json
+            reports/commercial_candidate_50.json
+            reports/commercial_comparison_50.json
+            reports/training_preflight.json
+            reports/final_training_data_report.json
+            datasets/registry/releases/silabs-v1-commercial-smoke.json
+          if-no-files-found: warn
+          compression-level: 9
+          retention-days: 14
