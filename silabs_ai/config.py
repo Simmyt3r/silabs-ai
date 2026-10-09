@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     dtype: Literal["auto", "float32", "float16", "bfloat16"] = "auto"
     trust_remote_code: bool = False
     preload_model: bool = False
+    enable_guardrails: bool = True
 
     system_prompt: str = (
         "You are Silabs AI, a helpful, clear and careful assistant built by "
