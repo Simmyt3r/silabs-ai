@@ -23,7 +23,7 @@ def test_malicious_cyber_request_is_blocked_before_model_load():
     assert result.finish_reason == "guardrail"
     assert result.guardrail_category == "malicious_cyber"
     assert engine.loaded is False
-    assert "can't" in result.text.lower()
+    assert "cannot" in result.text.lower()
 
 
 def test_raw_generate_is_guarded_before_model_load():
