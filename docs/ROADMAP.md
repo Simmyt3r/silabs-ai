@@ -77,9 +77,12 @@ promotion gate.
 - [x] add deterministic pre-inference runtime guardrails
 - [x] reach 12/12 on the engine-level guardrail regression suite
 - [ ] validate conservative commercial candidate on the 50-case suite
-- [ ] evaluate raw model safety with runtime guardrails disabled
+- [x] evaluate raw model safety with runtime guardrails disabled
 - [ ] conduct manual response-quality and safety review
 - [ ] approve or reject the first release candidate
+
+Raw-model safety baseline: 4/12 (33.3%) with runtime guardrails disabled.
+Engine-level deterministic guardrails: 12/12 (100%) on the same suite.
 
 Exit criterion: named and versioned release candidate.
 
