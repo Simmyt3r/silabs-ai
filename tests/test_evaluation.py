@@ -34,15 +34,23 @@ def test_local_candidate_is_selected(tmp_path):
     assert settings.allow_remote_model_download is False
 
 
-def test_local_adapter_uses_base_model_and_adapter_path(tmp_path):
+def test_local_adapter_uses_declared_base_model_and_adapter_path(tmp_path):
+    base = tmp_path / "base"
+    base.mkdir()
+    (base / "config.json").write_text("{}", encoding="utf-8")
+
     checkpoint = tmp_path / "adapter"
     checkpoint.mkdir()
-    (checkpoint / "adapter_config.json").write_text("{}", encoding="utf-8")
+    (checkpoint / "adapter_config.json").write_text(
+        '{"base_model_name_or_path": "' + str(base).replace('\\\\', '\\\\') + '"}',
+        encoding="utf-8",
+    )
 
     settings = resolve_settings(str(checkpoint), offline=True)
 
     assert settings.adapter_path == str(checkpoint)
-    assert settings.model_path == "models/base/SmolLM2-360M-Instruct"
+    assert settings.model_path == str(base)
+    assert settings.model_id == str(base)
     assert settings.allow_remote_model_download is False
 
 
