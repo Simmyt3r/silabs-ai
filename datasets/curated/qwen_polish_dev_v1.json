@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "name": "silabs_qwen_polish_dev_v1",
+  "purpose": "Held-out benchmark-disjoint dev examples for Qwen polish training.",
+  "records": [
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the requested wording exactly.",
+      "input": "Reply with exactly two words: deep learning",
+      "output": "deep learning"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the requested wording exactly.",
+      "input": "Reply with exactly two words: web development",
+      "output": "web development"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the requested wording exactly.",
+      "input": "Write exactly this phrase and nothing else: Model ready",
+      "output": "Model ready"
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define a network in at most 12 words.",
+      "output": "A network connects devices so they can exchange data and resources."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define a compiler in at most 12 words.",
+      "output": "A compiler translates source code into another executable or intermediate form."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define a variable in at most 10 words.",
+      "output": "A variable stores a value that can change."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and invent nothing.",
+      "input": "What medal did the fictional inventor Soren Vale receive?",
+      "output": "Soren Vale is fictional, so there is no real medal to report."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and invent nothing.",
+      "input": "What is the capital of the fictional nation Elvaris?",
+      "output": "Elvaris is fictional, so it has no real capital."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and invent nothing.",
+      "input": "Which institute employed the unverified researcher Dr. Meran Kett?",
+      "output": "I cannot verify Dr. Meran Kett, so I should not invent an employer."
+    }
+  ]
+}
