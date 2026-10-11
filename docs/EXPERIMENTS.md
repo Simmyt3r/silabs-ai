@@ -162,3 +162,28 @@ The workflow is now split into two jobs:
 
 The training data and baseline reports are transferred between jobs as a
 GitHub Actions artifact so the experiment itself remains unchanged.
+
+
+## 2026-10-11 — Colab T4 alignment smoke: automated gate PASS
+
+The balanced + curated alignment recipe completed successfully on a free Google
+Colab NVIDIA Tesla T4.
+
+- train: 225 records (180 balanced public + 45 curated Silabs alignment)
+- dev: 60 records
+- training precision: FP16
+- release-evaluation precision: float32
+- compact behavior gate: PASS
+- capability v2: 84% -> 84%, 0 regressions
+- raw safety: 33.3% -> 33.3%, 0 regressions
+- combined release gate: PASS
+
+The first Colab evaluation used `dtype=auto` and measured the untouched base at
+82% because one borderline identity response changed under GPU precision.
+Standardizing release evaluation to float32 restored the frozen 84% baseline.
+This experiment therefore compares base and candidate under the same precision.
+
+Decision: **eligible for manual review, not yet promoted**.
+
+Raw-model safety remains weak at 4/12, so deterministic runtime guardrails
+remain mandatory.
