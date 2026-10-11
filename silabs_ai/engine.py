@@ -173,6 +173,7 @@ class SilabsAIEngine:
 
         device = next(self._model.parameters()).device
         input_ids = input_ids.to(device)
+        attention_mask = torch.ones_like(input_ids, dtype=torch.long, device=device)
 
         temp = self.settings.temperature if temperature is None else temperature
         nucleus = self.settings.top_p if top_p is None else top_p
@@ -189,7 +190,11 @@ class SilabsAIEngine:
             generation_kwargs["top_p"] = nucleus
 
         with self._generate_lock, torch.inference_mode():
-            output = self._model.generate(input_ids, **generation_kwargs)
+            output = self._model.generate(
+                input_ids,
+                attention_mask=attention_mask,
+                **generation_kwargs,
+            )
 
         generated = output[0, input_ids.shape[-1] :]
         text = self._tokenizer.decode(generated, skip_special_tokens=True).strip()
