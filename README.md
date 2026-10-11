@@ -182,3 +182,17 @@ Open **Actions → Dataset Build and Smoke → Run workflow** and choose:
 The workflow streams/caps large sources such as OpenMathInstruct-2 instead of
 cloning the full multi-gigabyte dataset, then uploads the finalized corpus as a
 GitHub Actions artifact.
+
+
+## GPU training
+
+CPU GitHub runners are retained for data preparation and validation. LoRA
+training now uses an ephemeral self-hosted NVIDIA GPU runner.
+
+See `docs/GPU_RUNNER.md` for the setup flow. The current GPU workflow is:
+
+```text
+Actions -> Alignment LoRA Smoke GPU -> Run workflow
+```
+
+The GPU runner is one-job ephemeral and the workflow is manual-only.
