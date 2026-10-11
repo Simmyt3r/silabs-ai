@@ -1,0 +1,44 @@
+model:
+  id: Qwen/Qwen3-1.7B
+  local_path: models/base/Qwen3-1.7B
+  allow_remote: false
+  dtype: float16
+  device_map: null
+  enable_thinking: false
+
+data:
+  train: datasets/processed/qwen_polish/train.jsonl
+  dev: datasets/processed/qwen_polish/dev.jsonl
+  max_length: 256
+
+lora:
+  enabled: true
+  r: 8
+  alpha: 16
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+
+training:
+  output_dir: /content/drive/MyDrive/SilabsAI/outputs/silabs-ai-qwen3-1.7b-polish-v1
+  epochs: 2
+  batch_size: 2
+  eval_batch_size: 2
+  gradient_accumulation_steps: 2
+  learning_rate: 0.00001
+  warmup_ratio: 0.05
+  weight_decay: 0.01
+  logging_steps: 5
+  eval_strategy: epoch
+  save_strategy: epoch
+  save_total_limit: 2
+  load_best_model_at_end: false
+  gradient_checkpointing: false
+  dataloader_pin_memory: true
+  fp16: true
+  bf16: false
+  report_to: none
+  seed: 42
