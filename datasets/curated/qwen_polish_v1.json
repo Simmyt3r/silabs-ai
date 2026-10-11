@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "name": "silabs_qwen_polish_v1",
+  "purpose": "Small benchmark-disjoint alignment set for exact instruction following, strict brevity, and uncertainty without invented details.",
+  "records": [
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly two words: data science",
+      "output": "data science"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly two words: neural network",
+      "output": "neural network"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly two words: software engineering",
+      "output": "software engineering"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly three words: artificial intelligence system",
+      "output": "artificial intelligence system"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Write exactly this phrase and nothing else: Silabs ready",
+      "output": "Silabs ready"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly two words: database management",
+      "output": "database management"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly two words: computer vision",
+      "output": "computer vision"
+    },
+    {
+      "task": "exact_phrase",
+      "domain": "instruction",
+      "instruction": "Follow the user's requested wording exactly.",
+      "input": "Reply with exactly two words: cyber security",
+      "output": "cyber security"
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define an algorithm in one sentence of at most 12 words.",
+      "output": "An algorithm is a step-by-step procedure for solving a problem."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define electricity in one sentence of at most 12 words.",
+      "output": "Electricity is the flow or presence of electric charge."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define a browser in one sentence of at most 12 words.",
+      "output": "A browser is software used to access and view websites."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Explain gravity in at most 10 words.",
+      "output": "Gravity is the force attracting masses toward each other."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define a server in at most 12 words.",
+      "output": "A server provides data or services to other computers."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define encryption in at most 12 words.",
+      "output": "Encryption converts readable data into protected coded form."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define an operating system in at most 14 words.",
+      "output": "An operating system manages hardware resources and provides services for applications."
+    },
+    {
+      "task": "strict_brevity",
+      "domain": "instruction",
+      "instruction": "Respect the requested word limit exactly.",
+      "input": "Define cloud computing in at most 12 words.",
+      "output": "Cloud computing provides computing resources over networks on demand."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "What prize did the fictional researcher Dr. Kelvan Mire receive?",
+      "output": "Dr. Kelvan Mire is fictional, so there is no real prize to report."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "What is the capital of the fictional country Orvenia?",
+      "output": "Orvenia is fictional, so it has no real capital."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "Which university employed the fictional professor Narek Sol?",
+      "output": "Narek Sol is fictional, so there is no real university employment to report."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "When was the fictional city Velmora founded?",
+      "output": "Velmora is fictional, so there is no real founding date to report."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "What currency does the fictional nation Tarevia use?",
+      "output": "Tarevia is fictional, so it has no real currency."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "What company hired the fictional engineer Rolan Vesk?",
+      "output": "Rolan Vesk is fictional, so there is no real employer to report."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "What award did the unverified scientist Dr. Pelen Tor win?",
+      "output": "I cannot verify Dr. Pelen Tor or any award, so I should not invent one."
+    },
+    {
+      "task": "uncertainty_no_invention",
+      "domain": "epistemic",
+      "instruction": "If an entity cannot be verified, say so briefly and do not invent any extra details.",
+      "input": "What is the capital of the unverified country Merovia?",
+      "output": "I cannot verify Merovia as a real country, so I should not invent a capital."
+    }
+  ]
+}
