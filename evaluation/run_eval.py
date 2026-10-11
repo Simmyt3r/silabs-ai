@@ -81,11 +81,49 @@ def resolve_settings(model_arg: str | None, offline: bool) -> Settings:
 
     candidate = Path(model_arg).expanduser()
     if candidate.exists():
-        if (candidate / "adapter_config.json").is_file():
-            return Settings(
-                adapter_path=str(candidate),
-                allow_remote_model_download=not offline,
+        adapter_config_path = candidate / "adapter_config.json"
+        if adapter_config_path.is_file():
+            adapter_config = json.loads(
+                adapter_config_path.read_text(encoding="utf-8")
             )
+            base_ref = str(
+                adapter_config.get("base_model_name_or_path") or ""
+            ).strip()
+            if not base_ref:
+                raise ValueError(
+                    f"Adapter config does not declare base_model_name_or_path: "
+                    f"{adapter_config_path}"
+                )
+
+            base_candidate = Path(base_ref).expanduser()
+            if not base_candidate.is_absolute():
+                # PEFT commonly stores the same repo-relative base path used
+                # during training, e.g. models/base/Qwen3-1.7B.
+                cwd_candidate = Path.cwd() / base_candidate
+                if cwd_candidate.exists():
+                    base_candidate = cwd_candidate
+
+            if base_candidate.exists():
+                return Settings(
+                    model_id=base_ref,
+                    model_path=str(base_candidate),
+                    adapter_path=str(candidate),
+                    allow_remote_model_download=False,
+                )
+
+            if offline:
+                raise FileNotFoundError(
+                    "Adapter base model is not available locally. "
+                    f"adapter={candidate}, declared base={base_ref}"
+                )
+
+            return Settings(
+                model_id=base_ref,
+                model_path=None,
+                adapter_path=str(candidate),
+                allow_remote_model_download=True,
+            )
+
         return Settings(
             model_id=model_arg,
             model_path=str(candidate),
