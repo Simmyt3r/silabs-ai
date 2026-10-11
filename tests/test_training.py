@@ -1,6 +1,6 @@
 import json
 
-from training.train_sft import _truncate_supervised_example, build_tokenized_dataset
+from training.train_sft import _extract_input_ids, _truncate_supervised_example, build_tokenized_dataset
 
 
 class FakeTokenizer:
@@ -54,3 +54,11 @@ def test_truncation_rejects_tiny_context_window():
         assert "at least 8" in str(exc)
     else:
         raise AssertionError("expected ValueError")
+
+
+def test_extract_input_ids_from_batch_mapping():
+    assert _extract_input_ids({"input_ids": [1, 2, 3]}) == [1, 2, 3]
+
+
+def test_extract_input_ids_from_single_batched_sequence():
+    assert _extract_input_ids({"input_ids": [[4, 5, 6]]}) == [4, 5, 6]
