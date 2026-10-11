@@ -62,6 +62,20 @@ def _truncate_supervised_example(
     return input_ids, labels
 
 
+def _assistant_response_ids(tokenizer, text: str) -> list[int]:
+    """Tokenize only the assistant answer and terminate it with EOS."""
+    encoded = tokenizer(
+        text,
+        add_special_tokens=False,
+        return_attention_mask=False,
+    )
+    response_ids = list(encoded["input_ids"])
+    eos_id = tokenizer.eos_token_id
+    if eos_id is not None and (not response_ids or response_ids[-1] != eos_id):
+        response_ids.append(eos_id)
+    return response_ids
+
+
 def build_tokenized_dataset(
     path: str,
     tokenizer,
@@ -69,7 +83,13 @@ def build_tokenized_dataset(
     *,
     enable_thinking: bool = False,
 ) -> Dataset:
-    """Build causal-LM examples while masking prompt tokens from the loss."""
+    """Build SFT examples by explicitly joining prompt and assistant tokens.
+
+    Do not infer the assistant boundary by comparing two rendered chat
+    templates. Templates such as Qwen3 may render generation-only markers
+    differently from completed assistant turns, making prefix-diff logic
+    unreliable.
+    """
     rows = load_messages(path)
     examples: list[dict[str, list[int]]] = []
     skipped = 0
@@ -80,14 +100,6 @@ def build_tokenized_dataset(
             skipped += 1
             continue
 
-        full_ids = list(
-            tokenizer.apply_chat_template(
-                messages,
-                tokenize=True,
-                add_generation_prompt=False,
-                enable_thinking=enable_thinking,
-            )
-        )
         prompt_ids = list(
             tokenizer.apply_chat_template(
                 messages[:-1],
@@ -96,14 +108,32 @@ def build_tokenized_dataset(
                 enable_thinking=enable_thinking,
             )
         )
-
-        was_long = len(full_ids) > max_length
-        packed = _truncate_supervised_example(prompt_ids, full_ids, max_length)
-        if packed is None:
+        response_ids = _assistant_response_ids(
+            tokenizer,
+            messages[-1]["content"],
+        )
+        if not response_ids:
             skipped += 1
             continue
 
-        input_ids, labels = packed
+        was_long = len(prompt_ids) + len(response_ids) > max_length
+        min_prompt_budget = min(64, max(8, max_length // 4))
+        max_response_budget = max_length - min_prompt_budget
+        response_ids = response_ids[:max_response_budget]
+        prompt_budget = max_length - len(response_ids)
+
+        if len(prompt_ids) > prompt_budget:
+            tail = min(16, max(2, prompt_budget // 4))
+            head = max(0, prompt_budget - tail)
+            prompt_ids = prompt_ids[:head] + prompt_ids[-tail:]
+
+        input_ids = prompt_ids + response_ids
+        labels = [-100] * len(prompt_ids) + response_ids.copy()
+
+        if not input_ids or all(label == -100 for label in labels):
+            skipped += 1
+            continue
+
         if was_long:
             truncated += 1
 
