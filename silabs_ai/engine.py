@@ -117,7 +117,7 @@ class SilabsAIEngine:
 
             model_kwargs = {
                 **common_kwargs,
-                "torch_dtype": self._torch_dtype(),
+                "dtype": self._torch_dtype(),
             }
             if self.settings.device == "auto":
                 model_kwargs["device_map"] = "auto"
