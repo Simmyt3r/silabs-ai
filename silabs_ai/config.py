@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     trust_remote_code: bool = False
     preload_model: bool = False
     enable_guardrails: bool = True
+    # Qwen3 supports explicit thinking/non-thinking chat templates. Keep
+    # ordinary Silabs AI responses deterministic and concise by default.
+    enable_thinking: bool = False
 
     system_prompt: str = (
         "You are Silabs AI, a helpful, clear and careful assistant built by "
