@@ -28,7 +28,7 @@ def read_eval_prompts(paths: list[Path]) -> dict[str, str]:
 
 def read_curated(path: Path) -> list[dict]:
     payload = json.loads(path.read_text(encoding="utf-8"))
-    dataset_name = str(payload.get("name") or path.stem).strip()
+    dataset_name = str(payload.get("name") or "silabs_alignment_v1").strip()
     records = payload.get("records")
     if not isinstance(records, list) or not records:
         raise ValueError(f"{path} must contain a non-empty records list")
