@@ -169,6 +169,7 @@ class SilabsAIEngine:
             tokenize=True,
             add_generation_prompt=True,
             return_tensors="pt",
+            enable_thinking=self.settings.enable_thinking,
         )
 
         device = next(self._model.parameters()).device
