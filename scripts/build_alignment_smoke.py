@@ -28,6 +28,7 @@ def read_eval_prompts(paths: list[Path]) -> dict[str, str]:
 
 def read_curated(path: Path) -> list[dict]:
     payload = json.loads(path.read_text(encoding="utf-8"))
+    dataset_name = str(payload.get("name") or path.stem).strip()
     records = payload.get("records")
     if not isinstance(records, list) or not records:
         raise ValueError(f"{path} must contain a non-empty records list")
@@ -50,15 +51,15 @@ def read_curated(path: Path) -> list[dict]:
 
         output.append(
             {
-                "id": f"silabs_alignment_v1_{digest}",
-                "dataset": "silabs_alignment_v1",
+                "id": f"{dataset_name}_{digest}",
+                "dataset": dataset_name,
                 "task": task,
                 "domain": domain,
                 "instruction": instruction,
                 "input": input_text,
                 "output": answer,
                 "metadata": {
-                    "source": "Silabs curated alignment v1",
+                    "source": dataset_name,
                     "curated": True,
                     "benchmark_disjoint_required": True,
                 },
