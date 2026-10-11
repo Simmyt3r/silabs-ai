@@ -196,3 +196,12 @@ Actions -> Alignment LoRA Smoke GPU -> Run workflow
 ```
 
 The GPU runner is one-job ephemeral and the workflow is manual-only.
+
+
+### Free GPU option: Google Colab
+
+If a paid/self-hosted GPU is not available, use the Colab notebook at
+`notebooks/Silabs_AI_Alignment_Training.ipynb`.
+
+See `docs/COLAB.md` for the baby-step setup. The trained adapter and reports
+are saved to Google Drive.
