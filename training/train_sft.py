@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import argparse
+import inspect
+import math
 from pathlib import Path
 
 import torch
@@ -213,6 +215,74 @@ class CausalLMCollator:
         return batch
 
 
+def _make_training_arguments(training: dict, train_records: int) -> TrainingArguments:
+    """Build TrainingArguments across compatible Transformers API versions."""
+    params = inspect.signature(TrainingArguments.__init__).parameters
+
+    epochs = float(training.get("epochs", 2))
+    batch_size = int(training.get("batch_size", 1))
+    grad_accum = int(training.get("gradient_accumulation_steps", 16))
+    eval_strategy = training.get("eval_strategy", "steps")
+    save_strategy = training.get("save_strategy", eval_strategy)
+    warmup_ratio = float(training.get("warmup_ratio", 0.03))
+
+    kwargs = {
+        "output_dir": training["output_dir"],
+        "num_train_epochs": epochs,
+        "per_device_train_batch_size": batch_size,
+        "per_device_eval_batch_size": int(training.get("eval_batch_size", 1)),
+        "gradient_accumulation_steps": grad_accum,
+        "learning_rate": float(training.get("learning_rate", 2e-4)),
+        "weight_decay": float(training.get("weight_decay", 0.01)),
+        "logging_steps": int(training.get("logging_steps", 10)),
+        "save_strategy": save_strategy,
+        "eval_steps": int(training.get("eval_steps", 200)),
+        "save_steps": int(training.get("save_steps", 200)),
+        "save_total_limit": int(training.get("save_total_limit", 2)),
+        "load_best_model_at_end": bool(training.get("load_best_model_at_end", True)),
+        "metric_for_best_model": "eval_loss",
+        "greater_is_better": False,
+        "fp16": bool(training.get("fp16", False)),
+        "bf16": bool(training.get("bf16", False)),
+        "gradient_checkpointing": bool(training.get("gradient_checkpointing", True)),
+        "report_to": training.get("report_to", "none"),
+        "dataloader_pin_memory": bool(
+            training.get("dataloader_pin_memory", torch.cuda.is_available())
+        ),
+        "max_steps": int(training.get("max_steps", -1)),
+        "seed": int(training.get("seed", 42)),
+    }
+
+    if "eval_strategy" in params:
+        kwargs["eval_strategy"] = eval_strategy
+    elif "evaluation_strategy" in params:
+        kwargs["evaluation_strategy"] = eval_strategy
+
+    if "warmup_ratio" in params:
+        kwargs["warmup_ratio"] = warmup_ratio
+    elif "warmup_steps" in params:
+        updates_per_epoch = max(
+            1,
+            math.ceil(train_records / max(1, batch_size * grad_accum)),
+        )
+        total_updates = max(1, math.ceil(updates_per_epoch * epochs))
+        kwargs["warmup_steps"] = (
+            max(1, math.ceil(total_updates * warmup_ratio))
+            if warmup_ratio > 0
+            else 0
+        )
+
+    if "gradient_checkpointing_kwargs" in params and kwargs["gradient_checkpointing"]:
+        kwargs["gradient_checkpointing_kwargs"] = {"use_reentrant": False}
+
+    unsupported = sorted(key for key in kwargs if key not in params)
+    for key in unsupported:
+        print(f"TrainingArguments compatibility: omitting unsupported '{key}'")
+        kwargs.pop(key)
+
+    return TrainingArguments(**kwargs)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fine-tune Silabs AI")
     parser.add_argument(
@@ -305,36 +375,9 @@ def main() -> None:
     save_strategy = training.get("save_strategy", eval_strategy)
     load_best_model_at_end = bool(training.get("load_best_model_at_end", True))
 
-    training_args = TrainingArguments(
-        output_dir=training["output_dir"],
-        num_train_epochs=float(training.get("epochs", 2)),
-        per_device_train_batch_size=int(training.get("batch_size", 1)),
-        per_device_eval_batch_size=int(training.get("eval_batch_size", 1)),
-        gradient_accumulation_steps=int(training.get("gradient_accumulation_steps", 16)),
-        learning_rate=float(training.get("learning_rate", 2e-4)),
-        warmup_ratio=float(training.get("warmup_ratio", 0.03)),
-        weight_decay=float(training.get("weight_decay", 0.01)),
-        logging_steps=int(training.get("logging_steps", 10)),
-        eval_strategy=eval_strategy,
-        save_strategy=save_strategy,
-        eval_steps=int(training.get("eval_steps", 200)),
-        save_steps=int(training.get("save_steps", 200)),
-        save_total_limit=int(training.get("save_total_limit", 2)),
-        load_best_model_at_end=load_best_model_at_end,
-        metric_for_best_model="eval_loss",
-        greater_is_better=False,
-        fp16=bool(training.get("fp16", False)),
-        bf16=bool(training.get("bf16", False)),
-        gradient_checkpointing=gradient_checkpointing,
-        gradient_checkpointing_kwargs={"use_reentrant": False}
-        if gradient_checkpointing
-        else None,
-        report_to=training.get("report_to", "none"),
-        dataloader_pin_memory=bool(
-            training.get("dataloader_pin_memory", torch.cuda.is_available())
-        ),
-        max_steps=int(training.get("max_steps", -1)),
-        seed=int(training.get("seed", 42)),
+    training_args = _make_training_arguments(
+        training,
+        train_records=len(train_data),
     )
 
     trainer = Trainer(
