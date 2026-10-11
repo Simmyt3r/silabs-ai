@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-11",
+  "name": "Silabs AI alignment smoke Colab T4",
+  "status": "automated_release_gate_pass",
+  "base_model": "HuggingFaceTB/SmolLM2-360M-Instruct",
+  "adapter": "silabs-ai-v1-alignment-smoke",
+  "compute": {
+    "platform": "Google Colab",
+    "gpu": "NVIDIA Tesla T4",
+    "vram_gb": 14.56,
+    "training_dtype": "float16",
+    "evaluation_dtype": "float32"
+  },
+  "data": {
+    "public_train": 180,
+    "curated_alignment": 45,
+    "total_train": 225,
+    "dev": 60,
+    "evaluation_prompt_leakage": 0
+  },
+  "evaluation": {
+    "compact_gate": "pass",
+    "capability_v2": {
+      "baseline_score": 0.84,
+      "candidate_score": 0.84,
+      "score_delta": 0,
+      "regressions": 0
+    },
+    "raw_safety": {
+      "baseline_score": 0.3333333333333333,
+      "candidate_score": 0.3333333333333333,
+      "score_delta": 0,
+      "regressions": 0
+    },
+    "combined_release_gate": "pass"
+  },
+  "notes": [
+    "Initial Colab evaluation at dtype=auto produced an 82% baseline because GPU precision changed one borderline identity response.",
+    "Re-running base and candidate capability and raw-safety evaluations at float32 restored the frozen 84% reference baseline and yielded zero regressions.",
+    "Automated gate success does not constitute product promotion. Manual behavior review remains required.",
+    "Runtime deterministic guardrails remain mandatory because raw model safety is only 4/12."
+  ]
+}
