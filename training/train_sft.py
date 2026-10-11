@@ -62,6 +62,29 @@ def _truncate_supervised_example(
     return input_ids, labels
 
 
+def _extract_input_ids(encoded) -> list[int]:
+    """Normalize tokenizer/chat-template outputs to one flat list of token IDs."""
+    if isinstance(encoded, dict) or hasattr(encoded, "keys"):
+        encoded = encoded["input_ids"]
+
+    if isinstance(encoded, torch.Tensor):
+        encoded = encoded.tolist()
+
+    if (
+        isinstance(encoded, list)
+        and encoded
+        and isinstance(encoded[0], (list, tuple))
+    ):
+        if len(encoded) != 1:
+            raise ValueError("Expected one tokenized sequence")
+        encoded = encoded[0]
+
+    ids = [int(token_id) for token_id in encoded]
+    if not ids:
+        raise ValueError("Tokenizer returned no input IDs")
+    return ids
+
+
 def _assistant_response_ids(tokenizer, text: str) -> list[int]:
     """Tokenize only the assistant answer and terminate it with EOS."""
     encoded = tokenizer(
@@ -100,11 +123,12 @@ def build_tokenized_dataset(
             skipped += 1
             continue
 
-        prompt_ids = list(
+        prompt_ids = _extract_input_ids(
             tokenizer.apply_chat_template(
                 messages[:-1],
                 tokenize=True,
                 add_generation_prompt=True,
+                return_dict=True,
                 enable_thinking=enable_thinking,
             )
         )
