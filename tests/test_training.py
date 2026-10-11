@@ -4,12 +4,17 @@ from training.train_sft import _truncate_supervised_example, build_tokenized_dat
 
 
 class FakeTokenizer:
+    eos_token_id = 99
+
     def apply_chat_template(
         self, messages, tokenize=True, add_generation_prompt=False, **kwargs
     ):
         if add_generation_prompt:
             return [10, 11, 12]
         return [10, 11, 12, 20, 21]
+
+    def __call__(self, text, add_special_tokens=False, return_attention_mask=False):
+        return {"input_ids": [20, 21]}
 
 
 def test_prompt_tokens_are_masked(tmp_path):
@@ -21,7 +26,7 @@ def test_prompt_tokens_are_masked(tmp_path):
     labels = dataset[0]["labels"]
 
     assert labels[:3] == [-100, -100, -100]
-    assert labels[3:] == [20, 21]
+    assert labels[3:] == [20, 21, 99]
 
 
 
