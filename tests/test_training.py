@@ -4,7 +4,9 @@ from training.train_sft import _truncate_supervised_example, build_tokenized_dat
 
 
 class FakeTokenizer:
-    def apply_chat_template(self, messages, tokenize=True, add_generation_prompt=False):
+    def apply_chat_template(
+        self, messages, tokenize=True, add_generation_prompt=False, **kwargs
+    ):
         if add_generation_prompt:
             return [10, 11, 12]
         return [10, 11, 12, 20, 21]
