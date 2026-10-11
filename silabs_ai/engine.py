@@ -164,17 +164,24 @@ class SilabsAIEngine:
         assert self._tokenizer is not None
 
         messages = ensure_system_message(messages, self.settings.system_prompt)
-        input_ids = self._tokenizer.apply_chat_template(
+        encoded = self._tokenizer.apply_chat_template(
             messages,
             tokenize=True,
             add_generation_prompt=True,
             return_tensors="pt",
+            return_dict=True,
             enable_thinking=self.settings.enable_thinking,
         )
 
         device = next(self._model.parameters()).device
-        input_ids = input_ids.to(device)
-        attention_mask = torch.ones_like(input_ids, dtype=torch.long, device=device)
+        input_ids = encoded["input_ids"].to(device)
+        attention_mask = encoded.get("attention_mask")
+        if attention_mask is None:
+            attention_mask = torch.ones_like(
+                input_ids, dtype=torch.long, device=device
+            )
+        else:
+            attention_mask = attention_mask.to(device)
 
         temp = self.settings.temperature if temperature is None else temperature
         nucleus = self.settings.top_p if top_p is None else top_p
