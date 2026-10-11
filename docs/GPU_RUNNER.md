@@ -148,3 +148,28 @@ When the Actions job finishes:
 3. review the uploaded `silabs-ai-alignment-smoke-gpu` artifact.
 
 Do not leave paid GPU hardware running after the experiment.
+
+
+## Fast path: RunPod
+
+A RunPod GPU Pod works well for this ephemeral runner pattern because it gives
+you a Linux terminal on a dedicated GPU container.
+
+Recommended flow:
+
+1. Create a RunPod account.
+2. Open **Pods** and choose **Deploy Pod**.
+3. Choose the official **RunPod PyTorch** template.
+4. Choose one NVIDIA GPU:
+   - T4 16 GB: sufficient;
+   - A10 / RTX 3090 / RTX 4090: preferred for faster smoke training;
+   - larger cards are unnecessary for the current 360M LoRA experiment.
+5. Use at least 20 GB container disk and about 20 GB system RAM.
+6. Deploy the Pod.
+7. Open its web terminal.
+8. Run `nvidia-smi`.
+9. Follow the GitHub runner-token and bootstrap steps above.
+10. When the Actions job finishes, terminate the Pod so billing stops.
+
+The Pod does not need the Silabs datasets preloaded. GitHub Actions and the
+repository workflows reconstruct/download everything required.
