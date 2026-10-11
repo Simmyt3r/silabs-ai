@@ -56,8 +56,8 @@ Exit criterion: measurable baseline before Silabs fine-tuning. **Complete.**
 - [x] inspect train/eval loss and checkpoint behavior
 - [x] retain experiment metadata and rejected-candidate records
 - [x] validate and reject the conservative commercial-profile smoke recipe
-- [ ] validate the balanced + curated alignment smoke recipe
-- [ ] select the first no-regression candidate recipe
+- [x] validate the balanced + curated alignment smoke recipe on Colab T4 with float32 release evaluation
+- [x] select the first no-regression candidate recipe
 - [ ] run LoRA SFT on the full commercially screened corpus
 
 Fast 100/25 experiment: 90% -> 95%, zero regressions.
@@ -84,7 +84,8 @@ promotion gate.
 - [x] add deterministic pre-inference runtime guardrails
 - [x] reach 12/12 on the engine-level guardrail regression suite
 - [x] reevaluate and reject the conservative commercial candidate under the current engine and raw-safety gate
-- [ ] validate the balanced alignment candidate on compact, v2 capability and raw-safety gates
+- [x] validate the balanced alignment candidate on compact, v2 capability and raw-safety gates
+- [ ] complete manual behavior review before promotion
 - [x] evaluate raw model safety with runtime guardrails disabled
 - [ ] conduct manual response-quality and safety review
 - [ ] approve or reject the first release candidate
