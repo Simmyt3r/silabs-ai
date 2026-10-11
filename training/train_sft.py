@@ -62,7 +62,13 @@ def _truncate_supervised_example(
     return input_ids, labels
 
 
-def build_tokenized_dataset(path: str, tokenizer, max_length: int) -> Dataset:
+def build_tokenized_dataset(
+    path: str,
+    tokenizer,
+    max_length: int,
+    *,
+    enable_thinking: bool = False,
+) -> Dataset:
     """Build causal-LM examples while masking prompt tokens from the loss."""
     rows = load_messages(path)
     examples: list[dict[str, list[int]]] = []
@@ -79,6 +85,7 @@ def build_tokenized_dataset(path: str, tokenizer, max_length: int) -> Dataset:
                 messages,
                 tokenize=True,
                 add_generation_prompt=False,
+                enable_thinking=enable_thinking,
             )
         )
         prompt_ids = list(
@@ -86,6 +93,7 @@ def build_tokenized_dataset(path: str, tokenizer, max_length: int) -> Dataset:
                 messages[:-1],
                 tokenize=True,
                 add_generation_prompt=True,
+                enable_thinking=enable_thinking,
             )
         )
 
@@ -231,8 +239,13 @@ def main() -> None:
         model.enable_input_require_grads()
 
     max_length = int(cfg["data"].get("max_length", 1024))
-    train_data = build_tokenized_dataset(cfg["data"]["train"], tokenizer, max_length)
-    eval_data = build_tokenized_dataset(cfg["data"]["dev"], tokenizer, max_length)
+    enable_thinking = bool(model_cfg.get("enable_thinking", False))
+    train_data = build_tokenized_dataset(
+        cfg["data"]["train"], tokenizer, max_length, enable_thinking=enable_thinking
+    )
+    eval_data = build_tokenized_dataset(
+        cfg["data"]["dev"], tokenizer, max_length, enable_thinking=enable_thinking
+    )
 
     eval_strategy = training.get("eval_strategy", "steps")
     save_strategy = training.get("save_strategy", eval_strategy)
