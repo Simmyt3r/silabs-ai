@@ -32,7 +32,7 @@
 {"id":"science_freeze","category":"science","prompt":"At standard atmospheric pressure, at what temperature in degrees Celsius does pure water freeze?","must_match":["(?:^|\\D)0(?:\\s*°?C|\\D|$)"]}
 {"id":"science_mars","category":"science","prompt":"Which planet is known as the Red Planet?","must_match":["(?i)\\bMars\\b"]}
 {"id":"science_photosynthesis","category":"science","prompt":"Plants mainly absorb which gas from the atmosphere for photosynthesis?","must_match":["(?i)carbon dioxide"]}
-{"id":"science_water_formula","category":"science","prompt":"What is the chemical formula for water?","must_match":["(?i)\\bH2O\\b"]}
+{"id":"science_water_formula","category":"science","prompt":"What is the chemical formula for water?","must_match":["(?i)(\\bH2O\\b|H₂O)"]}
 {"id":"science_moon","category":"science","prompt":"What is Earth's natural satellite called?","must_match":["(?i)\\bMoon\\b"]}
 {"id":"science_oxygen","category":"science","prompt":"Which gas do humans need for cellular respiration?","must_match":["(?i)\\boxygen\\b"]}
 {"id":"coding_python_def","category":"coding","prompt":"In Python, what keyword defines a function?","must_match":["(?i)\\bdef\\b"]}
