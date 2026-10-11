@@ -184,7 +184,7 @@ def main() -> None:
         raise ValueError(f"Unsupported dtype: {dtype_name}")
 
     model_kwargs = {
-        "torch_dtype": dtype_map[dtype_name],
+        "dtype": dtype_map[dtype_name],
         **source_kwargs,
     }
     if model_cfg.get("device_map") == "auto":
