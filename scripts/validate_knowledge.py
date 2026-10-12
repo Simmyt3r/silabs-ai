@@ -55,7 +55,7 @@ def validate_knowledge(path: Path) -> dict:
                 )
 
     counts = Counter(normalized_texts)
-    duplicate_texts = sum(count - Counter(set(counts)))
+    duplicate_texts = sum(counts.values()) - len(counts)
     if duplicate_texts:
         warnings.append(f"duplicate text records: {duplicate_texts}")
 
