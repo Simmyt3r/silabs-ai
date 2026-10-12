@@ -29,6 +29,11 @@ class GenerateRequest(BaseModel):
     top_p: float | None = Field(default=None, gt=0.0, le=1.0)
 
 
+class SourceReference(BaseModel):
+    source: str
+    score: float | None = None
+
+
 class GenerationResponse(BaseModel):
     text: str
     model: str
@@ -36,6 +41,7 @@ class GenerationResponse(BaseModel):
     guardrail_category: str | None = None
     input_tokens: int | None = None
     output_tokens: int | None = None
+    sources: list[SourceReference] = Field(default_factory=list)
 
 
 class HealthResponse(BaseModel):
@@ -52,3 +58,5 @@ class ModelStatusResponse(BaseModel):
     device: str
     dtype: str
     guardrails_enabled: bool
+    rag_enabled: bool
+    knowledge_path: str | None
