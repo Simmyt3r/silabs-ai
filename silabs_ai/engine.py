@@ -11,7 +11,7 @@ from .config import Settings, get_settings
 from .guardrails import BasicGuardrail
 from .model_source import resolve_model_source
 from .prompting import build_chat_messages, ensure_system_message
-from .retrieval import NullRetriever, Retriever
+from .retrieval import JsonlKnowledgeRetriever, NullRetriever, Retriever
 from .response_contracts import contract_for_prompt, enforce_contract
 from .schemas import Message
 
@@ -37,7 +37,15 @@ class SilabsAIEngine:
         guardrail: BasicGuardrail | None = None,
     ) -> None:
         self.settings = settings or get_settings()
-        self.retriever = retriever or NullRetriever()
+        if retriever is not None:
+            self.retriever = retriever
+        elif self.settings.rag_enabled and self.settings.knowledge_path:
+            self.retriever = JsonlKnowledgeRetriever(
+                self.settings.knowledge_path,
+                min_score=self.settings.rag_min_score,
+            )
+        else:
+            self.retriever = NullRetriever()
         self.guardrail = guardrail or BasicGuardrail()
         self._tokenizer = None
         self._model = None
@@ -252,12 +260,23 @@ class SilabsAIEngine:
         if guarded is not None:
             return guarded
 
-        chunks = self.retriever.retrieve(message, limit=4)
+        chunks = self.retriever.retrieve(
+            message,
+            limit=self.settings.rag_limit,
+        )
+        retrieved_context = [
+            (
+                f"Source: {chunk.source}\n{chunk.text}"
+                if chunk.source
+                else chunk.text
+            )
+            for chunk in chunks
+        ]
         messages = build_chat_messages(
             message,
             history,
             system_prompt=system_prompt,
-            retrieved_context=[chunk.text for chunk in chunks],
+            retrieved_context=retrieved_context,
         )
         return self.generate(
             messages,
