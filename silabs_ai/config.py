@@ -21,9 +21,9 @@ class Settings(BaseSettings):
     env: str = "development"
 
     # Base-model identity and local materialization path.
-    model_id: str = "HuggingFaceTB/SmolLM2-360M-Instruct"
+    model_id: str = "Qwen/Qwen3-1.7B"
     model_revision: str = "main"
-    model_path: str | None = "models/base/SmolLM2-360M-Instruct"
+    model_path: str | None = "models/base/Qwen3-1.7B"
     model_cache: str | None = None
     allow_remote_model_download: bool = True
 
