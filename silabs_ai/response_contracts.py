@@ -23,6 +23,7 @@ class ResponseContract:
     direct_response: str | None = None
     system_instruction: str | None = None
     category: str | None = None
+    max_words: int | None = None
 
 
 def _word_count(text: str) -> int:
@@ -83,24 +84,43 @@ def contract_for_prompt(prompt: str) -> ResponseContract | None:
         r"(?i)(?:at most|no more than)\s+(\d+)\s+words",
         normalized,
     )
+    max_words = None
     if word_limit:
-        limit = int(word_limit.group(1))
+        max_words = int(word_limit.group(1))
         instructions.append(
-            f"Hard output constraint: answer in no more than {limit} words. "
+            f"Hard output constraint: answer in no more than {max_words} words. "
             "Count carefully before responding."
         )
 
     if re.search(r"(?i)\bfictional\b", normalized):
-        instructions.append(
-            "The user explicitly describes an entity or scenario as fictional. "
-            "Do not invent real-world records, awards, dates, affiliations, or other "
-            "facts for it. Answer briefly and state the fictional status when relevant."
+        return ResponseContract(
+            direct_response=(
+                "The subject is fictional, so there is no real-world fact to report."
+            ),
+            category="fictional",
         )
 
     if instructions:
         return ResponseContract(
             system_instruction=" ".join(instructions),
             category="instruction",
+            max_words=max_words,
         )
 
     return None
+
+
+def enforce_contract(text: str, contract: ResponseContract | None) -> str:
+    """Apply deterministic post-generation limits without changing unconstrained text."""
+    if contract is None or contract.max_words is None:
+        return text.strip()
+
+    matches = list(re.finditer(r"\b[\w'-]+\b", text))
+    if len(matches) <= contract.max_words:
+        return text.strip()
+
+    end = matches[contract.max_words - 1].end()
+    trimmed = text[:end].rstrip(" ,;:-")
+    if trimmed and trimmed[-1] not in ".!?":
+        trimmed += "."
+    return trimmed
