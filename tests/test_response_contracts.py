@@ -1,6 +1,6 @@
 from silabs_ai.config import Settings
 from silabs_ai.engine import SilabsAIEngine
-from silabs_ai.response_contracts import contract_for_prompt
+from silabs_ai.response_contracts import contract_for_prompt, enforce_contract
 
 
 def offline_settings() -> Settings:
@@ -70,3 +70,26 @@ def test_exact_word_contract_returns_before_model_load():
     assert result.finish_reason == "contract"
     assert result.text == "machine learning"
     assert engine.loaded is False
+
+
+def test_word_limit_postprocessor_truncates_to_cap():
+    contract = contract_for_prompt(
+        "Define a computer in one sentence of at most 15 words."
+    )
+    output = (
+        "A computer is an electronic device that processes information and "
+        "performs tasks using hardware and software."
+    )
+    result = enforce_contract(output, contract)
+
+    assert len(result.rstrip(".").split()) <= 15
+
+
+def test_fictional_contract_returns_concise_direct_response():
+    contract = contract_for_prompt(
+        "What year did the fictional scientist Dr. Zorban Quill win the Nobel Prize?"
+    )
+    assert contract is not None
+    assert contract.direct_response is not None
+    assert "fictional" in contract.direct_response.lower()
+    assert len(contract.direct_response.split()) <= 20
