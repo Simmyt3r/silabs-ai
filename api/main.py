@@ -48,6 +48,8 @@ def model_status() -> ModelStatusResponse:
         device=settings.device,
         dtype=settings.dtype,
         guardrails_enabled=settings.enable_guardrails,
+        rag_enabled=settings.rag_enabled,
+        knowledge_path=settings.knowledge_path,
     )
 
 
@@ -73,6 +75,11 @@ def chat(payload: ChatRequest) -> GenerationResponse:
         guardrail_category=result.guardrail_category,
         input_tokens=result.input_tokens,
         output_tokens=result.output_tokens,
+        sources=[
+            {"source": item.source, "score": item.score}
+            for item in result.sources
+            if item.source
+        ],
     )
 
 
@@ -96,4 +103,9 @@ def generate(payload: GenerateRequest) -> GenerationResponse:
         guardrail_category=result.guardrail_category,
         input_tokens=result.input_tokens,
         output_tokens=result.output_tokens,
+        sources=[
+            {"source": item.source, "score": item.score}
+            for item in result.sources
+            if item.source
+        ],
     )
