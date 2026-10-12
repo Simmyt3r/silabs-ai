@@ -93,3 +93,34 @@ Before promoting any later model/runtime change, rerun:
 - product safety suite;
 - manual hallucination/identity review.
 
+
+
+## RAG continuation progress
+
+Implemented and saved after the frozen Qwen baseline:
+
+- `fb01f70` made Qwen3-1.7B the runtime default in Settings.
+- `4a02b5d` added the dependency-free verified JSONL retriever.
+- `7800059` added retrieval tests.
+- `4e0ffb3` added RAG runtime settings.
+- `0d4f458` updated `.env.example` for Qwen and RAG.
+- `337b039` wired verified retrieval into the engine.
+- `8d82d13` added engine RAG-selection tests.
+- `85c7614` added the knowledge validation command.
+- `6469ea6` added knowledge-validator tests.
+- `37b2621` preserved retrieved source metadata in generation results.
+- `9244ce7` added API source/status schemas.
+- `9af5daa` exposed RAG provenance through the API.
+- `88fd64b` documented the verified knowledge store.
+- `2affdae` seeded the first verified Silabs/UniXpress/AI knowledge records.
+
+Current default knowledge path:
+`knowledge/verified.jsonl`
+
+RAG remains disabled by default until explicitly enabled with:
+`SILABS_RAG_ENABLED=true`
+
+Next runtime step:
+1. pull the latest repository;
+2. run `python -m scripts.validate_knowledge knowledge/verified.jsonl`;
+3. only after validation passes, enable RAG and run retrieval/API tests.
