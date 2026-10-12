@@ -12,6 +12,7 @@ from .guardrails import BasicGuardrail
 from .model_source import resolve_model_source
 from .prompting import build_chat_messages, ensure_system_message
 from .retrieval import NullRetriever, Retriever
+from .response_contracts import contract_for_prompt
 from .schemas import Message
 
 logger = logging.getLogger(__name__)
@@ -154,16 +155,39 @@ class SilabsAIEngine:
         top_p: float | None = None,
     ) -> GenerationResult:
         user_content = self._latest_user_content(messages)
+        contract = None
         if user_content:
             guarded = self._apply_guardrail(user_content)
             if guarded is not None:
                 return guarded
+
+            contract = contract_for_prompt(user_content)
+            if contract and contract.direct_response is not None:
+                return GenerationResult(
+                    text=contract.direct_response,
+                    input_tokens=0,
+                    output_tokens=len(contract.direct_response.split()),
+                    finish_reason="contract",
+                )
 
         self.load()
         assert self._model is not None
         assert self._tokenizer is not None
 
         messages = ensure_system_message(messages, self.settings.system_prompt)
+        if contract and contract.system_instruction:
+            base_system = messages[0]["content"]
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        base_system
+                        + "\n\nHard response contract:\n"
+                        + contract.system_instruction
+                    ),
+                },
+                *messages[1:],
+            ]
         encoded = self._tokenizer.apply_chat_template(
             messages,
             tokenize=True,
