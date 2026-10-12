@@ -12,7 +12,7 @@ from .guardrails import BasicGuardrail
 from .model_source import resolve_model_source
 from .prompting import build_chat_messages, ensure_system_message
 from .retrieval import NullRetriever, Retriever
-from .response_contracts import contract_for_prompt
+from .response_contracts import contract_for_prompt, enforce_contract
 from .schemas import Message
 
 logger = logging.getLogger(__name__)
@@ -230,6 +230,7 @@ class SilabsAIEngine:
 
         generated = output[0, input_ids.shape[-1] :]
         text = self._tokenizer.decode(generated, skip_special_tokens=True).strip()
+        text = enforce_contract(text, contract)
 
         return GenerationResult(
             text=text,
