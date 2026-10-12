@@ -124,3 +124,48 @@ Next runtime step:
 1. pull the latest repository;
 2. run `python -m scripts.validate_knowledge knowledge/verified.jsonl`;
 3. only after validation passes, enable RAG and run retrieval/API tests.
+
+
+## Colab pause checkpoint
+
+The verified knowledge validator was successfully run in Colab after commit `bb2ceb3`.
+
+Result:
+
+```text
+knowledge: knowledge/verified.jsonl
+records: 5
+verified: 5
+unverified: 0
+SILABS KNOWLEDGE VALIDATION: PASS
+```
+
+Colab usage limit was reached immediately after validation, so no model-backed RAG generation test was run yet.
+
+Current status:
+- Qwen3-1.7B capability baseline remains frozen at 50/50.
+- Raw safety remains 10/12.
+- Product safety remains 12/12.
+- RAG JSONL knowledge file is structurally valid.
+- Five verified records are present.
+- RAG is still disabled by default.
+- No post-RAG model benchmark has been run yet.
+
+Resume from this exact step when a Colab GPU is available.
+
+Next Colab step:
+
+```python
+!cd /content/silabs-ai && git pull --ff-only
+```
+
+Then enable RAG in the notebook environment:
+
+```python
+import os
+os.environ["SILABS_RAG_ENABLED"] = "true"
+os.environ["SILABS_KNOWLEDGE_PATH"] = "knowledge/verified.jsonl"
+os.environ["SILABS_RAG_LIMIT"] = "4"
+```
+
+After that, test lexical retrieval first without loading the model, then run one model-backed RAG response and verify API provenance before re-running the frozen regression suites.
