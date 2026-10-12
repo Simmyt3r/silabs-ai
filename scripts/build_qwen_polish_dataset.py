@@ -6,6 +6,8 @@ import json
 import re
 from pathlib import Path
 
+from silabs_ai.config import Settings
+
 
 def normalize(text: str) -> str:
     return re.sub(r"\s+", " ", str(text).strip().lower())
@@ -18,6 +20,8 @@ def load_records(path: Path, dataset_name: str) -> list[dict]:
         raise ValueError(f"{path} must contain a non-empty records list")
 
     output: list[dict] = []
+    system_prompt = Settings().system_prompt
+
     for index, row in enumerate(records, start=1):
         required = ["task", "domain", "instruction", "input", "output"]
         if not isinstance(row, dict) or not all(str(row.get(k) or "").strip() for k in required):
@@ -32,6 +36,7 @@ def load_records(path: Path, dataset_name: str) -> list[dict]:
             "dataset": dataset_name,
             "task": str(row["task"]).strip(),
             "domain": str(row["domain"]).strip(),
+            "system": system_prompt,
             "instruction": str(row["instruction"]).strip(),
             "input": str(row["input"]).strip(),
             "output": str(row["output"]).strip(),
