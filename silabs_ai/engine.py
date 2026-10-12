@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import threading
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -25,6 +25,7 @@ class GenerationResult:
     output_tokens: int
     finish_reason: str = "stop"
     guardrail_category: str | None = None
+    sources: list[RetrievedChunk] = field(default_factory=list)
 
 
 class SilabsAIEngine:
@@ -161,6 +162,7 @@ class SilabsAIEngine:
         max_new_tokens: int | None = None,
         temperature: float | None = None,
         top_p: float | None = None,
+        sources: list[RetrievedChunk] | None = None,
     ) -> GenerationResult:
         user_content = self._latest_user_content(messages)
         contract = None
@@ -244,6 +246,7 @@ class SilabsAIEngine:
             text=text,
             input_tokens=int(input_ids.shape[-1]),
             output_tokens=int(generated.shape[-1]),
+            sources=list(sources or []),
         )
 
     def chat(
@@ -283,4 +286,5 @@ class SilabsAIEngine:
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
+            sources=chunks,
         )
