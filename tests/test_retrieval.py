@@ -1,6 +1,9 @@
+from silabs_ai.config import Settings
+from silabs_ai.engine import SilabsAIEngine
+from silabs_ai.retrieval import JsonlKnowledgeRetriever, NullRetriever
+
 import json
 
-from silabs_ai.retrieval import JsonlKnowledgeRetriever
 
 
 def _write_jsonl(path, records):
@@ -92,3 +95,38 @@ def test_zero_limit_returns_no_results(tmp_path):
     retriever = JsonlKnowledgeRetriever(path)
 
     assert retriever.retrieve("Silabs", limit=0) == []
+
+
+def test_engine_uses_null_retriever_when_rag_disabled(tmp_path):
+    settings = Settings(
+        _env_file=None,
+        rag_enabled=False,
+        knowledge_path=str(tmp_path / "knowledge.jsonl"),
+    )
+    engine = SilabsAIEngine(settings)
+
+    assert isinstance(engine.retriever, NullRetriever)
+
+
+def test_engine_builds_jsonl_retriever_when_rag_enabled(tmp_path):
+    path = tmp_path / "knowledge.jsonl"
+    _write_jsonl(
+        path,
+        [
+            {
+                "text": "UniXpress provides verified academic resources.",
+                "source": "silabs://unixpress",
+                "verified": True,
+            }
+        ],
+    )
+    settings = Settings(
+        _env_file=None,
+        rag_enabled=True,
+        knowledge_path=str(path),
+        rag_limit=3,
+    )
+    engine = SilabsAIEngine(settings)
+
+    assert isinstance(engine.retriever, JsonlKnowledgeRetriever)
+    assert engine.retriever.retrieve("academic resources", limit=3)
