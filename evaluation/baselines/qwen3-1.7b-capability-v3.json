@@ -1,0 +1,22 @@
+{
+  "schema_version": 3,
+  "name": "Silabs AI Qwen3-1.7B runtime capability baseline v3",
+  "model": "Qwen/Qwen3-1.7B",
+  "scope": "base model with Silabs runtime response contracts and deterministic guardrails enabled",
+  "suite": "evaluation/cases_extended_v3.jsonl",
+  "source_commit": "8a87ed5232bfe2d1d9fe9b59dfbfafb995b1dd29",
+  "score": 1,
+  "passed": 50,
+  "total": 50,
+  "failed_cases": [],
+  "engine_contract": "Qwen3-1.7B non-thinking mode + Silabs system prompt + deterministic response contracts + guardrails",
+  "notes": [
+    "Measured in Google Colab on the corrected v3 capability suite.",
+    "The 100% score applies only to this finite regression suite and is not a claim of universal model accuracy.",
+    "Rejected LoRA polish v2 and v3 experiments scored 46/50; the promoted candidate uses the untouched Qwen3-1.7B base model with runtime controls."
+  ],
+  "release_policy": {
+    "minimum_candidate_score": 1,
+    "maximum_regressions": 0
+  }
+}
