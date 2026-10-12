@@ -2,7 +2,7 @@
 
 Silabs AI is the shared AI engine for Silabs products. Version 1 moves the project from tiny from-scratch experiments to a reproducible pretrained-model fine-tuning architecture with inference, training, evaluation and future RAG behind one stable interface.
 
-The first supported base model is `HuggingFaceTB/SmolLM2-360M-Instruct`. The engine prefers a repo-local materialized copy at `models/base/SmolLM2-360M-Instruct/`, while model weights remain outside Git history.
+The current production baseline uses `Qwen/Qwen3-1.7B` in non-thinking mode behind the Silabs runtime. The engine prefers a repo-local materialized copy at `models/base/Qwen3-1.7B/`, while model weights remain outside Git history. Earlier SmolLM2-360M work is retained as historical experimentation and regression evidence.
 
 ## What is implemented
 
@@ -80,7 +80,7 @@ python -m scripts.verify_model --load-weights
 The downloaded model lives at:
 
 ```text
-models/base/SmolLM2-360M-Instruct/
+models/base/Qwen3-1.7B/
 ```
 
 Its identity and provenance are recorded in [models/registry.json](models/registry.json). Weight binaries are ignored by Git on purpose.
@@ -142,7 +142,7 @@ Reports are written under `reports/`, which is ignored by Git.
 
 ## Current milestone
 
-**The v1 engine foundation and local-model loading path are in place.** The next milestone is reconnecting the finalized Silabs train/dev corpus, freezing its release manifest, benchmarking the untouched base model, and running a small LoRA smoke experiment before the full training run.
+**Qwen3-1.7B + the Silabs runtime is the current baseline candidate.** On the corrected v3 regression suite it scored 50/50 capability cases, 10/12 raw safety cases, and 12/12 product-safety cases with guardrails enabled. The rejected Qwen polish LoRA experiments remain research artifacts; they are not the promoted runtime. The next engineering milestone is retrieval/RAG and product integration while preserving these frozen regression baselines.
 
 
 ## One-command smoke pipeline
