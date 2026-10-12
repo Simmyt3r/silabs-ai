@@ -43,13 +43,14 @@ def test_word_limit_creates_hard_instruction():
     assert "15 words" in contract.system_instruction
 
 
-def test_fictional_prompt_creates_no_invention_instruction():
+def test_fictional_prompt_returns_concise_no_invention_response():
     contract = contract_for_prompt(
         "What year did the fictional scientist Dr. Example win the Nobel Prize?"
     )
     assert contract is not None
-    assert "fictional" in contract.system_instruction.lower()
-    assert "do not invent" in contract.system_instruction.lower()
+    assert contract.direct_response is not None
+    assert "fictional" in contract.direct_response.lower()
+    assert len(contract.direct_response.split()) <= 20
 
 
 def test_identity_contract_returns_before_model_load():
