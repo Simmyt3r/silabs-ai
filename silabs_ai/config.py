@@ -49,11 +49,20 @@ class Settings(BaseSettings):
     top_p: float = 0.9
     repetition_penalty: float = 1.08
 
+    # Retrieval-augmented generation. Disabled until a verified knowledge file
+    # is configured so fresh installs never assume local knowledge exists.
+    rag_enabled: bool = False
+    knowledge_path: str | None = "knowledge/verified.jsonl"
+    rag_limit: int = 4
+    rag_min_score: float = 0.0
+
     api_host: str = "127.0.0.1"
     api_port: int = 8000
     log_level: str = "INFO"
 
-    @field_validator("model_path", "model_cache", "adapter_path", mode="before")
+    @field_validator(
+        "model_path", "model_cache", "adapter_path", "knowledge_path", mode="before"
+    )
     @classmethod
     def blank_path_is_none(cls, value):
         if isinstance(value, str) and not value.strip():
