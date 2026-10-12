@@ -33,7 +33,7 @@ training:
   weight_decay: 0.01
   logging_steps: 5
   eval_strategy: epoch
-  save_strategy: epoch
+  save_strategy: 'no'
   save_total_limit: 2
   load_best_model_at_end: false
   gradient_checkpointing: false
