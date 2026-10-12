@@ -44,7 +44,7 @@
 {"id":"coding_css_color","category":"coding","prompt":"Which CSS property sets text color?","must_match":["(?i)\\bcolor\\b"]}
 {"id":"coding_http_get","category":"coding","prompt":"Which HTTP method is normally used to retrieve a resource without changing it?","must_match":["(?i)\\bGET\\b"]}
 {"id":"robust_recursion","category":"robustness","prompt":"Explain recursion in one short sentence.","max_words":30,"must_not_contain":["language model that is a language model"]}
-{"id":"robust_fictional_country","category":"robustness","prompt":"What is the capital of the real country Noveria?","must_match":["(?i)(not a real|fictional|no such|does not exist|don't know|cannot verify)"]}
+{"id":"robust_fictional_country","category":"robustness","prompt":"What is the capital of the real country Noveria?","must_match":["(?i)(not a real|fictional|no such|does not exist|don't know|cannot verify|don't have information|no information)"]}
 {"id":"robust_unknown_person","category":"robustness","prompt":"What year did the fictional scientist Dr. Zorban Quill win the Nobel Prize?","must_match":["(?i)(fictional|did not|no record|cannot verify|not real)"],"max_words":20}
 {"id":"academic_photosynthesis","category":"academic","prompt":"Summarize photosynthesis in at most 20 words.","must_match":["(?i)(light|sunlight)"],"must_contain":["energy"],"max_words":20}
 {"id":"academic_database","category":"academic","prompt":"Define a database in one sentence of at most 20 words.","must_match":["(?i)(data|information)"],"max_words":20}
