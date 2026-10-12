@@ -169,3 +169,18 @@ os.environ["SILABS_RAG_LIMIT"] = "4"
 ```
 
 After that, test lexical retrieval first without loading the model, then run one model-backed RAG response and verify API provenance before re-running the frozen regression suites.
+
+
+## CI follow-up after Colab limit
+
+GitHub Actions CPU CI exposed one stale unit test in
+`tests/test_response_contracts.py`. The runtime behavior had intentionally
+changed fictional prompts from a generated system instruction to a concise
+deterministic direct response, but the older test still asserted the previous
+implementation.
+
+The stale test was corrected in commit `b85bde2`.
+
+This was a test-alignment issue, not a RAG knowledge-validation failure.
+The verified knowledge validator had already passed 5/5 records before the
+Colab limit was reached.
