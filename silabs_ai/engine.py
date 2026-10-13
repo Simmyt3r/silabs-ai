@@ -269,11 +269,11 @@ class SilabsAIEngine:
         )
         retrieved_context = [
             (
-                f"Source: {chunk.source}\n{chunk.text}"
+                f"[{chunk.citation or f'S{index}'}] Source: {chunk.source}\n{chunk.text}"
                 if chunk.source
-                else chunk.text
+                else f"[{chunk.citation or f'S{index}'}]\n{chunk.text}"
             )
-            for chunk in chunks
+            for index, chunk in enumerate(chunks, start=1)
         ]
         messages = build_chat_messages(
             message,
