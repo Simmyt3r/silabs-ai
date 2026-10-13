@@ -7,8 +7,10 @@ import os
 import re
 import subprocess
 import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
+from xml.etree import ElementTree as ET
 
 import requests
 from bs4 import BeautifulSoup
@@ -123,8 +125,63 @@ def clone_repo(name: str, branch: str, target: Path) -> None:
     )
 
 
-def build(registry_path: Path, seed_path: Path, output_path: Path, manifest_path: Path,
-          max_repos: int | None = None, max_web: int | None = None) -> dict:
+def fetch_page(session: requests.Session, url: str) -> tuple[str, str | None]:
+    response = session.get(url, timeout=30)
+    response.raise_for_status()
+    return html_text(response.text)
+
+
+def sitemap_urls(
+    session: requests.Session,
+    sitemap_url: str,
+    allow_prefixes: list[str],
+    limit: int,
+) -> list[str]:
+    found: list[str] = []
+    seen_sitemaps: set[str] = set()
+
+    def visit(url: str, depth: int = 0) -> None:
+        if len(found) >= limit or url in seen_sitemaps or depth > 3:
+            return
+        seen_sitemaps.add(url)
+        response = session.get(url, timeout=30)
+        response.raise_for_status()
+        root = ET.fromstring(response.content)
+        locations = [
+            (element.text or "").strip()
+            for element in root.iter()
+            if element.tag.endswith("loc") and (element.text or "").strip()
+        ]
+
+        if root.tag.endswith("sitemapindex"):
+            for child in locations:
+                visit(child, depth + 1)
+                if len(found) >= limit:
+                    break
+            return
+
+        for page_url in locations:
+            if allow_prefixes and not any(page_url.startswith(prefix) for prefix in allow_prefixes):
+                continue
+            if page_url not in found:
+                found.append(page_url)
+            if len(found) >= limit:
+                break
+
+    visit(sitemap_url)
+    return found
+
+
+def build(
+    registry_path: Path,
+    seed_path: Path,
+    output_path: Path,
+    manifest_path: Path,
+    max_repos: int | None = None,
+    max_web: int | None = None,
+    skip_collections: bool = False,
+    max_collection_pages: int | None = None,
+) -> dict:
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     policy = registry["policy"]
     target = int(policy["chunking"]["target_chars"])
@@ -135,8 +192,15 @@ def build(registry_path: Path, seed_path: Path, output_path: Path, manifest_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
     seen: set[str] = set()
     rows: list[dict] = []
-    stats = {"seed_records": 0, "github_documents": 0, "web_documents": 0,
-             "chunks_written": 0, "duplicates_skipped": 0, "source_failures": 0}
+    stats = {
+        "seed_records": 0,
+        "github_documents": 0,
+        "web_documents": 0,
+        "collection_documents": 0,
+        "chunks_written": 0,
+        "duplicates_skipped": 0,
+        "source_failures": 0,
+    }
 
     def add(row: dict) -> None:
         text = normalize(str(row.get("text", "")))
@@ -241,6 +305,53 @@ def build(registry_path: Path, seed_path: Path, output_path: Path, manifest_path
                 "retrieved_at": now(),
             })
 
+    if not skip_collections:
+        for source in registry.get("web_collections", []):
+            page_limit = int(source.get("max_pages", 100))
+            if max_collection_pages is not None:
+                page_limit = min(page_limit, max_collection_pages)
+            try:
+                urls = sitemap_urls(
+                    session,
+                    source["sitemap_url"],
+                    list(source.get("allow_prefixes", [])),
+                    page_limit,
+                )
+            except Exception as exc:
+                stats["source_failures"] += 1
+                print("WARN sitemap", source.get("name"), str(exc))
+                continue
+
+            print("COLLECTION", source.get("name"), "pages:", len(urls))
+            for page_number, url in enumerate(urls, 1):
+                try:
+                    text, page_title = fetch_page(session, url)
+                except Exception as exc:
+                    stats["source_failures"] += 1
+                    print("WARN collection page", url, str(exc))
+                    continue
+                pieces = chunks(text, target, overlap, minimum)
+                if not pieces:
+                    continue
+                stats["collection_documents"] += 1
+                title = page_title or source.get("name") or url
+                for idx, piece in enumerate(pieces, 1):
+                    add({
+                        "title": title,
+                        "text": piece,
+                        "source": url + "#chunk-" + str(idx),
+                        "verified": bool(source.get("verified")),
+                        "trust_tier": source.get("trust_tier"),
+                        "authority": source.get("authority"),
+                        "domain": source.get("domain"),
+                        "source_kind": "web_collection",
+                        "collection": source.get("name"),
+                        "chunk_index": idx,
+                        "retrieved_at": now(),
+                    })
+                if page_number < len(urls):
+                    time.sleep(float(source.get("delay_seconds", 0.05)))
+
     output_path.write_text(
         "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
         encoding="utf-8",
@@ -256,6 +367,7 @@ def build(registry_path: Path, seed_path: Path, output_path: Path, manifest_path
         "registered": {
             "github": len(registry.get("github_repositories", [])),
             "web": len(registry.get("web_pages", [])),
+            "collections": len(registry.get("web_collections", [])),
         },
         "chunking": {"target_chars": target, "overlap_chars": overlap, "min_chars": minimum},
     }
@@ -271,11 +383,16 @@ def main() -> None:
     parser.add_argument("--manifest", type=Path, default=Path("knowledge/generated/manifest.json"))
     parser.add_argument("--max-repos", type=int)
     parser.add_argument("--max-web-pages", type=int)
+    parser.add_argument("--skip-collections", action="store_true")
+    parser.add_argument("--max-collection-pages", type=int)
     args = parser.parse_args()
 
     stats = build(
         args.registry, args.seed, args.output, args.manifest,
-        max_repos=args.max_repos, max_web=args.max_web_pages,
+        max_repos=args.max_repos,
+        max_web=args.max_web_pages,
+        skip_collections=args.skip_collections,
+        max_collection_pages=args.max_collection_pages,
     )
     print("\nSILABS KNOWLEDGE EXPANSION COMPLETE")
     for key, value in stats.items():
