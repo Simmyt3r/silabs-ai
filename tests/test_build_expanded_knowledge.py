@@ -7,6 +7,8 @@ from scripts.build_expanded_knowledge import (
     html_text,
     sitemap_urls,
     build,
+    allowed_doc,
+    clean_repo_document,
 )
 
 
@@ -139,3 +141,29 @@ def test_build_resume_does_not_duplicate_existing_records(tmp_path):
 
     assert len(second) == 1
     assert stats["resumed_records"] == 1
+
+
+
+def test_allowed_doc_accepts_sparse_root_even_without_docs_name():
+    from pathlib import Path
+
+    assert allowed_doc(
+        Path("content/actions/quickstart.md"),
+        excluded=set(),
+        include_roots=["content/actions"],
+    )
+
+
+def test_clean_repo_document_extracts_xml_text():
+    xml = """
+    <chapter>
+      <title>PostGIS Introduction</title>
+      <para>PostGIS adds spatial capabilities to PostgreSQL.</para>
+    </chapter>
+    """
+
+    cleaned = clean_repo_document(xml, ".xml")
+
+    assert "PostGIS Introduction" in cleaned
+    assert "spatial capabilities" in cleaned
+    assert "<chapter>" not in cleaned
