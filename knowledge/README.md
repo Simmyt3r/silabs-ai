@@ -154,3 +154,36 @@ addition to repository documentation and exact pages.
 
 Always run the smoke build with `--skip-collections` first. The full build
 intentionally omits that flag.
+
+
+## Colab / Google Drive full build
+
+For long crawls, write the generated corpus directly to persistent Google Drive
+and enable resume support. This protects progress from Colab runtime resets.
+
+Recommended output paths:
+
+```text
+/content/drive/MyDrive/SilabsAI/knowledge/verified-expanded.jsonl
+/content/drive/MyDrive/SilabsAI/knowledge/manifest.json
+```
+
+Run the builder with:
+
+```bash
+python -m scripts.build_expanded_knowledge \
+  --output /content/drive/MyDrive/SilabsAI/knowledge/verified-expanded.jsonl \
+  --manifest /content/drive/MyDrive/SilabsAI/knowledge/manifest.json \
+  --resume
+```
+
+If the runtime resets, rerun the same command with `--resume`. Existing chunks
+are loaded by content hash and are not duplicated.
+
+Private GitHub repositories require `GITHUB_TOKEN`. In Colab, store that token
+in Colab Secrets rather than pasting it into a notebook cell or committing it.
+Without a token, public repositories and approved web sources still build
+normally and private repositories are reported as skipped rather than failures.
+
+The output file is streamed in batches during the crawl, so collected chunks
+remain on Drive even if the notebook stops before the entire registry finishes.
