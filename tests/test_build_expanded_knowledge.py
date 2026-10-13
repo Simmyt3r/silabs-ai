@@ -167,3 +167,55 @@ def test_clean_repo_document_extracts_xml_text():
     assert "PostGIS Introduction" in cleaned
     assert "spatial capabilities" in cleaned
     assert "<chapter>" not in cleaned
+
+
+def test_build_resume_rewrites_duplicate_physical_records(tmp_path):
+    registry = tmp_path / "registry.json"
+    seed = tmp_path / "seed.jsonl"
+    output = tmp_path / "verified.jsonl"
+    manifest = tmp_path / "manifest.json"
+
+    registry.write_text(
+        json.dumps(
+            {
+                "policy": {
+                    "chunking": {
+                        "target_chars": 300,
+                        "overlap_chars": 30,
+                        "min_chars": 20,
+                    },
+                    "github_exclude_dirs": [],
+                },
+                "github_repositories": [],
+                "web_pages": [],
+                "web_collections": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    seed.write_text("", encoding="utf-8")
+
+    row = {
+        "title": "Duplicate",
+        "text": "This record was accidentally written twice during an earlier run.",
+        "source": "silabs://resume/duplicate",
+        "verified": True,
+    }
+    row["content_hash"] = digest(row["text"])
+    duplicated = json.dumps(row) + "\n" + json.dumps(row) + "\n"
+    output.write_text(duplicated, encoding="utf-8")
+
+    stats = build(
+        registry,
+        seed,
+        output,
+        manifest,
+        resume=True,
+    )
+
+    lines = [line for line in output.read_text(encoding="utf-8").splitlines() if line]
+    assert len(lines) == 1
+    assert stats["resumed_records"] == 1
+
+    saved_manifest = json.loads(manifest.read_text(encoding="utf-8"))
+    assert saved_manifest["stats"]["chunks_written"] == 1
