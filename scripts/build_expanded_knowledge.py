@@ -267,9 +267,11 @@ def build(
     }
 
     if resume and output_path.exists():
+        physical_records = 0
         for raw in output_path.read_text(encoding="utf-8").splitlines():
             if not raw.strip():
                 continue
+            physical_records += 1
             try:
                 row = json.loads(raw)
             except json.JSONDecodeError:
@@ -281,9 +283,27 @@ def build(
             if key in seen:
                 continue
             seen.add(key)
+            row = dict(row)
+            row["text"] = text
+            row["content_hash"] = key
             rows.append(row)
+
+        # Canonicalize the resumed file before appending new material. Earlier
+        # interrupted/resumed builds may leave duplicate physical JSONL lines
+        # even though the in-memory resume set correctly deduplicates them.
+        # Rewriting here keeps the corpus, manifest count and later audits in
+        # agreement without requiring a separate repair step.
+        canonical = "".join(
+            json.dumps(row, ensure_ascii=False) + "\n"
+            for row in rows
+        )
+        output_path.write_text(canonical, encoding="utf-8")
+
+        removed = max(physical_records - len(rows), 0)
         stats["resumed_records"] = len(rows)
         print("RESUME existing records:", len(rows))
+        if removed:
+            print("RESUME canonicalized duplicate/invalid records:", removed)
     else:
         output_path.write_text("", encoding="utf-8")
 
