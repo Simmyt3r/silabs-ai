@@ -5,6 +5,7 @@ from scripts.build_expanded_knowledge import (
     clean_markdown,
     digest,
     html_text,
+    sitemap_urls,
 )
 
 
@@ -56,3 +57,29 @@ def test_html_to_text_prefers_main_content():
 
 def test_content_hash_is_whitespace_and_case_stable():
     assert digest("Silabs AI") == digest("  silabs   ai  ")
+
+
+
+def test_sitemap_urls_filters_prefix_and_limit():
+    class Response:
+        content = b"""<?xml version="1.0" encoding="UTF-8"?>
+        <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+          <url><loc>https://example.com/docs/a</loc></url>
+          <url><loc>https://example.com/blog/b</loc></url>
+          <url><loc>https://example.com/docs/c</loc></url>
+        </urlset>"""
+        def raise_for_status(self):
+            return None
+
+    class Session:
+        def get(self, url, timeout=30):
+            return Response()
+
+    urls = sitemap_urls(
+        Session(),
+        "https://example.com/sitemap.xml",
+        ["https://example.com/docs/"],
+        1,
+    )
+
+    assert urls == ["https://example.com/docs/a"]
