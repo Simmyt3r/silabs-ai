@@ -668,3 +668,41 @@ Next phase:
 4. rerank candidates while preserving source provenance;
 5. evaluate retrieval quality on held-out factual questions before enabling the
    expanded corpus in production.
+
+
+## Official documentation fallback expansion prepared — 2026-10-13
+
+After the first full 16,998-chunk corpus build, several sitemap/direct-HTTP
+sources were identified as unavailable from Colab due to HTTP 403, HTTP 404, or
+empty sitemap matches.
+
+The builder and source registry now include official GitHub documentation
+fallbacks for:
+
+```text
+github/docs
+reactjs/react.dev
+microsoft/TypeScript-Website
+tailwindlabs/tailwindcss.com
+aiven/aiven-docs
+python/cpython
+pallets/flask
+postgis/postgis
+PaystackHQ/documentation
+```
+
+The fallback implementation supports:
+- sparse checkout of only the relevant documentation directories;
+- Markdown, MDX, RST, XML, HTML and text documentation;
+- XML/HTML text extraction;
+- source domain and source-scope metadata;
+- resuming into the existing Google Drive corpus with content-hash
+  deduplication.
+
+This avoids repeatedly depending on anti-bot-protected documentation websites
+and avoids cloning unrelated source trees from very large repositories.
+
+Next step:
+rerun the full builder against the existing Google Drive corpus with
+`--resume`. The existing 16,998 chunks will be loaded first and only new
+content will be appended.
