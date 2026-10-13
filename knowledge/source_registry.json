@@ -729,6 +729,27 @@
       "include_roots": [
         "doc"
       ]
+    },
+    {
+      "type": "github_repo",
+      "repository": "PaystackHQ/documentation",
+      "default_branch": "master",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "payments",
+      "access": "public",
+      "include_documentation_only": true,
+      "include_roots": [
+        "getting-started",
+        "receiving-payments",
+        "recurring-payments",
+        "sending-money",
+        "other-features"
+      ]
     }
   ],
   "web_pages": [
