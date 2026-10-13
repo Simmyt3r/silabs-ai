@@ -514,3 +514,48 @@ The next milestone is large-scale verified knowledge expansion using:
 - explicit provenance, authority tier, license and freshness metadata;
 - deterministic chunking and deduplication;
 - source-specific retrieval controls.
+
+
+## Expanded knowledge smoke build — 2026-10-13
+
+The first network-backed expanded knowledge smoke build completed successfully
+and the generated corpus passed validation.
+
+Command scope:
+- first 3 registered GitHub repositories;
+- first 5 exact web pages;
+- sitemap collections disabled.
+
+Result:
+
+```text
+SILABS KNOWLEDGE EXPANSION COMPLETE
+seed records: 5
+github documents: 2
+web documents: 2
+collection documents: 0
+chunks written: 26
+duplicates skipped: 0
+source failures: 4
+
+knowledge: knowledge/generated/verified.jsonl
+records: 26
+verified: 26
+unverified: 0
+SILABS KNOWLEDGE VALIDATION: PASS
+```
+
+Observed access failures:
+- `Simmyt3r/Unixpress-Initial` could not be cloned anonymously because it is private.
+- three direct `www.cac.gov.ng` pages returned HTTP 403 to the Colab HTTP client.
+
+Follow-up changes:
+- the source registry now records repository visibility and token requirements;
+- 29 registered repositories are public and 16 are private;
+- private repositories are skipped cleanly unless `GITHUB_TOKEN` is supplied;
+- blocked CAC pages were replaced with official public iCRP pages;
+- source failures remain visible in the manifest rather than silently ignored.
+
+Next step:
+run a second smoke build after these access fixes, then launch the full
+repository + exact-page + sitemap collection build into persistent Google Drive.
