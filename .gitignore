@@ -56,3 +56,6 @@ tensorboard/
 # Local RAG indexes
 indexes/
 vector_store/
+
+# Generated expanded knowledge corpus
+knowledge/generated/
