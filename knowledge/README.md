@@ -124,7 +124,7 @@ SILABS_KNOWLEDGE_PATH=knowledge/generated/verified.jsonl
 For a quick smoke build before downloading every registered repository:
 
 ```bash
-python -m scripts.build_expanded_knowledge --max-repos 3 --max-web-pages 5
+python -m scripts.build_expanded_knowledge --max-repos 3 --max-web-pages 5 --skip-collections
 ```
 
 If a registered GitHub repository is private, expose a `GITHUB_TOKEN` to the
@@ -143,3 +143,14 @@ bulk corpus files are therefore kept local and out of Git by default.
 
 When external material is later packaged, redistributed or used for training
 rather than retrieval, perform a separate license review.
+
+
+### Registered expansion scale
+
+The current registry contains 45 first-party repositories, 42 exact approved
+official pages, and 7 path-restricted sitemap collections. The collection caps
+permit up to 2,100 official documentation pages before deduplication, in
+addition to repository documentation and exact pages.
+
+Always run the smoke build with `--skip-collections` first. The full build
+intentionally omits that flag.
