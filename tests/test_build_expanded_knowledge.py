@@ -1,17 +1,17 @@
 import json
 
 from scripts.build_expanded_knowledge import (
-    chunk_text,
+    chunks,
     clean_markdown,
-    content_hash,
-    html_to_text,
+    digest,
+    html_text,
 )
 
 
 def test_chunk_text_splits_large_text_without_empty_chunks():
     text = ("Alpha sentence. Beta sentence. Gamma sentence. " * 80).strip()
 
-    parts = chunk_text(
+    parts = chunks(
         text,
         target_chars=220,
         overlap_chars=30,
@@ -45,7 +45,7 @@ def test_html_to_text_prefers_main_content():
     </html>
     """
 
-    text, title = html_to_text(html)
+    text, title = html_text(html)
 
     assert title == "Example"
     assert "Verified Page" in text
@@ -55,4 +55,4 @@ def test_html_to_text_prefers_main_content():
 
 
 def test_content_hash_is_whitespace_and_case_stable():
-    assert content_hash("Silabs AI") == content_hash("  silabs   ai  ")
+    assert digest("Silabs AI") == digest("  silabs   ai  ")
