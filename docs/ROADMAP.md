@@ -97,11 +97,29 @@ Exit criterion: named and versioned release candidate.
 
 ## Phase 5 - RAG
 
-- [ ] select retrieval backend
-- [ ] build ingestion pipeline
-- [ ] source-aware retrieval
+- [x] select retrieval backend
+- [x] build ingestion pipeline
+- [x] source-aware retrieval
 - [ ] citation-capable generation
-- [ ] retrieval-quality evaluation
+- [x] retrieval-quality evaluation
+
+RAG Baseline v1 uses the local JSONL retriever over a canonical verified corpus
+of 47,493 chunks. The retrieval benchmark contains 20 held-out source-targeted
+queries across the registered documentation domains.
+
+Retrieval progression:
+
+- TF-IDF-style baseline: Hit@1 45%, Hit@3 100%, Hit@5 100%, MRR@5 0.6833.
+- BM25 + title weighting: Hit@1 85%, Hit@3 95%, Hit@5 95%, MRR@5 0.8917.
+- BM25 + title weighting + canonical named-source preference: Hit@1 95%,
+  Hit@3 100%, Hit@5 100%, MRR@5 0.9750.
+
+The v1 lexical retriever is frozen at this point to avoid tuning specifically to
+the current 20-case benchmark. New retrieval changes must be justified by a
+larger or harder evaluation set.
+
+Next milestone: citation-aware generation that preserves retrieved source
+provenance through the API response.
 
 ## Phase 6 - Product integration
 
