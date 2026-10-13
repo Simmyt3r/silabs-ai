@@ -358,3 +358,32 @@ Validation outcome:
 Next step:
 verify the same provenance path through the `/v1/chat` HTTP API without
 reloading the already-loaded Qwen model.
+
+
+## Second fresh-runtime Qwen restore verification — 2026-10-13
+
+After another Colab runtime reset, the repository was recloned at commit
+`d13ae2`, the lightweight/runtime dependencies were restored, and the
+Qwen3-1.7B base model was downloaded again to:
+
+```text
+/content/silabs-ai/models/base/Qwen3-1.7B
+```
+
+Full verification result:
+
+```text
+Model source: models/base/Qwen3-1.7B
+Architecture: qwen3
+Tokenizer vocabulary: 151,669
+Loading checkpoint shards: 100% 2/2
+Loaded weights successfully: 1,720,574,976 parameters
+Silabs AI base model verification: PASS
+```
+
+The runtime emitted a CUDA-driver warning during verification:
+`Could not find cuda drivers on your machine, GPU will not be used.`
+
+Before the next model-backed API/RAG test, explicitly check
+`torch.cuda.is_available()` and the GPU name. If CUDA is unavailable, switch
+the Colab runtime to a GPU rather than running Qwen3-1.7B inference on CPU.
