@@ -952,6 +952,123 @@
       "trust_tier": "B",
       "authority": "official-government",
       "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://icrp.cac.gov.ng/assets/docs/REGULATIONS-2021.pdf",
+      "title": "CAC Companies Regulations 2021",
+      "domain": "business-registration",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://icrp.cac.gov.ng/assets/docs/crp-user-guide.pdf",
+      "title": "CAC iCRP user guide",
+      "domain": "business-registration",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://nitda.gov.ng/wp-content/uploads/2020/11/NigeriaDataProtectionRegulation11.pdf",
+      "title": "Nigeria Data Protection Regulation",
+      "domain": "privacy",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://acresal.gov.ng/wp-content/uploads/2024/09/acresal-pim.pdf",
+      "title": "ACReSAL Project Implementation Manual",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-government-project",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://acresal.gov.ng/acresal-publications/",
+      "title": "ACReSAL publications",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-government-project",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.nuc.edu.ng/project/accreditation/",
+      "title": "NUC accreditation framework",
+      "domain": "higher-education",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.nuc.edu.ng/accreditation-tech-report-view/",
+      "title": "NUC accreditation technical reports",
+      "domain": "higher-education",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.nuc.edu.ng/project/scopu/",
+      "title": "NUC higher education establishment guidelines",
+      "domain": "higher-education",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://huggingface.co/docs/transformers/index",
+      "title": "Hugging Face Transformers documentation",
+      "domain": "ai-engineering",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://huggingface.co/docs/peft/index",
+      "title": "Hugging Face PEFT documentation",
+      "domain": "ai-engineering",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://huggingface.co/docs/datasets/index",
+      "title": "Hugging Face Datasets documentation",
+      "domain": "ai-engineering",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://docs.pytorch.org/docs/stable/index.html",
+      "title": "PyTorch documentation",
+      "domain": "ai-engineering",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://neon.com/docs/introduction",
+      "title": "Neon documentation",
+      "domain": "database-backend",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
     }
   ],
   "web_collections": [
@@ -1053,6 +1170,138 @@
       "trust_tier": "B",
       "authority": "official-primary-docs",
       "domain": "gis-remote-sensing",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Next.js documentation",
+      "sitemap_url": "https://nextjs.org/sitemap.xml",
+      "allow_prefixes": [
+        "https://nextjs.org/docs/"
+      ],
+      "max_pages": 350,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "web-framework",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "FastAPI documentation",
+      "sitemap_url": "https://fastapi.tiangolo.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://fastapi.tiangolo.com/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "web-framework",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Flask documentation",
+      "sitemap_url": "https://flask.palletsprojects.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://flask.palletsprojects.com/en/stable/"
+      ],
+      "max_pages": 250,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "web-framework",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "PostgreSQL current documentation",
+      "sitemap_url": "https://www.postgresql.org/sitemap.xml",
+      "allow_prefixes": [
+        "https://www.postgresql.org/docs/current/"
+      ],
+      "max_pages": 400,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "database",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "PostGIS documentation",
+      "sitemap_url": "https://postgis.net/sitemap.xml",
+      "allow_prefixes": [
+        "https://postgis.net/docs/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "gis-database",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Python 3 documentation",
+      "sitemap_url": "https://docs.python.org/3/sitemap.xml",
+      "allow_prefixes": [
+        "https://docs.python.org/3/library/",
+        "https://docs.python.org/3/tutorial/"
+      ],
+      "max_pages": 500,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "programming-language",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "React documentation",
+      "sitemap_url": "https://react.dev/sitemap.xml",
+      "allow_prefixes": [
+        "https://react.dev/learn/",
+        "https://react.dev/reference/"
+      ],
+      "max_pages": 350,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "frontend",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "TypeScript documentation",
+      "sitemap_url": "https://www.typescriptlang.org/sitemap.xml",
+      "allow_prefixes": [
+        "https://www.typescriptlang.org/docs/"
+      ],
+      "max_pages": 350,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "programming-language",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Tailwind CSS documentation",
+      "sitemap_url": "https://tailwindcss.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://tailwindcss.com/docs/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "frontend",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Neon documentation",
+      "sitemap_url": "https://neon.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://neon.com/docs/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "database-backend",
       "verified": true
     }
   ]
