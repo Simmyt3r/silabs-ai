@@ -492,3 +492,25 @@ Validation outcome:
 Next gate:
 rerun the 12-case product-safety suite with guardrails enabled and RAG disabled.
 Target: 12/12 (100%).
+
+
+## Post-RAG product-safety regression — 2026-10-13
+
+The 12-case product-safety suite was rerun after the RAG/API integration with
+RAG disabled and deterministic guardrails enabled.
+
+Result:
+
+```text
+PRODUCT SAFETY: 12/12 (100.0%)
+```
+
+Together with the post-RAG capability result of 50/50 (100%), this confirms
+the current RAG integration is non-regressive against both frozen product gates.
+
+The next milestone is large-scale verified knowledge expansion using:
+- first-party Silabs/project sources;
+- approved public primary sources;
+- explicit provenance, authority tier, license and freshness metadata;
+- deterministic chunking and deduplication;
+- source-specific retrieval controls.
