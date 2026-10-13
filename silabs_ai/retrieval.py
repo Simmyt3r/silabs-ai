@@ -84,6 +84,13 @@ class JsonlKnowledgeRetriever:
         self.min_score = min_score
         self._records = self._load_records()
         self._document_term_counts = self._build_document_term_counts()
+        self._title_term_counts = self._build_title_term_counts()
+        self._document_lengths = [sum(counts.values()) for counts in self._document_term_counts]
+        self._average_document_length = (
+            sum(self._document_lengths) / len(self._document_lengths)
+            if self._document_lengths
+            else 1.0
+        )
         self._document_frequency = self._build_document_frequency()
 
     def _load_records(self) -> list[KnowledgeRecord]:
@@ -120,26 +127,61 @@ class JsonlKnowledgeRetriever:
             counts.append(Counter(tokens))
         return counts
 
+    def _build_title_term_counts(self) -> list[Counter[str]]:
+        return [
+            Counter(_tokens(record.title or ""))
+            for record in self._records
+        ]
+
     def _build_document_frequency(self) -> Counter[str]:
         frequency: Counter[str] = Counter()
         for counts in self._document_term_counts:
             frequency.update(counts.keys())
         return frequency
 
-    def _score(self, query_tokens: list[str], counts: Counter[str]) -> float:
+    def _score(
+        self,
+        query_tokens: list[str],
+        counts: Counter[str],
+        title_counts: Counter[str],
+        document_length: int,
+    ) -> float:
         if not query_tokens:
             return 0.0
 
         total_docs = max(len(self._records), 1)
+        unique_query = set(query_tokens)
         score = 0.0
+        matched = 0
 
-        for token in set(query_tokens):
+        # BM25 keeps long documentation chunks from winning simply because
+        # they contain more occurrences of common query terms.
+        k1 = 1.5
+        b = 0.75
+        avgdl = max(self._average_document_length, 1.0)
+        length_norm = 1.0 - b + b * (document_length / avgdl)
+
+        for token in unique_query:
             tf = counts[token]
             if tf == 0:
                 continue
+
+            matched += 1
             df = self._document_frequency.get(token, 0)
-            idf = math.log((1 + total_docs) / (1 + df)) + 1.0
-            score += (1.0 + math.log(tf)) * idf
+            idf = math.log(1.0 + (total_docs - df + 0.5) / (df + 0.5))
+            bm25 = idf * ((tf * (k1 + 1.0)) / (tf + k1 * length_norm))
+
+            # Titles are concise document labels and carry much stronger
+            # intent than incidental occurrences inside a long documentation
+            # chunk.
+            title_bonus = 1.75 * idf if title_counts[token] else 0.0
+            score += bm25 + title_bonus
+
+        # Prefer documents covering more of the user's distinct terms. This
+        # helps the correct source move from rank 2/3 to rank 1 without
+        # sacrificing the strong lexical recall of the baseline.
+        if unique_query:
+            score += 2.0 * (matched / len(unique_query))
 
         return score
 
@@ -150,8 +192,18 @@ class JsonlKnowledgeRetriever:
         query_tokens = _tokens(query)
         ranked: list[tuple[float, KnowledgeRecord]] = []
 
-        for record, counts in zip(self._records, self._document_term_counts):
-            score = self._score(query_tokens, counts)
+        for record, counts, title_counts, document_length in zip(
+            self._records,
+            self._document_term_counts,
+            self._title_term_counts,
+            self._document_lengths,
+        ):
+            score = self._score(
+                query_tokens,
+                counts,
+                title_counts,
+                document_length,
+            )
             if score > self.min_score:
                 ranked.append((score, record))
 
