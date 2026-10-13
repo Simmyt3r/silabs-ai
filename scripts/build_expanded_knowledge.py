@@ -197,6 +197,7 @@ def build(
     max_web: int | None = None,
     skip_collections: bool = False,
     max_collection_pages: int | None = None,
+    resume: bool = False,
 ) -> dict:
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     policy = registry["policy"]
@@ -206,8 +207,10 @@ def build(
     excluded = set(policy.get("github_exclude_dirs", []))
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
     seen: set[str] = set()
     rows: list[dict] = []
+    pending_lines: list[str] = []
     stats = {
         "seed_records": 0,
         "github_documents": 0,
@@ -217,7 +220,37 @@ def build(
         "duplicates_skipped": 0,
         "private_repos_skipped": 0,
         "source_failures": 0,
+        "resumed_records": 0,
     }
+
+    if resume and output_path.exists():
+        for raw in output_path.read_text(encoding="utf-8").splitlines():
+            if not raw.strip():
+                continue
+            try:
+                row = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+            text = normalize(str(row.get("text", "")))
+            if not text:
+                continue
+            key = str(row.get("content_hash") or digest(text))
+            if key in seen:
+                continue
+            seen.add(key)
+            rows.append(row)
+        stats["resumed_records"] = len(rows)
+        print("RESUME existing records:", len(rows))
+    else:
+        output_path.write_text("", encoding="utf-8")
+
+    def flush_pending() -> None:
+        if not pending_lines:
+            return
+        with output_path.open("a", encoding="utf-8") as handle:
+            handle.write("".join(pending_lines))
+            handle.flush()
+        pending_lines.clear()
 
     def add(row: dict) -> None:
         text = normalize(str(row.get("text", "")))
@@ -232,6 +265,9 @@ def build(
         row["text"] = text
         row["content_hash"] = key
         rows.append(row)
+        pending_lines.append(json.dumps(row, ensure_ascii=False) + "\n")
+        if len(pending_lines) >= 50:
+            flush_pending()
 
     if seed_path.exists():
         for line in seed_path.read_text(encoding="utf-8").splitlines():
@@ -371,10 +407,7 @@ def build(
                 if page_number < len(urls):
                     time.sleep(float(source.get("delay_seconds", 0.05)))
 
-    output_path.write_text(
-        "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows),
-        encoding="utf-8",
-    )
+    flush_pending()
     stats["chunks_written"] = len(rows)
     manifest = {
         "schema_version": 1,
@@ -389,6 +422,8 @@ def build(
             "collections": len(registry.get("web_collections", [])),
         },
         "chunking": {"target_chars": target, "overlap_chars": overlap, "min_chars": minimum},
+        "resume_enabled": resume,
+        "complete": True,
     }
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return stats
@@ -404,6 +439,11 @@ def main() -> None:
     parser.add_argument("--max-web-pages", type=int)
     parser.add_argument("--skip-collections", action="store_true")
     parser.add_argument("--max-collection-pages", type=int)
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="Continue from an existing output JSONL and deduplicate new chunks.",
+    )
     args = parser.parse_args()
 
     stats = build(
@@ -412,6 +452,7 @@ def main() -> None:
         max_web=args.max_web_pages,
         skip_collections=args.skip_collections,
         max_collection_pages=args.max_collection_pages,
+        resume=args.resume,
     )
     print("\nSILABS KNOWLEDGE EXPANSION COMPLETE")
     for key, value in stats.items():
