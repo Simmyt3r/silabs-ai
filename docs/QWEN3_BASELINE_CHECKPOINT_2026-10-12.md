@@ -559,3 +559,51 @@ Follow-up changes:
 Next step:
 run a second smoke build after these access fixes, then launch the full
 repository + exact-page + sitemap collection build into persistent Google Drive.
+
+
+## Large verified corpus expansion prepared — 2026-10-13
+
+After the successful 26-record network smoke build, the knowledge expansion
+pipeline was enlarged and hardened for a persistent full crawl.
+
+Current registered source scale:
+
+```text
+GitHub repositories: 45
+  public: 29
+  private: 16
+
+Exact official web/PDF sources: 54
+Sitemap-backed official documentation collections: 17
+Combined collection page cap: 5,500 pages before deduplication
+```
+
+Coverage includes first-party Silabs/project repositories plus approved primary
+or official documentation for Nigerian public institutions, ACReSAL, payments,
+deployment, databases, GIS/remote sensing, AI engineering and the main software
+stacks used across Silabs projects.
+
+The builder now supports:
+- HTML ingestion;
+- official PDF text extraction;
+- deterministic chunking;
+- content-hash deduplication;
+- trust/provenance metadata;
+- explicit private-repository handling;
+- streaming output during collection;
+- `--resume` so interrupted Google Drive builds can continue without
+  duplicating existing chunks.
+
+Recommended persistent output:
+
+```text
+/content/drive/MyDrive/SilabsAI/knowledge/verified-expanded.jsonl
+/content/drive/MyDrive/SilabsAI/knowledge/manifest.json
+```
+
+Private repositories are included only when a `GITHUB_TOKEN` is supplied
+securely. Without it, the 29 public repositories and approved web/PDF sources
+continue normally and private repositories are reported as skipped.
+
+Next step: launch the full crawl directly into Google Drive with `--resume`,
+validate the completed corpus, then build a scalable retrieval index over it.
