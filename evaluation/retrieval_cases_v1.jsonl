@@ -1,0 +1,20 @@
+{"id":"github_actions","query":"How do GitHub Actions workflows use jobs and steps?","expected_source_contains":["github.com/github/docs/"]}
+{"id":"github_webhooks","query":"How are GitHub webhooks configured and delivered?","expected_source_contains":["github.com/github/docs/"]}
+{"id":"react_effect","query":"What is React useEffect used for?","expected_source_contains":["github.com/reactjs/react.dev/"]}
+{"id":"typescript_generics","query":"How do generics work in TypeScript?","expected_source_contains":["github.com/microsoft/TypeScript-Website/"]}
+{"id":"tailwind_responsive","query":"How do responsive design breakpoints work in Tailwind CSS?","expected_source_contains":["github.com/tailwindlabs/tailwindcss.com/"]}
+{"id":"aiven_postgresql","query":"How do I create or manage a PostgreSQL service on Aiven?","expected_source_contains":["github.com/aiven/aiven-docs/","aiven.io/docs"]}
+{"id":"python_venv","query":"How do I create and use a Python virtual environment?","expected_source_contains":["github.com/python/cpython/"]}
+{"id":"python_asyncio","query":"What does asyncio provide in Python?","expected_source_contains":["github.com/python/cpython/"]}
+{"id":"flask_routes","query":"How do routes and view functions work in Flask?","expected_source_contains":["github.com/pallets/flask/"]}
+{"id":"flask_config","query":"How should application configuration be handled in Flask?","expected_source_contains":["github.com/pallets/flask/"]}
+{"id":"postgis_geometry","query":"What is the PostGIS geometry type and how is spatial data stored?","expected_source_contains":["github.com/postgis/postgis/"]}
+{"id":"postgis_spatial_index","query":"How do spatial indexes work in PostGIS?","expected_source_contains":["github.com/postgis/postgis/"]}
+{"id":"paystack_auth","query":"How should a Paystack API secret key be used for authentication?","expected_source_contains":["github.com/PaystackHQ/documentation/","paystack.com/docs"]}
+{"id":"paystack_payments","query":"How do I initialize and verify a payment with Paystack?","expected_source_contains":["github.com/PaystackHQ/documentation/","paystack.com/docs"]}
+{"id":"cloudinary_upload","query":"How do I upload images using Cloudinary's upload API?","expected_source_contains":["cloudinary.com/documentation"]}
+{"id":"supabase_database","query":"What database does Supabase provide and how is it managed?","expected_source_contains":["supabase.com/docs"]}
+{"id":"vercel_deploy","query":"How does deploying a web application to Vercel work?","expected_source_contains":["vercel.com/docs"]}
+{"id":"nysc_service_year","query":"What information does NYSC provide about the service year?","expected_source_contains":["nysc.gov.ng"]}
+{"id":"acresal","query":"What is ACReSAL and what is the project intended to achieve?","expected_source_contains":["acresal.gov.ng","worldbank.org"]}
+{"id":"cac_registration","query":"Where is company or business registration handled by Nigeria's CAC?","expected_source_contains":["cac.gov.ng"]}
