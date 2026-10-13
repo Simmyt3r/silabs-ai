@@ -76,7 +76,7 @@ def chat(payload: ChatRequest) -> GenerationResponse:
         input_tokens=result.input_tokens,
         output_tokens=result.output_tokens,
         sources=[
-            {"source": item.source, "score": item.score}
+            {"citation": item.citation, "source": item.source, "score": item.score}
             for item in result.sources
             if item.source
         ],
@@ -104,7 +104,7 @@ def generate(payload: GenerateRequest) -> GenerationResponse:
         input_tokens=result.input_tokens,
         output_tokens=result.output_tokens,
         sources=[
-            {"source": item.source, "score": item.score}
+            {"citation": item.citation, "source": item.source, "score": item.score}
             for item in result.sources
             if item.source
         ],
