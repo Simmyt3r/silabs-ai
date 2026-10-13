@@ -413,3 +413,61 @@ recreate the Silabs RAG engine with:
 
 then reuse that engine inside the FastAPI test client and confirm `/v1/chat`
 returns both the grounded answer and source provenance.
+
+
+## HTTP API + RAG provenance validation — 2026-10-13
+
+The end-to-end FastAPI RAG path was validated successfully on a Tesla T4.
+
+Runtime:
+
+```text
+MODEL LOADED: True
+MODEL: Qwen/Qwen3-1.7B
+RAG ENABLED: True
+STATUS: 200
+```
+
+Prompt:
+
+```text
+What is UniXpress?
+```
+
+API answer:
+
+```text
+UniXpress is a Silabs student platform focused on organized past questions,
+verified solutions, contributor rewards, and related student services.
+Its slogan is Learn, Earn, Connect.
+```
+
+Top API source:
+
+```text
+silabs-internal://unixpress/product-overview/2026-10-12
+score: 5.246407
+```
+
+Finish reason:
+
+```text
+stop
+```
+
+Validation outcome:
+- Qwen3-1.7B loaded successfully on Tesla T4;
+- RAG was enabled;
+- `/v1/chat` returned HTTP 200;
+- answer matched the verified UniXpress record;
+- source provenance survived the engine-to-API boundary;
+- the correct UniXpress source ranked first.
+
+The Transformers warning about `temperature`, `top_p`, and `top_k` being
+ignored occurred with deterministic generation (`temperature=0`) and did not
+affect the successful result.
+
+Next step:
+add an automated API provenance regression test so CI protects this behavior,
+then rerun the frozen capability and product-safety suites with RAG disabled to
+confirm the new RAG code has not regressed the baseline.
