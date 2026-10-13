@@ -227,3 +227,28 @@ The lexical RAG baseline had already passed before this restore.
 Next step:
 run the model verification command with weight loading before the first
 model-backed RAG response.
+
+
+## Qwen weight-load verification — 2026-10-13
+
+The freshly restored local Qwen3-1.7B base model was verified successfully in
+Colab with full weight loading.
+
+Result:
+
+```text
+Model source: models/base/Qwen3-1.7B
+Architecture: qwen3
+Tokenizer vocabulary: 151,669
+Loading weights: 100% 311/311
+Loaded weights successfully: 1,720,574,976 parameters
+Silabs AI base model verification: PASS
+```
+
+This confirms the local reconstructed model is loadable and ready for the first
+model-backed RAG generation test.
+
+Next step:
+enable RAG in the runtime environment and run one deterministic source-aware
+chat request through `SilabsAIEngine`, printing both the answer and retrieved
+source metadata.
