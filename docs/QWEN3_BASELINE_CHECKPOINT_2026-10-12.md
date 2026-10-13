@@ -206,3 +206,24 @@ before the first model-backed RAG response test.
 
 Next step: restore/download the Qwen3-1.7B base model, then run one source-aware
 RAG response through `SilabsAIEngine`.
+
+
+## Fresh Colab base-model restore — 2026-10-13
+
+A fresh Colab runtime was prepared and the Qwen3-1.7B base model was restored successfully.
+
+Download result:
+
+```text
+Fetching 8 files: 100%
+Download complete: 3.53 GB
+Reconstruction complete: 4.08 GB
+Silabs AI base model downloaded to:
+/content/silabs-ai/models/base/Qwen3-1.7B
+```
+
+The lexical RAG baseline had already passed before this restore.
+
+Next step:
+run the model verification command with weight loading before the first
+model-backed RAG response.
