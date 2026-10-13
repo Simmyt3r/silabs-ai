@@ -191,3 +191,19 @@ def test_named_source_identity_breaks_integration_guide_tie(tmp_path):
     )
 
     assert "tailwindlabs/tailwindcss.com" in results[0].source
+
+
+def test_retrieval_assigns_stable_citation_labels(tmp_path):
+    path = tmp_path / "knowledge.jsonl"
+    _write_jsonl(
+        path,
+        [
+            {"text": "Alpha relevant fact.", "source": "source://alpha", "verified": True},
+            {"text": "Beta relevant fact.", "source": "source://beta", "verified": True},
+        ],
+    )
+
+    retriever = JsonlKnowledgeRetriever(path)
+    results = retriever.retrieve("relevant fact", limit=2)
+
+    assert [item.citation for item in results] == ["S1", "S2"]
