@@ -38,7 +38,8 @@
       "generated",
       "outputs",
       "reports"
-    ]
+    ],
+    "external_content_note": "External sources are trusted for retrieval provenance only; copyright and terms remain with the source owner. Generated bulk corpus stays local."
   },
   "github_repositories": [
     {
@@ -743,6 +744,234 @@
       "domain": "acresal",
       "trust_tier": "B",
       "authority": "official-primary-source",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.nysc.gov.ng/serviceyear.html",
+      "title": "NYSC service year overview",
+      "domain": "nysc",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://ndpc.gov.ng/faqs/",
+      "title": "NDPC data protection FAQs",
+      "domain": "privacy",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://ndpc.gov.ng/download/nigeria-data-protection-act-2023",
+      "title": "Nigeria Data Protection Act 2023",
+      "domain": "privacy",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://nitda.gov.ng/regulations/",
+      "title": "NITDA regulations and guidelines",
+      "domain": "technology-policy",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://acresal.gov.ng/",
+      "title": "ACReSAL official website",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-government-project",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://acresal.gov.ng/about-us/",
+      "title": "ACReSAL about and project objective",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-government-project",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://acresal.gov.ng/faq/where-is-the-project-being-implemented/",
+      "title": "ACReSAL implementation area",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-government-project",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://acresal.gov.ng/faq/what-is-acresal-project-impact/",
+      "title": "ACReSAL project impact",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-government-project",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documents.worldbank.org/en/publication/documents-reports/documentdetail/099031326115527145",
+      "title": "ACReSAL implementation status report 2026",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-primary-source",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documentation.dataspace.copernicus.eu/Data/SentinelMissions/Sentinel2.html",
+      "title": "Copernicus Sentinel-2",
+      "domain": "gis-remote-sensing",
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documentation.dataspace.copernicus.eu/APIs/OData.html",
+      "title": "Copernicus OData API",
+      "domain": "gis-remote-sensing",
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documentation.dataspace.copernicus.eu/APIs/STAC.html",
+      "title": "Copernicus STAC catalogue",
+      "domain": "gis-remote-sensing",
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/UserGuides/BeginnersGuide.html",
+      "title": "Copernicus Sentinel Hub beginner guide",
+      "domain": "gis-remote-sensing",
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Data/S2L2A.html",
+      "title": "Copernicus Sentinel-2 L2A",
+      "domain": "gis-remote-sensing",
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true
+    }
+  ],
+  "web_collections": [
+    {
+      "type": "sitemap_collection",
+      "name": "Paystack developer documentation",
+      "sitemap_url": "https://paystack.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://paystack.com/docs/"
+      ],
+      "max_pages": 250,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "payments",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Supabase relevant documentation",
+      "sitemap_url": "https://supabase.com/docs/sitemap.xml",
+      "allow_prefixes": [
+        "https://supabase.com/docs/guides/database/",
+        "https://supabase.com/docs/guides/auth/",
+        "https://supabase.com/docs/guides/storage/",
+        "https://supabase.com/docs/guides/functions/",
+        "https://supabase.com/docs/guides/security/",
+        "https://supabase.com/docs/reference/"
+      ],
+      "max_pages": 400,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "database-backend",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Vercel documentation",
+      "sitemap_url": "https://vercel.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://vercel.com/docs/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "deployment",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "GitHub engineering documentation",
+      "sitemap_url": "https://docs.github.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://docs.github.com/en/actions/",
+        "https://docs.github.com/en/repositories/",
+        "https://docs.github.com/en/authentication/",
+        "https://docs.github.com/en/code-security/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "source-control",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Aiven documentation",
+      "sitemap_url": "https://aiven.io/sitemap.xml",
+      "allow_prefixes": [
+        "https://aiven.io/docs/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "managed-data-platform",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Cloudinary documentation",
+      "sitemap_url": "https://cloudinary.com/sitemap.xml",
+      "allow_prefixes": [
+        "https://cloudinary.com/documentation/"
+      ],
+      "max_pages": 250,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "domain": "media-storage",
+      "verified": true
+    },
+    {
+      "type": "sitemap_collection",
+      "name": "Copernicus Data Space relevant documentation",
+      "sitemap_url": "https://documentation.dataspace.copernicus.eu/sitemap.xml",
+      "allow_prefixes": [
+        "https://documentation.dataspace.copernicus.eu/Data/SentinelMissions/Sentinel2",
+        "https://documentation.dataspace.copernicus.eu/APIs/"
+      ],
+      "max_pages": 300,
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "domain": "gis-remote-sensing",
       "verified": true
     }
   ]
