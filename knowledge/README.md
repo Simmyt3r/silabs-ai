@@ -74,3 +74,72 @@ engine and API do not need to change.
 
 The frozen Qwen3-1.7B capability and safety suites must be rerun before a RAG
 change is promoted to production.
+
+
+## Large corpus expansion
+
+The tracked `knowledge/verified.jsonl` file remains the small, reviewed seed
+corpus. Large generated knowledge is intentionally written under
+`knowledge/generated/`, which is ignored by Git.
+
+The approved source registry is:
+
+```text
+knowledge/source_registry.json
+```
+
+It currently includes:
+- first-party documentation from the repositories registered under
+  `Simmyt3r/*`;
+- official Nigerian government and education sources;
+- official documentation for infrastructure and services used by Silabs
+  projects.
+
+Build the expanded corpus with:
+
+```bash
+python -m scripts.build_expanded_knowledge
+```
+
+Output:
+
+```text
+knowledge/generated/verified.jsonl
+knowledge/generated/manifest.json
+```
+
+Validate it with:
+
+```bash
+python -m scripts.validate_knowledge knowledge/generated/verified.jsonl
+```
+
+Then point the runtime at it:
+
+```text
+SILABS_RAG_ENABLED=true
+SILABS_KNOWLEDGE_PATH=knowledge/generated/verified.jsonl
+```
+
+For a quick smoke build before downloading every registered repository:
+
+```bash
+python -m scripts.build_expanded_knowledge --max-repos 3 --max-web-pages 5
+```
+
+If a registered GitHub repository is private, expose a `GITHUB_TOKEN` to the
+runtime environment through a secret manager or Colab secret. Do not place the
+token in the repository or knowledge corpus.
+
+## Trust versus licensing
+
+`verified=true` means the source is approved as authoritative enough for the
+knowledge layer. It is not a legal determination that third-party text can be
+republished.
+
+First-party repository material and externally published official documentation
+remain subject to their respective ownership, licenses and terms. Generated
+bulk corpus files are therefore kept local and out of Git by default.
+
+When external material is later packaged, redistributed or used for training
+rather than retrieval, perform a separate license review.
