@@ -607,3 +607,64 @@ continue normally and private repositories are reported as skipped.
 
 Next step: launch the full crawl directly into Google Drive with `--resume`,
 validate the completed corpus, then build a scalable retrieval index over it.
+
+
+## First full expanded knowledge build — 2026-10-13
+
+The first persistent, resumable full knowledge crawl completed successfully and
+wrote the corpus to Google Drive.
+
+Persistent files:
+
+```text
+/content/drive/MyDrive/SilabsAI/knowledge/verified-expanded.jsonl
+/content/drive/MyDrive/SilabsAI/knowledge/manifest.json
+/content/drive/MyDrive/SilabsAI/knowledge/build.log
+```
+
+Manifest summary:
+
+```text
+built_at: 2026-10-13T16:53:52+00:00
+seed records: 5
+github documents: 135
+web documents: 42
+collection documents: 2130
+chunks written: 16998
+duplicates skipped: 868
+private repos skipped: 16
+source failures: 13
+resumed records: 0
+
+registered:
+  github: 45
+  web: 54
+  collections: 17
+
+chunking:
+  target_chars: 1200
+  overlap_chars: 180
+  min_chars: 180
+
+resume_enabled: true
+complete: true
+```
+
+Observed source gaps in the first full crawl:
+- private repositories were skipped because no `GITHUB_TOKEN` was available;
+- NDPC and Paystack rejected direct Colab HTTP requests with HTTP 403;
+- some documentation sitemap URLs were unavailable or returned zero useful pages;
+- collection coverage was nevertheless substantial, including Supabase, Vercel,
+  Copernicus, Next.js, FastAPI, PostgreSQL and Neon.
+
+The corpus is now large enough that the original in-memory lexical JSONL
+retriever should no longer be treated as the final production retrieval
+architecture.
+
+Next phase:
+1. audit corpus quality and source distribution;
+2. build a persistent lexical index for fast exact/keyword retrieval;
+3. add semantic retrieval as a second stage;
+4. rerank candidates while preserving source provenance;
+5. evaluate retrieval quality on held-out factual questions before enabling the
+   expanded corpus in production.
