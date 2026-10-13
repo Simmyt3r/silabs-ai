@@ -225,7 +225,11 @@ class JsonlKnowledgeRetriever:
             if token in canonical_identity:
                 df = self._document_frequency.get(token, 0)
                 idf = math.log(1.0 + (total_docs - df + 0.5) / (df + 0.5))
-                score += 2.25 * idf
+                # A direct match between a named query technology and the
+                # canonical repository/hostname is strong evidence of source
+                # ownership. Use a fixed floor so common product names are not
+                # weakened merely because many integration pages mention them.
+                score += 6.0 + idf
 
         return score
 
