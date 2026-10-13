@@ -48,7 +48,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -57,7 +58,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "master"
     },
     {
       "type": "github_repo",
@@ -66,7 +68,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -75,7 +78,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -84,7 +88,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "master"
     },
     {
       "type": "github_repo",
@@ -93,7 +98,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -102,7 +108,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -111,7 +118,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -120,7 +128,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -129,7 +138,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -138,7 +148,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -147,7 +158,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -156,7 +168,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -165,7 +178,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -174,7 +188,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -183,7 +198,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -192,7 +208,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -201,7 +218,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -210,7 +228,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -219,7 +238,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -228,7 +248,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -237,7 +258,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -246,7 +268,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -255,7 +278,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -264,7 +288,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -273,7 +298,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -282,7 +308,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -291,7 +318,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -300,7 +328,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -309,7 +338,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -318,7 +348,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -327,7 +358,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -336,7 +368,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -345,7 +378,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -354,7 +388,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -363,7 +398,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -372,7 +408,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -381,7 +418,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -390,7 +428,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -399,7 +438,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -408,7 +448,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -417,7 +458,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -426,7 +468,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -435,7 +478,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     },
     {
       "type": "github_repo",
@@ -444,7 +488,8 @@
       "authority": "first-party-repository",
       "verified": true,
       "access": "public-or-GITHUB_TOKEN",
-      "include_documentation_only": true
+      "include_documentation_only": true,
+      "default_branch": "main"
     }
   ],
   "web_pages": [
