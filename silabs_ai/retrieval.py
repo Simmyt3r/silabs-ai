@@ -7,6 +7,7 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
+from urllib.parse import urlparse
 
 
 _TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_'-]*")
@@ -26,6 +27,9 @@ class KnowledgeRecord:
     source: str
     title: str | None = None
     verified: bool = True
+    repository: str | None = None
+    source_scope: str | None = None
+    authority: str | None = None
 
     @classmethod
     def from_mapping(cls, data: dict) -> "KnowledgeRecord":
@@ -39,11 +43,20 @@ class KnowledgeRecord:
         title = data.get("title")
         title = str(title).strip() if title is not None else None
         verified = bool(data.get("verified", True))
+        repository = data.get("repository")
+        repository = str(repository).strip() if repository is not None else None
+        source_scope = data.get("source_scope")
+        source_scope = str(source_scope).strip() if source_scope is not None else None
+        authority = data.get("authority")
+        authority = str(authority).strip() if authority is not None else None
         return cls(
             text=text,
             source=source,
             title=title or None,
             verified=verified,
+            repository=repository or None,
+            source_scope=source_scope or None,
+            authority=authority or None,
         )
 
 
@@ -185,19 +198,34 @@ class JsonlKnowledgeRetriever:
         if unique_query:
             score += 2.0 * (matched / len(unique_query))
 
-        # Prefer the canonical source when the query explicitly names a
-        # technology/product and that name appears in the document identity
-        # (title or source URL). This resolves cases where an integration guide
-        # is highly relevant but the primary vendor documentation is the
-        # better first result.
-        identity = ((record.title or "") + " " + record.source).lower()
+        # Prefer the canonical named source rather than an integration page
+        # that merely mentions the same technology in its path or title.
+        #
+        # Repository-backed docs use the registered repository identity. Web
+        # docs use the hostname. For older/minimal records, GitHub owner/repo
+        # is inferred from the source URL. Page-path terms are intentionally
+        # excluded so /guides/tailwind-v3-css does not make nextjs.org look
+        # like Tailwind's canonical documentation.
+        canonical_identity = ""
+        if record.repository:
+            canonical_identity = record.repository.lower()
+        else:
+            parsed = urlparse(record.source)
+            host = (parsed.hostname or "").lower()
+            if host == "github.com":
+                parts = [part for part in parsed.path.split("/") if part]
+                if len(parts) >= 2:
+                    canonical_identity = f"{parts[0]}/{parts[1]}".lower()
+            if not canonical_identity:
+                canonical_identity = host
+
         for token in unique_query:
             if len(token) < 5:
                 continue
-            if token in identity:
+            if token in canonical_identity:
                 df = self._document_frequency.get(token, 0)
                 idf = math.log(1.0 + (total_docs - df + 0.5) / (df + 0.5))
-                score += 1.5 * idf
+                score += 2.25 * idf
 
         return score
 
