@@ -99,6 +99,9 @@ class JsonlKnowledgeRetriever:
         self._records = self._load_records()
         self._document_term_counts = self._build_document_term_counts()
         self._title_term_counts = self._build_title_term_counts()
+        self._canonical_identities = [
+            self._canonical_identity(record) for record in self._records
+        ]
         self._document_lengths = [sum(counts.values()) for counts in self._document_term_counts]
         self._average_document_length = (
             sum(self._document_lengths) / len(self._document_lengths)
@@ -147,6 +150,19 @@ class JsonlKnowledgeRetriever:
             for record in self._records
         ]
 
+    @staticmethod
+    def _canonical_identity(record: KnowledgeRecord) -> str:
+        if record.repository:
+            return record.repository.lower()
+
+        parsed = urlparse(record.source)
+        host = (parsed.hostname or "").lower()
+        if host == "github.com":
+            parts = [part for part in parsed.path.split("/") if part]
+            if len(parts) >= 2:
+                return f"{parts[0]}/{parts[1]}".lower()
+        return host
+
     def _build_document_frequency(self) -> Counter[str]:
         frequency: Counter[str] = Counter()
         for counts in self._document_term_counts:
@@ -160,6 +176,7 @@ class JsonlKnowledgeRetriever:
         title_counts: Counter[str],
         document_length: int,
         record: KnowledgeRecord,
+        canonical_identity: str,
     ) -> float:
         if not query_tokens:
             return 0.0
@@ -206,19 +223,6 @@ class JsonlKnowledgeRetriever:
         # is inferred from the source URL. Page-path terms are intentionally
         # excluded so /guides/tailwind-v3-css does not make nextjs.org look
         # like Tailwind's canonical documentation.
-        canonical_identity = ""
-        if record.repository:
-            canonical_identity = record.repository.lower()
-        else:
-            parsed = urlparse(record.source)
-            host = (parsed.hostname or "").lower()
-            if host == "github.com":
-                parts = [part for part in parsed.path.split("/") if part]
-                if len(parts) >= 2:
-                    canonical_identity = f"{parts[0]}/{parts[1]}".lower()
-            if not canonical_identity:
-                canonical_identity = host
-
         for token in unique_query:
             if len(token) < 5:
                 continue
@@ -240,10 +244,11 @@ class JsonlKnowledgeRetriever:
         query_tokens = _tokens(query)
         ranked: list[tuple[float, KnowledgeRecord]] = []
 
-        for record, counts, title_counts, document_length in zip(
+        for record, counts, title_counts, canonical_identity, document_length in zip(
             self._records,
             self._document_term_counts,
             self._title_term_counts,
+            self._canonical_identities,
             self._document_lengths,
         ):
             score = self._score(
@@ -252,6 +257,7 @@ class JsonlKnowledgeRetriever:
                 title_counts,
                 document_length,
                 record,
+                canonical_identity,
             )
             if score > self.min_score:
                 ranked.append((score, record))
