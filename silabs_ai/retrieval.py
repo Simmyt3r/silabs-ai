@@ -145,6 +145,7 @@ class JsonlKnowledgeRetriever:
         counts: Counter[str],
         title_counts: Counter[str],
         document_length: int,
+        record: KnowledgeRecord,
     ) -> float:
         if not query_tokens:
             return 0.0
@@ -183,6 +184,20 @@ class JsonlKnowledgeRetriever:
         if unique_query:
             score += 2.0 * (matched / len(unique_query))
 
+        # Prefer the canonical source when the query explicitly names a
+        # technology/product and that name appears in the document identity
+        # (title or source URL). This resolves cases where an integration guide
+        # is highly relevant but the primary vendor documentation is the
+        # better first result.
+        identity = ((record.title or "") + " " + record.source).lower()
+        for token in unique_query:
+            if len(token) < 5:
+                continue
+            if token in identity:
+                df = self._document_frequency.get(token, 0)
+                idf = math.log(1.0 + (total_docs - df + 0.5) / (df + 0.5))
+                score += 1.5 * idf
+
         return score
 
     def retrieve(self, query: str, *, limit: int = 4) -> list[RetrievedChunk]:
@@ -203,6 +218,7 @@ class JsonlKnowledgeRetriever:
                 counts,
                 title_counts,
                 document_length,
+                record,
             )
             if score > self.min_score:
                 ranked.append((score, record))
