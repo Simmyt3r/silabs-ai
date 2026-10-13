@@ -14,9 +14,9 @@ def test_chunk_text_splits_large_text_without_empty_chunks():
 
     parts = chunks(
         text,
-        target_chars=220,
-        overlap_chars=30,
-        min_chars=40,
+        target=220,
+        overlap=30,
+        minimum=40,
     )
 
     assert len(parts) > 2
