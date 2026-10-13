@@ -130,3 +130,35 @@ def test_engine_builds_jsonl_retriever_when_rag_enabled(tmp_path):
 
     assert isinstance(engine.retriever, JsonlKnowledgeRetriever)
     assert engine.retriever.retrieve("academic resources", limit=3)
+
+
+def test_bm25_title_weighting_breaks_ambiguous_ties(tmp_path):
+    path = tmp_path / "knowledge.jsonl"
+    _write_jsonl(
+        path,
+        [
+            {
+                "title": "General payments",
+                "text": "Authentication uses secret keys for API requests. "
+                        "Payments can be initialized and verified. "
+                        "This document also discusses many unrelated deployment "
+                        "and application topics for a long time. " * 8,
+                "source": "https://example.com/general",
+                "verified": True,
+            },
+            {
+                "title": "Paystack authentication",
+                "text": "Use the Paystack secret key to authenticate API requests.",
+                "source": "https://github.com/PaystackHQ/documentation/auth",
+                "verified": True,
+            },
+        ],
+    )
+
+    retriever = JsonlKnowledgeRetriever(path)
+    results = retriever.retrieve(
+        "How should a Paystack API secret key be used for authentication?",
+        limit=2,
+    )
+
+    assert results[0].source == "https://github.com/PaystackHQ/documentation/auth"
