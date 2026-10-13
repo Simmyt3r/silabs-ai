@@ -29,7 +29,10 @@ def build_chat_messages(
         )
         user_text = (
             "Use the following retrieved context when relevant. Do not invent facts that "
-            "are not present in it.\n\n"
+            "are not present in it. When you make a factual claim supported by retrieved "
+            "context, cite its context label inline, for example [S1]. Use only citation "
+            "labels actually provided below; never invent a citation. If the retrieved "
+            "context does not support the answer, say that clearly.\n\n"
             f"{context_block}\n\n[User]\n{user_text}"
         )
 
