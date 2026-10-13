@@ -199,6 +199,7 @@ def build(
         "collection_documents": 0,
         "chunks_written": 0,
         "duplicates_skipped": 0,
+        "private_repos_skipped": 0,
         "source_failures": 0,
     }
 
@@ -235,6 +236,10 @@ def build(
     for source in repo_sources:
         name = source["repository"]
         branch = source.get("default_branch", "main")
+        if source.get("requires_token") and not os.environ.get("GITHUB_TOKEN"):
+            stats["private_repos_skipped"] += 1
+            print("SKIP private repo (set GITHUB_TOKEN to include):", name)
+            continue
         with tempfile.TemporaryDirectory(prefix="silabs-kb-") as tmp:
             root = Path(tmp) / "repo"
             try:
