@@ -387,3 +387,29 @@ The runtime emitted a CUDA-driver warning during verification:
 Before the next model-backed API/RAG test, explicitly check
 `torch.cuda.is_available()` and the GPU name. If CUDA is unavailable, switch
 the Colab runtime to a GPU rather than running Qwen3-1.7B inference on CPU.
+
+
+## GPU availability confirmed — 2026-10-13
+
+The fresh Colab runtime was checked explicitly before resuming model-backed RAG/API testing.
+
+Result:
+
+```text
+CUDA AVAILABLE: True
+GPU: Tesla T4
+VRAM: 14.56 GB
+```
+
+The local Qwen3-1.7B weights have already passed full load verification in this runtime.
+
+Next step:
+recreate the Silabs RAG engine with:
+- Qwen3-1.7B local weights;
+- RAG enabled;
+- verified JSONL knowledge store;
+- guardrails enabled;
+- thinking disabled;
+
+then reuse that engine inside the FastAPI test client and confirm `/v1/chat`
+returns both the grounded answer and source provenance.
