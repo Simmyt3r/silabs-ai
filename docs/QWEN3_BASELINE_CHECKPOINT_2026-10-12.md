@@ -252,3 +252,48 @@ Next step:
 enable RAG in the runtime environment and run one deterministic source-aware
 chat request through `SilabsAIEngine`, printing both the answer and retrieved
 source metadata.
+
+
+## First successful model-backed RAG response — 2026-10-13
+
+The first full Qwen3-1.7B + Silabs runtime + verified JSONL RAG generation test
+completed successfully in Colab.
+
+Prompt:
+
+```text
+What is the Silabs motto?
+```
+
+Answer:
+
+```text
+The Silabs motto is TECHNOLOGIA OMNIBUS.
+```
+
+Top retrieved source:
+
+```text
+silabs-internal://company/profile/2026-10-12
+score: 6.461169
+```
+
+Additional lower-ranked verified context was also returned through
+`GenerationResult.sources`.
+
+Finish reason:
+
+```text
+stop
+```
+
+Validation outcome:
+- answer correct;
+- no invented extra fact;
+- verified provenance returned successfully;
+- Qwen3-1.7B local weights loaded successfully;
+- RAG integration is now proven end-to-end inside `SilabsAIEngine`.
+
+Next step:
+run two additional model-backed RAG queries for UniXpress and the current Silabs
+AI base model, then test the same provenance path through the HTTP API.
