@@ -162,3 +162,32 @@ def test_bm25_title_weighting_breaks_ambiguous_ties(tmp_path):
     )
 
     assert results[0].source == "https://github.com/PaystackHQ/documentation/auth"
+
+
+def test_named_source_identity_breaks_integration_guide_tie(tmp_path):
+    path = tmp_path / "knowledge.jsonl"
+    _write_jsonl(
+        path,
+        [
+            {
+                "title": "Next.js Tailwind guide",
+                "text": "Tailwind CSS responsive design breakpoints can be configured in an application.",
+                "source": "https://nextjs.org/docs/app/guides/tailwind-v3-css#chunk-1",
+                "verified": True,
+            },
+            {
+                "title": "tailwindlabs/tailwindcss.com: responsive-design.mdx",
+                "text": "Use responsive utility variants to build adaptive interfaces across breakpoints.",
+                "source": "https://github.com/tailwindlabs/tailwindcss.com/blob/main/src/docs/responsive-design.mdx#chunk-1",
+                "verified": True,
+            },
+        ],
+    )
+
+    retriever = JsonlKnowledgeRetriever(path)
+    results = retriever.retrieve(
+        "How do responsive design breakpoints work in Tailwind CSS?",
+        limit=2,
+    )
+
+    assert "tailwindlabs/tailwindcss.com" in results[0].source
