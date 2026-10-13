@@ -65,6 +65,7 @@ def test_chat_response_exposes_rag_source_provenance(monkeypatch):
                         text="UniXpress verified product overview.",
                         source="silabs-internal://unixpress/product-overview/test",
                         score=5.25,
+                        citation="S1",
                     )
                 ],
             )
@@ -85,6 +86,7 @@ def test_chat_response_exposes_rag_source_provenance(monkeypatch):
     assert payload["text"] == "UniXpress is a Silabs student platform."
     assert payload["sources"] == [
         {
+            "citation": "S1",
             "source": "silabs-internal://unixpress/product-overview/test",
             "score": 5.25,
         }
