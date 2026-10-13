@@ -17,7 +17,7 @@ import requests
 from bs4 import BeautifulSoup
 from pypdf import PdfReader
 
-TEXT_EXTENSIONS = {".md", ".txt", ".rst"}
+TEXT_EXTENSIONS = {".md", ".mdx", ".markdown", ".txt", ".rst", ".xml", ".html"}
 DOC_WORDS = ("readme", "spec", "requirement", "roadmap", "architecture", "api", "decision", "policy", "guide")
 MAX_BYTES = 1_500_000
 USER_AGENT = "SilabsAI-KnowledgeBuilder/1.0"
@@ -37,6 +37,15 @@ def normalize(text: str) -> str:
 def digest(text: str) -> str:
     value = " ".join(text.lower().split())
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def clean_repo_document(text: str, suffix: str) -> str:
+    if suffix.lower() in {".xml", ".html"}:
+        soup = BeautifulSoup(text, "html.parser")
+        for tag in soup(["script", "style"]):
+            tag.decompose()
+        return normalize(soup.get_text("\n", strip=True))
+    return clean_markdown(text)
 
 
 def clean_markdown(text: str) -> str:
@@ -108,34 +117,66 @@ def chunks(text: str, target: int, overlap: int, minimum: int) -> list[str]:
     return out
 
 
-def allowed_doc(path: Path, excluded: set[str]) -> bool:
+def allowed_doc(
+    path: Path,
+    excluded: set[str],
+    include_roots: list[str] | None = None,
+) -> bool:
     if any(part in excluded for part in path.parts):
         return False
+    if include_roots:
+        path_text = path.as_posix()
+        if not any(
+            path_text == root.rstrip("/")
+            or path_text.startswith(root.rstrip("/") + "/")
+            for root in include_roots
+        ):
+            return False
     if path.suffix.lower() not in TEXT_EXTENSIONS:
         return False
     low = path.name.lower()
     return "docs" in {p.lower() for p in path.parts} or any(word in low for word in DOC_WORDS)
 
 
-def clone_repo(name: str, branch: str, target: Path) -> None:
+def clone_repo(
+    name: str,
+    branch: str,
+    target: Path,
+    sparse_paths: list[str] | None = None,
+) -> None:
     env = os.environ.copy()
     token = env.get("GITHUB_TOKEN")
     if token:
         env["GIT_CONFIG_COUNT"] = "1"
         env["GIT_CONFIG_KEY_0"] = "http.https://github.com/.extraheader"
         env["GIT_CONFIG_VALUE_0"] = "Authorization: Bearer " + token
+    cmd = [
+        "git", "clone", "--depth=1", "--filter=blob:none",
+        "--single-branch", "--branch", branch,
+    ]
+    if sparse_paths:
+        cmd.append("--sparse")
+    cmd.extend(["https://github.com/" + name + ".git", str(target)])
+
     subprocess.run(
-        [
-            "git", "clone", "--depth=1", "--filter=blob:none",
-            "--single-branch", "--branch", branch,
-            "https://github.com/" + name + ".git", str(target),
-        ],
+        cmd,
         check=True,
         stdout=subprocess.DEVNULL,
         stderr=subprocess.PIPE,
         text=True,
         env=env,
     )
+
+    if sparse_paths:
+        subprocess.run(
+            ["git", "sparse-checkout", "set", *sparse_paths],
+            cwd=target,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+            env=env,
+        )
 
 
 def fetch_page(session: requests.Session, url: str) -> tuple[str, str | None]:
@@ -288,6 +329,7 @@ def build(
     for source in repo_sources:
         name = source["repository"]
         branch = source.get("default_branch", "main")
+        include_roots = list(source.get("include_roots", []))
         if source.get("requires_token") and not os.environ.get("GITHUB_TOKEN"):
             stats["private_repos_skipped"] += 1
             print("SKIP private repo (set GITHUB_TOKEN to include):", name)
@@ -295,7 +337,7 @@ def build(
         with tempfile.TemporaryDirectory(prefix="silabs-kb-") as tmp:
             root = Path(tmp) / "repo"
             try:
-                clone_repo(name, branch, root)
+                clone_repo(name, branch, root, include_roots or None)
             except Exception as exc:
                 stats["source_failures"] += 1
                 print("WARN github", name, str(exc))
@@ -304,10 +346,15 @@ def build(
                 if not path.is_file():
                     continue
                 rel = path.relative_to(root)
-                if not allowed_doc(rel, excluded) or path.stat().st_size > MAX_BYTES:
+                if not allowed_doc(rel, excluded, include_roots) or path.stat().st_size > MAX_BYTES:
                     continue
                 raw = path.read_text(encoding="utf-8", errors="ignore")
-                pieces = chunks(clean_markdown(raw), target, overlap, minimum)
+                pieces = chunks(
+                    clean_repo_document(raw, path.suffix),
+                    target,
+                    overlap,
+                    minimum,
+                )
                 if not pieces:
                     continue
                 stats["github_documents"] += 1
