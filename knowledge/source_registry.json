@@ -1,0 +1,704 @@
+{
+  "schema_version": 1,
+  "generated_on": "2026-10-13",
+  "policy": {
+    "default_verified": false,
+    "note": "Sources are eligible for ingestion only. A fetched chunk becomes verified when it comes from an allowlisted first-party repository or approved primary-source URL and passes validation. External terms and licenses still apply.",
+    "chunking": {
+      "target_chars": 1200,
+      "overlap_chars": 180,
+      "min_chars": 180
+    },
+    "github_include_globs": [
+      "README*",
+      "docs/**/*.md",
+      "docs/**/*.txt",
+      "**/*SPEC*.md",
+      "**/*REQUIREMENTS*.md",
+      "**/*requirements*.md",
+      "**/*ROADMAP*.md",
+      "**/*ARCHITECTURE*.md",
+      "**/*API*.md",
+      "**/*DECISIONS*.md",
+      "**/*POLICY*.md",
+      "**/*GUIDE*.md"
+    ],
+    "github_exclude_dirs": [
+      ".git",
+      "node_modules",
+      "vendor",
+      "dist",
+      "build",
+      ".next",
+      "coverage",
+      ".venv",
+      "venv",
+      "__pycache__",
+      "migrations",
+      "generated",
+      "outputs",
+      "reports"
+    ]
+  },
+  "github_repositories": [
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Portfolio",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/cloud_storage_system",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Unixpress-Initial",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Games",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/fraud_ecommerce_detectionbrowser-extension",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/MinimindsAcademy",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/military_logistics",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/digi-in",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/ar_network_viz",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/miniminds",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Smart-Attendance-Management-System-using-Haar-Cascade-and-LBPH",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/artisanconnect-ng",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/unixpressng",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/bbms",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/payquick",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/desktop-tutorial",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/roya",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/ID-Card-Verification-System-Using-OCR-",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/campshuttle",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/silabs",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/SCERS",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/VANGUARD",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Apex",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/CyCLone-Security-",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/BELRCA",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/cpart",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/ransom-intel-flow",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/capstone",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/CARE-Map",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Camp-photo-ai",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Palisade",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/tallentt",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/Quick-Fix",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/JosChat",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/MiniApp",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/hopehorizon",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/silabs-ai",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/school-generic-platform",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/AskFrame",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/CareerMirror",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/slac_website",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/AgroDialect",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/RSCDS-Project",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/MyPlatoon",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    },
+    {
+      "type": "github_repo",
+      "repository": "Simmyt3r/scoolabs",
+      "trust_tier": "A",
+      "authority": "first-party-repository",
+      "verified": true,
+      "access": "public-or-GITHUB_TOKEN",
+      "include_documentation_only": true
+    }
+  ],
+  "web_pages": [
+    {
+      "type": "web_page",
+      "url": "https://www.nysc.gov.ng/",
+      "title": "NYSC official website",
+      "domain": "nysc",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://enuc.nuc.edu.ng/nus",
+      "title": "NUC Nigerian University System",
+      "domain": "higher-education",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.cac.gov.ng/about",
+      "title": "Corporate Affairs Commission overview",
+      "domain": "business-registration",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.cac.gov.ng/services/company-registration",
+      "title": "CAC company registration",
+      "domain": "business-registration",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.cac.gov.ng/services/service-timelines",
+      "title": "CAC service timelines",
+      "domain": "business-registration",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://icrp.cac.gov.ng/",
+      "title": "CAC Company Registration Portal",
+      "domain": "business-registration",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://ndpc.gov.ng/",
+      "title": "Nigeria Data Protection Commission",
+      "domain": "privacy",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://nitda.gov.ng/",
+      "title": "NITDA official website",
+      "domain": "technology-policy",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://www.jamb.gov.ng/",
+      "title": "JAMB official website",
+      "domain": "higher-education",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://nimc.gov.ng/",
+      "title": "NIMC official website",
+      "domain": "identity",
+      "trust_tier": "B",
+      "authority": "official-government",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://paystack.com/docs/",
+      "title": "Paystack developer documentation",
+      "domain": "payments",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://paystack.com/docs/api/",
+      "title": "Paystack API reference",
+      "domain": "payments",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://paystack.com/docs/api/authentication/",
+      "title": "Paystack authentication",
+      "domain": "payments",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://paystack.com/docs/payments/",
+      "title": "Paystack payments guide",
+      "domain": "payments",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://supabase.com/docs",
+      "title": "Supabase documentation",
+      "domain": "database-backend",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://supabase.com/docs/reference",
+      "title": "Supabase API references",
+      "domain": "database-backend",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://supabase.com/docs/guides/database/overview",
+      "title": "Supabase database overview",
+      "domain": "database-backend",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://supabase.com/docs/guides/security/product-security",
+      "title": "Supabase product security",
+      "domain": "database-security",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://aiven.io/docs/",
+      "title": "Aiven documentation",
+      "domain": "managed-data-platform",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://aiven.io/docs/get-started",
+      "title": "Aiven get started",
+      "domain": "managed-data-platform",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://aiven.io/docs/products/overview",
+      "title": "Aiven products overview",
+      "domain": "managed-data-platform",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://api.aiven.io/doc/",
+      "title": "Aiven API documentation",
+      "domain": "managed-data-platform",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://vercel.com/docs",
+      "title": "Vercel documentation",
+      "domain": "deployment",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://docs.github.com/en",
+      "title": "GitHub documentation",
+      "domain": "source-control",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://cloudinary.com/documentation/upload_images",
+      "title": "Cloudinary upload guide",
+      "domain": "media-storage",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://cloudinary.com/documentation/image_upload_api_reference",
+      "title": "Cloudinary Upload API reference",
+      "domain": "media-storage",
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://documentation.dataspace.copernicus.eu/",
+      "title": "Copernicus Data Space documentation",
+      "domain": "gis-remote-sensing",
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true
+    },
+    {
+      "type": "web_page",
+      "url": "https://projects.worldbank.org/en/projects-operations/project-detail/P175237",
+      "title": "World Bank ACReSAL project",
+      "domain": "acresal",
+      "trust_tier": "B",
+      "authority": "official-primary-source",
+      "verified": true
+    }
+  ]
+}
