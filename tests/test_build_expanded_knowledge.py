@@ -6,6 +6,7 @@ from scripts.build_expanded_knowledge import (
     digest,
     html_text,
     sitemap_urls,
+    build,
 )
 
 
@@ -83,3 +84,58 @@ def test_sitemap_urls_filters_prefix_and_limit():
     )
 
     assert urls == ["https://example.com/docs/a"]
+
+
+
+def test_build_resume_does_not_duplicate_existing_records(tmp_path):
+    registry = tmp_path / "registry.json"
+    seed = tmp_path / "seed.jsonl"
+    output = tmp_path / "verified.jsonl"
+    manifest = tmp_path / "manifest.json"
+
+    registry.write_text(
+        json.dumps(
+            {
+                "policy": {
+                    "chunking": {
+                        "target_chars": 300,
+                        "overlap_chars": 30,
+                        "min_chars": 20,
+                    },
+                    "github_exclude_dirs": [],
+                },
+                "github_repositories": [],
+                "web_pages": [],
+                "web_collections": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    seed.write_text(
+        json.dumps(
+            {
+                "title": "Seed",
+                "text": "This is a stable verified seed record for resume testing.",
+                "source": "silabs://seed/test",
+                "verified": True,
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    build(registry, seed, output, manifest)
+    first = output.read_text(encoding="utf-8").splitlines()
+    assert len(first) == 1
+
+    stats = build(
+        registry,
+        seed,
+        output,
+        manifest,
+        resume=True,
+    )
+    second = output.read_text(encoding="utf-8").splitlines()
+
+    assert len(second) == 1
+    assert stats["resumed_records"] == 1
