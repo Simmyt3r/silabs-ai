@@ -184,3 +184,25 @@ The stale test was corrected in commit `b85bde2`.
 This was a test-alignment issue, not a RAG knowledge-validation failure.
 The verified knowledge validator had already passed 5/5 records before the
 Colab limit was reached.
+
+
+## Lexical RAG retrieval validation — 2026-10-13
+
+The dependency-free JSONL retriever was tested in a fresh Colab runtime against
+`knowledge/verified.jsonl`.
+
+All three validation queries returned the correct verified record at rank 1:
+
+- `What is the Silabs motto?` -> `The Silabs motto is TECHNOLOGIA OMNIBUS.`
+- `What is UniXpress?` -> UniXpress product overview record.
+- `Which model does Silabs AI currently use?` -> Qwen3-1.7B baseline record.
+
+This confirms the current lexical retrieval baseline is functioning correctly
+for the initial verified knowledge corpus.
+
+No model-backed RAG generation test has been run yet in the fresh runtime.
+The Qwen3-1.7B base weights must be restored to `/content/silabs-ai/models/base/Qwen3-1.7B`
+before the first model-backed RAG response test.
+
+Next step: restore/download the Qwen3-1.7B base model, then run one source-aware
+RAG response through `SilabsAIEngine`.
