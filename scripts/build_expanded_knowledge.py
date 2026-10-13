@@ -9,11 +9,13 @@ import subprocess
 import tempfile
 import time
 from datetime import datetime, timezone
+from io import BytesIO
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
 import requests
 from bs4 import BeautifulSoup
+from pypdf import PdfReader
 
 TEXT_EXTENSIONS = {".md", ".txt", ".rst"}
 DOC_WORDS = ("readme", "spec", "requirement", "roadmap", "architecture", "api", "decision", "policy", "guide")
@@ -45,6 +47,17 @@ def clean_markdown(text: str) -> str:
     text = re.sub(r"(?m)^\s*[-*+]\s+", "• ", text)
     text = re.sub(r"(?m)^\s*>\s?", "", text)
     return normalize(text)
+
+
+def pdf_text(content: bytes) -> str:
+    reader = PdfReader(BytesIO(content))
+    pages: list[str] = []
+    for page in reader.pages:
+        value = page.extract_text() or ""
+        value = normalize(value)
+        if value:
+            pages.append(value)
+    return normalize("\n\n".join(pages))
 
 
 def html_text(html: str) -> tuple[str, str | None]:
@@ -126,8 +139,11 @@ def clone_repo(name: str, branch: str, target: Path) -> None:
 
 
 def fetch_page(session: requests.Session, url: str) -> tuple[str, str | None]:
-    response = session.get(url, timeout=30)
+    response = session.get(url, timeout=45)
     response.raise_for_status()
+    content_type = response.headers.get("content-type", "").lower()
+    if "application/pdf" in content_type or url.lower().split("?")[0].endswith(".pdf"):
+        return pdf_text(response.content), None
     return html_text(response.text)
 
 
@@ -284,9 +300,7 @@ def build(
     for source in web_sources:
         url = source["url"]
         try:
-            response = session.get(url, timeout=30)
-            response.raise_for_status()
-            text, page_title = html_text(response.text)
+            text, page_title = fetch_page(session, url)
         except Exception as exc:
             stats["source_failures"] += 1
             print("WARN web", url, str(exc))
