@@ -17,6 +17,7 @@ class RetrievedChunk:
     text: str
     source: str | None = None
     score: float | None = None
+    citation: str | None = None
 
 
 @dataclass(frozen=True)
@@ -230,6 +231,7 @@ class JsonlKnowledgeRetriever:
                 text=record.text,
                 source=record.source,
                 score=round(score, 6),
+                citation=f"S{index}",
             )
-            for score, record in ranked[:limit]
+            for index, (score, record) in enumerate(ranked[:limit], start=1)
         ]
