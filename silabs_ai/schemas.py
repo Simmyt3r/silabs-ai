@@ -30,6 +30,7 @@ class GenerateRequest(BaseModel):
 
 
 class SourceReference(BaseModel):
+    citation: str | None = None
     source: str
     score: float | None = None
 
