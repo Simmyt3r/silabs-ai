@@ -83,6 +83,7 @@ class JsonlKnowledgeRetriever:
         self.verified_only = verified_only
         self.min_score = min_score
         self._records = self._load_records()
+        self._document_term_counts = self._build_document_term_counts()
         self._document_frequency = self._build_document_frequency()
 
     def _load_records(self) -> list[KnowledgeRecord]:
@@ -110,23 +111,25 @@ class JsonlKnowledgeRetriever:
 
         return records
 
+    def _build_document_term_counts(self) -> list[Counter[str]]:
+        counts: list[Counter[str]] = []
+        for record in self._records:
+            tokens = _tokens(record.text)
+            if record.title:
+                tokens.extend(_tokens(record.title))
+            counts.append(Counter(tokens))
+        return counts
+
     def _build_document_frequency(self) -> Counter[str]:
         frequency: Counter[str] = Counter()
-        for record in self._records:
-            frequency.update(set(_tokens(record.text)))
-            if record.title:
-                frequency.update(set(_tokens(record.title)))
+        for counts in self._document_term_counts:
+            frequency.update(counts.keys())
         return frequency
 
-    def _score(self, query_tokens: list[str], record: KnowledgeRecord) -> float:
+    def _score(self, query_tokens: list[str], counts: Counter[str]) -> float:
         if not query_tokens:
             return 0.0
 
-        document_tokens = _tokens(record.text)
-        if record.title:
-            document_tokens.extend(_tokens(record.title))
-
-        counts = Counter(document_tokens)
         total_docs = max(len(self._records), 1)
         score = 0.0
 
@@ -147,8 +150,8 @@ class JsonlKnowledgeRetriever:
         query_tokens = _tokens(query)
         ranked: list[tuple[float, KnowledgeRecord]] = []
 
-        for record in self._records:
-            score = self._score(query_tokens, record)
+        for record, counts in zip(self._records, self._document_term_counts):
+            score = self._score(query_tokens, counts)
             if score > self.min_score:
                 ranked.append((score, record))
 
