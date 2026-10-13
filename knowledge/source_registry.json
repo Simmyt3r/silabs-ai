@@ -581,6 +581,154 @@
       "default_branch": "main",
       "visibility": "public",
       "requires_token": false
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "github/docs",
+      "default_branch": "main",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "source-control",
+      "include_roots": [
+        "content/actions",
+        "content/repositories",
+        "content/authentication",
+        "content/code-security",
+        "content/rest",
+        "content/graphql",
+        "content/webhooks"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "reactjs/react.dev",
+      "default_branch": "main",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "frontend",
+      "include_roots": [
+        "src/content/learn",
+        "src/content/reference"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "microsoft/TypeScript-Website",
+      "default_branch": "v2",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "programming-language",
+      "include_roots": [
+        "packages/documentation/copy/en"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "tailwindlabs/tailwindcss.com",
+      "default_branch": "main",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "frontend",
+      "include_roots": [
+        "src/docs"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "aiven/aiven-docs",
+      "default_branch": "main",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "managed-data-platform",
+      "include_roots": [
+        "docs"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "python/cpython",
+      "default_branch": "main",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "programming-language",
+      "include_roots": [
+        "Doc/library",
+        "Doc/tutorial",
+        "Doc/reference",
+        "Doc/howto",
+        "Doc/using",
+        "Doc/installing"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "pallets/flask",
+      "default_branch": "main",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-vendor-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "web-framework",
+      "include_roots": [
+        "docs"
+      ]
+    },
+    {
+      "type": "github_repo",
+      "access": "public",
+      "include_documentation_only": true,
+      "repository": "postgis/postgis",
+      "default_branch": "master",
+      "visibility": "public",
+      "requires_token": false,
+      "trust_tier": "B",
+      "authority": "official-primary-docs",
+      "verified": true,
+      "source_scope": "external-official",
+      "domain": "gis-database",
+      "include_roots": [
+        "doc"
+      ]
     }
   ],
   "web_pages": [
