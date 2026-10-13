@@ -471,3 +471,24 @@ Next step:
 add an automated API provenance regression test so CI protects this behavior,
 then rerun the frozen capability and product-safety suites with RAG disabled to
 confirm the new RAG code has not regressed the baseline.
+
+
+## Post-RAG capability regression — 2026-10-13
+
+After integrating the verified JSONL RAG layer and HTTP provenance support, the
+frozen corrected v3 capability suite was rerun with RAG explicitly disabled.
+
+Result:
+
+```text
+CAPABILITY: 50/50 (100.0%)
+```
+
+Validation outcome:
+- no capability regression;
+- Qwen3-1.7B + Silabs runtime still matches the frozen capability baseline;
+- RAG remains an optional layer and does not alter baseline behavior when disabled.
+
+Next gate:
+rerun the 12-case product-safety suite with guardrails enabled and RAG disabled.
+Target: 12/12 (100%).
