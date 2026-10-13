@@ -102,3 +102,31 @@ reports can be reproduced exactly. New promotion decisions use
 `evaluation/cases_extended_v2.jsonl`, which corrects two evaluator-only
 false negatives without weakening the substantive reasoning, robustness,
 academic or coding checks.
+
+
+## Retrieval benchmark
+
+`evaluation/retrieval_cases_v1.jsonl` is the frozen first retrieval-quality
+suite for the expanded knowledge corpus. It measures whether the expected
+authoritative source appears at rank 1, rank 3 or rank 5, plus MRR@5.
+
+Run it with:
+
+```bash
+python -m scripts.evaluate_retrieval \
+  knowledge/generated/verified.jsonl \
+  --output reports/retrieval-eval.json
+```
+
+The frozen RAG Baseline v1 result on the 47,493-record verified corpus is:
+
+- Hit@1: 95.0%
+- Hit@3: 100.0%
+- Hit@5: 100.0%
+- MRR@5: 0.9750
+
+This result was reached after moving from the original TF-IDF-style scorer to
+BM25-style length normalization, title weighting, query coverage scoring and a
+generic canonical named-source preference. The 20-case suite should not be used
+for further micro-tuning; expand the evaluation set before making additional
+ranking changes.
