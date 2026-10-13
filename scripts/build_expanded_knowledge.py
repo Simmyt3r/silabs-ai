@@ -134,6 +134,8 @@ def allowed_doc(
             return False
     if path.suffix.lower() not in TEXT_EXTENSIONS:
         return False
+    if include_roots:
+        return True
     low = path.name.lower()
     return "docs" in {p.lower() for p in path.parts} or any(word in low for word in DOC_WORDS)
 
@@ -367,6 +369,8 @@ def build(
                         "verified": bool(source.get("verified")),
                         "trust_tier": source.get("trust_tier"),
                         "authority": source.get("authority"),
+                        "domain": source.get("domain"),
+                        "source_scope": source.get("source_scope", "first-party"),
                         "source_kind": "github_repo",
                         "repository": name,
                         "path": rel.as_posix(),
