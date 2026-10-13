@@ -297,3 +297,64 @@ Validation outcome:
 Next step:
 run two additional model-backed RAG queries for UniXpress and the current Silabs
 AI base model, then test the same provenance path through the HTTP API.
+
+
+## Multi-query model-backed RAG validation — 2026-10-13
+
+Two additional end-to-end RAG queries were tested successfully through the
+already-loaded `SilabsAIEngine`.
+
+### UniXpress
+
+Prompt:
+
+```text
+What is UniXpress?
+```
+
+Answer:
+
+```text
+UniXpress is a Silabs student platform focused on organized past questions,
+verified solutions, contributor rewards, and related student services.
+Its slogan is Learn, Earn, Connect.
+```
+
+Top source:
+
+```text
+silabs-internal://unixpress/product-overview/2026-10-12
+score: 5.246407
+```
+
+### Current Silabs AI model
+
+Prompt:
+
+```text
+Which model does Silabs AI currently use?
+```
+
+Answer:
+
+```text
+Silabs AI currently uses Qwen3-1.7B in non-thinking mode behind the Silabs runtime.
+```
+
+Top source:
+
+```text
+silabs-internal://ai/baseline/2026-10-12
+score: 5.348155
+```
+
+Validation outcome:
+- correct answers;
+- correct rank-1 verified source for both prompts;
+- no invented extra facts;
+- provenance returned in `GenerationResult.sources`;
+- model-backed RAG is now validated across company, product, and AI-baseline knowledge.
+
+Next step:
+verify the same provenance path through the `/v1/chat` HTTP API without
+reloading the already-loaded Qwen model.
