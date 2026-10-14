@@ -8,6 +8,7 @@ from silabs_ai import __version__
 from silabs_ai.auth import APIPrincipal, require_api_key
 from silabs_ai.config import get_settings
 from silabs_ai.engine import SilabsAIEngine
+from silabs_ai.rate_limit import InMemoryRateLimiter, enforce_rate_limit
 from silabs_ai.schemas import ChatRequest, GenerateRequest, GenerationResponse, HealthResponse, ModelStatusResponse
 
 settings = get_settings()
@@ -22,6 +23,7 @@ app = FastAPI(
     description="Shared inference API for Silabs AI.",
 )
 engine = SilabsAIEngine(settings)
+rate_limiter = InMemoryRateLimiter()
 
 
 @app.on_event("startup")
@@ -59,6 +61,13 @@ def chat(
     payload: ChatRequest,
     principal: APIPrincipal = Depends(require_api_key),
 ) -> GenerationResponse:
+    client_limits = settings.rate_limit_overrides.get(principal.client_id, {})
+    enforce_rate_limit(
+        rate_limiter,
+        client_id=principal.client_id,
+        route="chat",
+        limit=client_limits.get("chat", settings.rate_limit_chat_per_minute),
+    )
     logging.getLogger(__name__).info("chat request client=%s", principal.client_id)
     try:
         result = engine.chat(
@@ -94,6 +103,13 @@ def generate(
     payload: GenerateRequest,
     principal: APIPrincipal = Depends(require_api_key),
 ) -> GenerationResponse:
+    client_limits = settings.rate_limit_overrides.get(principal.client_id, {})
+    enforce_rate_limit(
+        rate_limiter,
+        client_id=principal.client_id,
+        route="generate",
+        limit=client_limits.get("generate", settings.rate_limit_generate_per_minute),
+    )
     logging.getLogger(__name__).info("generate request client=%s", principal.client_id)
     try:
         result = engine.generate(
