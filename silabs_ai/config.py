@@ -66,6 +66,14 @@ class Settings(BaseSettings):
     api_auth_enabled: bool = False
     api_key_hashes: dict[str, str] = Field(default_factory=dict)
 
+    # Per-product request limits for a single API process. A value <= 0
+    # disables limiting for that route. Product-specific overrides can be
+    # supplied with rate_limit_overrides, e.g.
+    # {"unixpress": {"chat": 30, "generate": 10}}.
+    rate_limit_chat_per_minute: int = 20
+    rate_limit_generate_per_minute: int = 10
+    rate_limit_overrides: dict[str, dict[str, int]] = Field(default_factory=dict)
+
     @field_validator(
         "model_path", "model_cache", "adapter_path", "knowledge_path", mode="before"
     )
