@@ -134,8 +134,8 @@ def test_chat_stream_emits_sse_events(monkeypatch):
     from silabs_ai.retrieval import RetrievedChunk
 
     class FakeEngine:
-        def chat(self, *args, **kwargs):
-            return GenerationResult(
+        def stream_chat(self, *args, **kwargs):
+            result = GenerationResult(
                 text="Grounded answer [S1].",
                 input_tokens=9,
                 output_tokens=4,
@@ -149,6 +149,9 @@ def test_chat_stream_emits_sse_events(monkeypatch):
                 ],
                 citation_repaired=False,
             )
+            yield {"type": "chunk", "text": "Grounded "}
+            yield {"type": "chunk", "text": "answer [S1]."}
+            yield {"type": "final", "result": result}
 
     monkeypatch.setattr(api_main, "engine", FakeEngine())
 
@@ -163,6 +166,8 @@ def test_chat_stream_emits_sse_events(monkeypatch):
     assert "event: start" in body
     assert "event: chunk" in body
     assert "Grounded answer" in body
+    assert "event: final" in body
+    assert "Grounded answer [S1]." in body
     assert "event: sources" in body
     assert "source://verified" in body
     assert "event: done" in body
@@ -172,8 +177,9 @@ def test_chat_stream_error_event(monkeypatch):
     import api.main as api_main
 
     class FailingEngine:
-        def chat(self, *args, **kwargs):
+        def stream_chat(self, *args, **kwargs):
             raise RuntimeError("boom")
+            yield
 
     monkeypatch.setattr(api_main, "engine", FailingEngine())
 
