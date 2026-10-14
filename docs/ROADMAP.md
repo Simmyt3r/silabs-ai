@@ -100,7 +100,7 @@ Exit criterion: named and versioned release candidate.
 - [x] select retrieval backend
 - [x] build ingestion pipeline
 - [x] source-aware retrieval
-- [ ] citation-capable generation
+- [x] citation-capable generation
 - [x] retrieval-quality evaluation
 
 RAG Baseline v1 uses the local JSONL retriever over a canonical verified corpus
@@ -118,8 +118,14 @@ The v1 lexical retriever is frozen at this point to avoid tuning specifically to
 the current 20-case benchmark. New retrieval changes must be justified by a
 larger or harder evaluation set.
 
-Next milestone: citation-aware generation that preserves retrieved source
-provenance through the API response.
+Citation-aware generation is now implemented end-to-end. Grounded-generation
+V2 passed 6/6 cases (100% citation integrity) on CPU. Qwen3-1.7B produced native
+citations in 2/6 cases (33.3%); deterministic citation enforcement repaired the
+remaining 4/6 while exposing `citation_repaired` so native compliance remains
+measurable rather than hidden.
+
+Phase 5 exit criterion: verified retrieval, source-preserving API provenance,
+and valid citation output. **Complete.**
 
 ## Phase 6 - Product integration
 
