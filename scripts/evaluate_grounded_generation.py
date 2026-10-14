@@ -56,6 +56,7 @@ def evaluate_case(engine: SilabsAIEngine, query: str, max_new_tokens: int) -> di
         "cited": sorted(cited),
         "valid_citations": valid,
         "invented_citations": invented,
+        "citation_repaired": result.citation_repaired,
         "sources": [
             {
                 "citation": item.citation,
@@ -101,20 +102,24 @@ def main() -> None:
         row = evaluate_case(engine, query, args.max_new_tokens)
         rows.append(row)
         status = "PASS" if row["passed"] else "FAIL"
+        repair = "repaired" if row["citation_repaired"] else "native"
         print(
             f"  {status} | cited={row['cited']} "
             f"| available={row['available_citations']} "
-            f"| {row['elapsed_seconds']}s",
+            f"| citation={repair} | {row['elapsed_seconds']}s",
             flush=True,
         )
 
     passed = sum(1 for row in rows if row["passed"])
     total = len(rows)
+    repaired = sum(1 for row in rows if row["citation_repaired"])
     report = {
         "model": settings.model_id,
         "cases": total,
         "passed": passed,
         "pass_rate": round(passed / total, 4) if total else 0.0,
+        "citation_repaired": repaired,
+        "native_citation_rate": round((total - repaired) / total, 4) if total else 0.0,
         "results": rows,
     }
 
@@ -122,6 +127,8 @@ def main() -> None:
     print(f"cases: {total}")
     print(f"passed: {passed}")
     print(f"pass rate: {report['pass_rate']:.1%}")
+    print(f"citation repairs: {report['citation_repaired']}")
+    print(f"native citation rate: {report['native_citation_rate']:.1%}")
 
     failures = [row for row in rows if not row["passed"]]
     if failures:
