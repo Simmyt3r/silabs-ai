@@ -60,6 +60,12 @@ class Settings(BaseSettings):
     api_port: int = 8000
     log_level: str = "INFO"
 
+    # Product API authentication. Keys are represented as SHA-256 digests,
+    # keyed by product/client name, for example:
+    # {"unixpress": "<64-char hex digest>"}.
+    api_auth_enabled: bool = False
+    api_key_hashes: dict[str, str] = {}
+
     @field_validator(
         "model_path", "model_cache", "adapter_path", "knowledge_path", mode="before"
     )
