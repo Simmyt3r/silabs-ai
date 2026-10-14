@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import json
 import logging
 import time
 import uuid
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 
 from silabs_ai import __version__
 from silabs_ai.auth import APIPrincipal, require_api_key
@@ -132,6 +134,124 @@ def chat(
             if item.source
         ],
         citation_repaired=result.citation_repaired,
+    )
+
+
+
+
+def _sse_event(event: str, payload: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+@app.post("/v1/chat/stream")
+def chat_stream(
+    request: Request,
+    payload: ChatRequest,
+    principal: APIPrincipal = Depends(require_api_key),
+):
+    client_limits = settings.rate_limit_overrides.get(principal.client_id, {})
+    enforce_rate_limit(
+        rate_limiter,
+        client_id=principal.client_id,
+        route="chat",
+        limit=client_limits.get("chat", settings.rate_limit_chat_per_minute),
+    )
+
+    request_id = request.state.request_id
+
+    def event_stream():
+        started = time.perf_counter()
+        yield _sse_event(
+            "start",
+            {
+                "request_id": request_id,
+                "model": settings.model_id,
+            },
+        )
+
+        try:
+            result = engine.chat(
+                payload.message,
+                payload.history,
+                system_prompt=payload.system_prompt,
+                max_new_tokens=payload.max_new_tokens,
+                temperature=payload.temperature,
+                top_p=payload.top_p,
+            )
+        except Exception as exc:
+            usage_tracker.record(
+                client_id=principal.client_id,
+                failed=True,
+                latency_ms=(time.perf_counter() - started) * 1000,
+            )
+            logging.getLogger(__name__).exception(
+                "Streaming chat failed request_id=%s client=%s",
+                request_id,
+                principal.client_id,
+            )
+            yield _sse_event(
+                "error",
+                {
+                    "request_id": request_id,
+                    "detail": str(exc),
+                },
+            )
+            return
+
+        usage_tracker.record(
+            client_id=principal.client_id,
+            input_tokens=result.input_tokens,
+            output_tokens=result.output_tokens,
+            rag_used=bool(result.sources),
+            guardrail_intercepted=result.finish_reason == "guardrail",
+            citation_repaired=result.citation_repaired,
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+
+        chunk_size = 48
+        for offset in range(0, len(result.text), chunk_size):
+            yield _sse_event(
+                "chunk",
+                {
+                    "request_id": request_id,
+                    "text": result.text[offset : offset + chunk_size],
+                },
+            )
+
+        yield _sse_event(
+            "sources",
+            {
+                "request_id": request_id,
+                "sources": [
+                    {
+                        "citation": item.citation,
+                        "source": item.source,
+                        "score": item.score,
+                    }
+                    for item in result.sources
+                    if item.source
+                ],
+            },
+        )
+        yield _sse_event(
+            "done",
+            {
+                "request_id": request_id,
+                "finish_reason": result.finish_reason,
+                "guardrail_category": result.guardrail_category,
+                "input_tokens": result.input_tokens,
+                "output_tokens": result.output_tokens,
+                "citation_repaired": result.citation_repaired,
+            },
+        )
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
     )
 
 
