@@ -6,13 +6,13 @@ import threading
 from dataclasses import dataclass, field
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStreamer
 
 from .config import Settings, get_settings
 from .guardrails import BasicGuardrail
 from .model_source import resolve_model_source
 from .prompting import build_chat_messages, ensure_system_message
-from .retrieval import JsonlKnowledgeRetriever, NullRetriever, Retriever
+from .retrieval import JsonlKnowledgeRetriever, NullRetriever, RetrievedChunk, Retriever
 from .response_contracts import contract_for_prompt, enforce_contract
 from .schemas import Message
 
@@ -294,6 +294,166 @@ class SilabsAIEngine:
             sources=list(sources or []),
             citation_repaired=citation_repaired,
         )
+
+    def stream_chat(
+        self,
+        message: str,
+        history: list[Message] | None = None,
+        *,
+        system_prompt: str | None = None,
+        max_new_tokens: int | None = None,
+        temperature: float | None = None,
+        top_p: float | None = None,
+    ):
+        guarded = self._apply_guardrail(message)
+        if guarded is not None:
+            yield {"type": "chunk", "text": guarded.text}
+            yield {
+                "type": "final",
+                "result": guarded,
+            }
+            return
+
+        chunks = self.retriever.retrieve(
+            message,
+            limit=self.settings.rag_limit,
+        )
+        retrieved_context = [
+            (
+                f"[{chunk.citation or f'S{index}'}] Source: {chunk.source}\n{chunk.text}"
+                if chunk.source
+                else f"[{chunk.citation or f'S{index}'}]\n{chunk.text}"
+            )
+            for index, chunk in enumerate(chunks, start=1)
+        ]
+        messages = build_chat_messages(
+            message,
+            history,
+            system_prompt=system_prompt,
+            retrieved_context=retrieved_context,
+        )
+
+        user_content = self._latest_user_content(messages)
+        contract = contract_for_prompt(user_content) if user_content else None
+        if contract and contract.direct_response is not None:
+            result = GenerationResult(
+                text=contract.direct_response,
+                input_tokens=0,
+                output_tokens=len(contract.direct_response.split()),
+                finish_reason="contract",
+                sources=chunks,
+            )
+            result.text, result.citation_repaired = enforce_source_citations(
+                result.text,
+                chunks,
+            )
+            yield {"type": "chunk", "text": result.text}
+            yield {"type": "final", "result": result}
+            return
+
+        self.load()
+        assert self._model is not None
+        assert self._tokenizer is not None
+
+        messages = ensure_system_message(messages, self.settings.system_prompt)
+        if contract and contract.system_instruction:
+            base_system = messages[0]["content"]
+            messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        base_system
+                        + "\n\nHard response contract:\n"
+                        + contract.system_instruction
+                    ),
+                },
+                *messages[1:],
+            ]
+
+        encoded = self._tokenizer.apply_chat_template(
+            messages,
+            tokenize=True,
+            add_generation_prompt=True,
+            return_tensors="pt",
+            return_dict=True,
+            enable_thinking=self.settings.enable_thinking,
+        )
+        device = next(self._model.parameters()).device
+        input_ids = encoded["input_ids"].to(device)
+        attention_mask = encoded.get("attention_mask")
+        if attention_mask is None:
+            attention_mask = torch.ones_like(
+                input_ids, dtype=torch.long, device=device
+            )
+        else:
+            attention_mask = attention_mask.to(device)
+
+        temp = self.settings.temperature if temperature is None else temperature
+        nucleus = self.settings.top_p if top_p is None else top_p
+        do_sample = temp > 0
+        streamer = TextIteratorStreamer(
+            self._tokenizer,
+            skip_prompt=True,
+            skip_special_tokens=True,
+        )
+        generation_kwargs = {
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
+            "streamer": streamer,
+            "max_new_tokens": max_new_tokens or self.settings.max_new_tokens,
+            "do_sample": do_sample,
+            "repetition_penalty": self.settings.repetition_penalty,
+            "pad_token_id": self._tokenizer.eos_token_id,
+        }
+        if do_sample:
+            generation_kwargs["temperature"] = temp
+            generation_kwargs["top_p"] = nucleus
+
+        worker_error: list[BaseException] = []
+
+        def run_generation() -> None:
+            try:
+                with self._generate_lock, torch.inference_mode():
+                    self._model.generate(**generation_kwargs)
+            except BaseException as exc:
+                worker_error.append(exc)
+                streamer.end()
+
+        worker = threading.Thread(target=run_generation, daemon=True)
+        worker.start()
+
+        pieces: list[str] = []
+        for piece in streamer:
+            if not piece:
+                continue
+            pieces.append(piece)
+            yield {"type": "chunk", "text": piece}
+
+        worker.join()
+        if worker_error:
+            raise RuntimeError("Streaming generation failed") from worker_error[0]
+
+        raw_text = "".join(pieces).strip()
+        final_text = enforce_contract(raw_text, contract)
+        final_text, citation_repaired = enforce_source_citations(
+            final_text,
+            chunks,
+        )
+        output_tokens = len(
+            self._tokenizer.encode(
+                raw_text,
+                add_special_tokens=False,
+            )
+        )
+
+        result = GenerationResult(
+            text=final_text,
+            input_tokens=int(input_ids.shape[-1]),
+            output_tokens=output_tokens,
+            sources=chunks,
+            citation_repaired=citation_repaired,
+        )
+        yield {"type": "final", "result": result}
 
     def chat(
         self,
