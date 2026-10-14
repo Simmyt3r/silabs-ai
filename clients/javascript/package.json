@@ -1,0 +1,8 @@
+{
+  "name": "@silabs/ai-client",
+  "version": "0.1.0",
+  "description": "JavaScript client for the Silabs AI API",
+  "type": "module",
+  "main": "index.js",
+  "exports": "./index.js"
+}
