@@ -129,7 +129,7 @@ and valid citation output. **Complete.**
 
 ## Phase 6 - Product integration
 
-- [ ] authentication and API keys
+- [x] authentication and API keys
 - [ ] streaming
 - [ ] rate limiting
 - [ ] observability
