@@ -1,7 +1,14 @@
 from fastapi.testclient import TestClient
 
 from api.main import app
+from silabs_ai.auth import APIPrincipal, require_api_key
 
+
+def _test_principal() -> APIPrincipal:
+    return APIPrincipal(client_id="test-client")
+
+
+app.dependency_overrides[require_api_key] = _test_principal
 client = TestClient(app)
 
 
