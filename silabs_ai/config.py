@@ -3,7 +3,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     # keyed by product/client name, for example:
     # {"unixpress": "<64-char hex digest>"}.
     api_auth_enabled: bool = False
-    api_key_hashes: dict[str, str] = {}
+    api_key_hashes: dict[str, str] = Field(default_factory=dict)
 
     @field_validator(
         "model_path", "model_cache", "adapter_path", "knowledge_path", mode="before"
