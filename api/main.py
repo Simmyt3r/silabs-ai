@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import logging
+import time
+import uuid
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 
 from silabs_ai import __version__
 from silabs_ai.auth import APIPrincipal, require_api_key
 from silabs_ai.config import get_settings
 from silabs_ai.engine import SilabsAIEngine
 from silabs_ai.rate_limit import InMemoryRateLimiter, enforce_rate_limit
-from silabs_ai.schemas import ChatRequest, GenerateRequest, GenerationResponse, HealthResponse, ModelStatusResponse
+from silabs_ai.schemas import ChatRequest, GenerateRequest, GenerationResponse, HealthResponse, ModelStatusResponse, UsageResponse
+from silabs_ai.telemetry import InMemoryUsageTracker
 
 settings = get_settings()
 logging.basicConfig(
@@ -24,7 +27,17 @@ app = FastAPI(
 )
 engine = SilabsAIEngine(settings)
 rate_limiter = InMemoryRateLimiter()
+usage_tracker = InMemoryUsageTracker()
 
+
+
+@app.middleware("http")
+async def request_id_middleware(request: Request, call_next):
+    request_id = request.headers.get("X-Request-ID") or str(uuid.uuid4())
+    request.state.request_id = request_id
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = request_id
+    return response
 
 @app.on_event("startup")
 def startup() -> None:
@@ -58,6 +71,7 @@ def model_status() -> ModelStatusResponse:
 
 @app.post("/v1/chat", response_model=GenerationResponse)
 def chat(
+    request: Request,
     payload: ChatRequest,
     principal: APIPrincipal = Depends(require_api_key),
 ) -> GenerationResponse:
@@ -68,7 +82,11 @@ def chat(
         route="chat",
         limit=client_limits.get("chat", settings.rate_limit_chat_per_minute),
     )
-    logging.getLogger(__name__).info("chat request client=%s", principal.client_id)
+    started = time.perf_counter()
+    request_id = request.state.request_id
+    logging.getLogger(__name__).info(
+        "chat request request_id=%s client=%s", request_id, principal.client_id
+    )
     try:
         result = engine.chat(
             payload.message,
@@ -79,10 +97,29 @@ def chat(
             top_p=payload.top_p,
         )
     except Exception as exc:
-        logging.getLogger(__name__).exception("Chat generation failed")
+        usage_tracker.record(
+            client_id=principal.client_id,
+            failed=True,
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+        logging.getLogger(__name__).exception(
+            "Chat generation failed request_id=%s client=%s",
+            request_id,
+            principal.client_id,
+        )
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    usage_tracker.record(
+        client_id=principal.client_id,
+        input_tokens=result.input_tokens,
+        output_tokens=result.output_tokens,
+        rag_used=bool(result.sources),
+        guardrail_intercepted=result.finish_reason == "guardrail",
+        citation_repaired=result.citation_repaired,
+        latency_ms=(time.perf_counter() - started) * 1000,
+    )
     return GenerationResponse(
+        request_id=request_id,
         text=result.text,
         model=settings.model_id,
         finish_reason=result.finish_reason,
@@ -100,6 +137,7 @@ def chat(
 
 @app.post("/v1/generate", response_model=GenerationResponse)
 def generate(
+    request: Request,
     payload: GenerateRequest,
     principal: APIPrincipal = Depends(require_api_key),
 ) -> GenerationResponse:
@@ -110,7 +148,11 @@ def generate(
         route="generate",
         limit=client_limits.get("generate", settings.rate_limit_generate_per_minute),
     )
-    logging.getLogger(__name__).info("generate request client=%s", principal.client_id)
+    started = time.perf_counter()
+    request_id = request.state.request_id
+    logging.getLogger(__name__).info(
+        "generate request request_id=%s client=%s", request_id, principal.client_id
+    )
     try:
         result = engine.generate(
             [message.model_dump() for message in payload.messages],
@@ -119,10 +161,28 @@ def generate(
             top_p=payload.top_p,
         )
     except Exception as exc:
-        logging.getLogger(__name__).exception("Generation failed")
+        usage_tracker.record(
+            client_id=principal.client_id,
+            failed=True,
+            latency_ms=(time.perf_counter() - started) * 1000,
+        )
+        logging.getLogger(__name__).exception(
+            "Generation failed request_id=%s client=%s",
+            request_id,
+            principal.client_id,
+        )
         raise HTTPException(status_code=500, detail=str(exc)) from exc
 
+    usage_tracker.record(
+        client_id=principal.client_id,
+        input_tokens=result.input_tokens,
+        output_tokens=result.output_tokens,
+        guardrail_intercepted=result.finish_reason == "guardrail",
+        citation_repaired=result.citation_repaired,
+        latency_ms=(time.perf_counter() - started) * 1000,
+    )
     return GenerationResponse(
+        request_id=request_id,
         text=result.text,
         model=settings.model_id,
         finish_reason=result.finish_reason,
@@ -136,3 +196,11 @@ def generate(
         ],
         citation_repaired=result.citation_repaired,
     )
+
+
+@app.get("/v1/usage", response_model=UsageResponse)
+def usage(
+    principal: APIPrincipal = Depends(require_api_key),
+) -> UsageResponse:
+    snapshot = usage_tracker.snapshot(principal.client_id)[principal.client_id]
+    return UsageResponse(client_id=principal.client_id, usage=snapshot)
