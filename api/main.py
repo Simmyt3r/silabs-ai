@@ -169,15 +169,26 @@ def chat_stream(
             },
         )
 
+        result = None
         try:
-            result = engine.chat(
+            for event in engine.stream_chat(
                 payload.message,
                 payload.history,
                 system_prompt=payload.system_prompt,
                 max_new_tokens=payload.max_new_tokens,
                 temperature=payload.temperature,
                 top_p=payload.top_p,
-            )
+            ):
+                if event["type"] == "chunk":
+                    yield _sse_event(
+                        "chunk",
+                        {
+                            "request_id": request_id,
+                            "text": event["text"],
+                        },
+                    )
+                elif event["type"] == "final":
+                    result = event["result"]
         except Exception as exc:
             usage_tracker.record(
                 client_id=principal.client_id,
@@ -198,6 +209,16 @@ def chat_stream(
             )
             return
 
+        if result is None:
+            yield _sse_event(
+                "error",
+                {
+                    "request_id": request_id,
+                    "detail": "Streaming generation ended without a final result.",
+                },
+            )
+            return
+
         usage_tracker.record(
             client_id=principal.client_id,
             input_tokens=result.input_tokens,
@@ -208,16 +229,14 @@ def chat_stream(
             latency_ms=(time.perf_counter() - started) * 1000,
         )
 
-        chunk_size = 48
-        for offset in range(0, len(result.text), chunk_size):
-            yield _sse_event(
-                "chunk",
-                {
-                    "request_id": request_id,
-                    "text": result.text[offset : offset + chunk_size],
-                },
-            )
-
+        yield _sse_event(
+            "final",
+            {
+                "request_id": request_id,
+                "text": result.text,
+                "citation_repaired": result.citation_repaired,
+            },
+        )
         yield _sse_event(
             "sources",
             {
