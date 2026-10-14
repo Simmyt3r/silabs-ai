@@ -26,14 +26,12 @@ def verify_api_key(
     return hmac.compare_digest(candidate, expected_hash.lower())
 
 
-def require_api_key(
-    x_silabs_api_key: str | None = Header(default=None, alias="X-Silabs-API-Key"),
-    x_silabs_client: str | None = Header(default=None, alias="X-Silabs-Client"),
-    settings: Settings | None = None,
+def authenticate_api_key(
+    x_silabs_api_key: str | None,
+    x_silabs_client: str | None,
+    settings: Settings,
 ) -> APIPrincipal:
-    cfg = settings or get_settings()
-
-    if not cfg.api_auth_enabled:
+    if not settings.api_auth_enabled:
         return APIPrincipal(client_id=x_silabs_client or "development")
 
     client_id = (x_silabs_client or "").strip()
@@ -46,7 +44,7 @@ def require_api_key(
             headers={"WWW-Authenticate": "SilabsApiKey"},
         )
 
-    expected_hash = cfg.api_key_hashes.get(client_id)
+    expected_hash = settings.api_key_hashes.get(client_id)
     if not expected_hash or not verify_api_key(raw_key, expected_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -55,3 +53,14 @@ def require_api_key(
         )
 
     return APIPrincipal(client_id=client_id)
+
+
+def require_api_key(
+    x_silabs_api_key: str | None = Header(default=None, alias="X-Silabs-API-Key"),
+    x_silabs_client: str | None = Header(default=None, alias="X-Silabs-Client"),
+) -> APIPrincipal:
+    return authenticate_api_key(
+        x_silabs_api_key=x_silabs_api_key,
+        x_silabs_client=x_silabs_client,
+        settings=get_settings(),
+    )
