@@ -131,7 +131,7 @@ and valid citation output. **Complete.**
 
 - [x] authentication and API keys
 - [ ] streaming
-- [ ] rate limiting
+- [x] rate limiting
 - [ ] observability
 - [ ] UniXpress integration
 - [ ] reusable client/SDK
