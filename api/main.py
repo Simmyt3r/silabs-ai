@@ -80,6 +80,7 @@ def chat(payload: ChatRequest) -> GenerationResponse:
             for item in result.sources
             if item.source
         ],
+        citation_repaired=result.citation_repaired,
     )
 
 
@@ -108,4 +109,5 @@ def generate(payload: GenerateRequest) -> GenerationResponse:
             for item in result.sources
             if item.source
         ],
+        citation_repaired=result.citation_repaired,
     )
