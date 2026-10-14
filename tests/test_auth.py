@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 
-from silabs_ai.auth import hash_api_key, require_api_key, verify_api_key
+from silabs_ai.auth import authenticate_api_key, hash_api_key, verify_api_key
 from silabs_ai.config import Settings
 
 
@@ -19,7 +19,7 @@ def test_auth_disabled_allows_development_client():
         api_auth_enabled=False,
     )
 
-    principal = require_api_key(
+    principal = authenticate_api_key(
         x_silabs_api_key=None,
         x_silabs_client=None,
         settings=settings,
@@ -36,7 +36,7 @@ def test_auth_enabled_accepts_valid_product_key():
         api_key_hashes={"unixpress": hash_api_key(raw)},
     )
 
-    principal = require_api_key(
+    principal = authenticate_api_key(
         x_silabs_api_key=raw,
         x_silabs_client="unixpress",
         settings=settings,
@@ -53,7 +53,7 @@ def test_auth_enabled_rejects_missing_credentials():
     )
 
     try:
-        require_api_key(
+        authenticate_api_key(
             x_silabs_api_key=None,
             x_silabs_client=None,
             settings=settings,
@@ -72,7 +72,7 @@ def test_auth_enabled_rejects_wrong_product_key():
     )
 
     try:
-        require_api_key(
+        authenticate_api_key(
             x_silabs_api_key="wrong",
             x_silabs_client="unixpress",
             settings=settings,
