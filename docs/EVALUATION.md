@@ -130,3 +130,24 @@ BM25-style length normalization, title weighting, query coverage scoring and a
 generic canonical named-source preference. The 20-case suite should not be used
 for further micro-tuning; expand the evaluation set before making additional
 ranking changes.
+
+
+## Grounded-generation citation evaluation
+
+`scripts/evaluate_grounded_generation.py` validates end-to-end RAG citation
+integrity. It checks that generated answers cite retrieved labels such as
+`[S1]`, rejects invented labels, and records whether citation enforcement had
+to repair the model output.
+
+Grounded-generation V2 on Qwen3-1.7B with the 47,493-record verified corpus:
+
+- Cases: 6
+- Passed: 6/6
+- Citation-integrity pass rate: 100.0%
+- Native citation rate: 33.3%
+- Citation repairs: 4/6
+- Runtime: CPU
+
+The distinction between native and repaired citations is intentional. System
+integrity is 100%, while the native citation rate remains visible as a model
+behavior metric for future training or prompt improvements.
