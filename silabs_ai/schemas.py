@@ -36,6 +36,7 @@ class SourceReference(BaseModel):
 
 
 class GenerationResponse(BaseModel):
+    request_id: str
     text: str
     model: str
     finish_reason: str = "stop"
@@ -62,3 +63,8 @@ class ModelStatusResponse(BaseModel):
     guardrails_enabled: bool
     rag_enabled: bool
     knowledge_path: str | None
+
+
+class UsageResponse(BaseModel):
+    client_id: str
+    usage: dict[str, int | float]
