@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import threading
 from dataclasses import dataclass, field
 
@@ -26,6 +27,49 @@ class GenerationResult:
     finish_reason: str = "stop"
     guardrail_category: str | None = None
     sources: list[RetrievedChunk] = field(default_factory=list)
+    citation_repaired: bool = False
+
+
+_CITATION_RE = re.compile(r"\[(S\d+)\]")
+
+
+def enforce_source_citations(
+    text: str,
+    sources: list[RetrievedChunk] | None,
+) -> tuple[str, bool]:
+    source_list = list(sources or [])
+    valid_labels = {
+        item.citation
+        for item in source_list
+        if item.citation
+    }
+    if not valid_labels:
+        return text, False
+
+    repaired = False
+
+    def replace_unknown(match: re.Match[str]) -> str:
+        nonlocal repaired
+        label = match.group(1)
+        if label in valid_labels:
+            return match.group(0)
+        repaired = True
+        return ""
+
+    cleaned = _CITATION_RE.sub(replace_unknown, text).strip()
+    cited = set(_CITATION_RE.findall(cleaned))
+
+    if not cited:
+        preferred = source_list[0].citation
+        if preferred:
+            cleaned = cleaned.rstrip()
+            if cleaned:
+                cleaned += f" [{preferred}]"
+            else:
+                cleaned = f"[{preferred}]"
+            repaired = True
+
+    return cleaned, repaired
 
 
 class SilabsAIEngine:
@@ -241,12 +285,14 @@ class SilabsAIEngine:
         generated = output[0, input_ids.shape[-1] :]
         text = self._tokenizer.decode(generated, skip_special_tokens=True).strip()
         text = enforce_contract(text, contract)
+        text, citation_repaired = enforce_source_citations(text, sources)
 
         return GenerationResult(
             text=text,
             input_tokens=int(input_ids.shape[-1]),
             output_tokens=int(generated.shape[-1]),
             sources=list(sources or []),
+            citation_repaired=citation_repaired,
         )
 
     def chat(
