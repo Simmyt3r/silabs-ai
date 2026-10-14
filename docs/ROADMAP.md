@@ -134,7 +134,7 @@ and valid citation output. **Complete.**
 - [x] rate limiting
 - [x] observability
 - [ ] UniXpress integration
-- [ ] reusable client/SDK
+- [x] reusable client/SDK
 - [ ] deployment benchmark and quantization
 
 ## Later
