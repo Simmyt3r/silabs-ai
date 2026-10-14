@@ -98,3 +98,31 @@ def test_chat_response_exposes_rag_source_provenance(monkeypatch):
             "score": 5.25,
         }
     ]
+
+
+def test_health_response_includes_request_id_header():
+    response = client.get("/v1/health")
+    assert response.status_code == 200
+    assert response.headers.get("X-Request-ID")
+
+
+def test_usage_endpoint_returns_calling_client_usage():
+    import api.main as api_main
+    from silabs_ai.telemetry import InMemoryUsageTracker
+
+    api_main.usage_tracker = InMemoryUsageTracker()
+    api_main.usage_tracker.record(
+        client_id="test-client",
+        input_tokens=7,
+        output_tokens=3,
+        latency_ms=10,
+    )
+
+    response = client.get("/v1/usage")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["client_id"] == "test-client"
+    assert payload["usage"]["requests"] == 1
+    assert payload["usage"]["input_tokens"] == 7
+    assert payload["usage"]["output_tokens"] == 3
