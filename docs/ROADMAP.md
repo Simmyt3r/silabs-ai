@@ -130,7 +130,7 @@ and valid citation output. **Complete.**
 ## Phase 6 - Product integration
 
 - [x] authentication and API keys
-- [ ] streaming
+- [ ] streaming (SSE transport complete; true token streaming pending)
 - [x] rate limiting
 - [x] observability
 - [ ] UniXpress integration
