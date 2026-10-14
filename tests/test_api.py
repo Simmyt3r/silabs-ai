@@ -126,3 +126,62 @@ def test_usage_endpoint_returns_calling_client_usage():
     assert payload["usage"]["requests"] == 1
     assert payload["usage"]["input_tokens"] == 7
     assert payload["usage"]["output_tokens"] == 3
+
+
+def test_chat_stream_emits_sse_events(monkeypatch):
+    import api.main as api_main
+    from silabs_ai.engine import GenerationResult
+    from silabs_ai.retrieval import RetrievedChunk
+
+    class FakeEngine:
+        def chat(self, *args, **kwargs):
+            return GenerationResult(
+                text="Grounded answer [S1].",
+                input_tokens=9,
+                output_tokens=4,
+                sources=[
+                    RetrievedChunk(
+                        text="Verified source.",
+                        source="source://verified",
+                        score=4.2,
+                        citation="S1",
+                    )
+                ],
+                citation_repaired=False,
+            )
+
+    monkeypatch.setattr(api_main, "engine", FakeEngine())
+
+    response = client.post(
+        "/v1/chat/stream",
+        json={"message": "Explain this."},
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+    body = response.text
+    assert "event: start" in body
+    assert "event: chunk" in body
+    assert "Grounded answer" in body
+    assert "event: sources" in body
+    assert "source://verified" in body
+    assert "event: done" in body
+
+
+def test_chat_stream_error_event(monkeypatch):
+    import api.main as api_main
+
+    class FailingEngine:
+        def chat(self, *args, **kwargs):
+            raise RuntimeError("boom")
+
+    monkeypatch.setattr(api_main, "engine", FailingEngine())
+
+    response = client.post(
+        "/v1/chat/stream",
+        json={"message": "Explain this."},
+    )
+
+    assert response.status_code == 200
+    assert "event: error" in response.text
+    assert "boom" in response.text
