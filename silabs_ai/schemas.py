@@ -43,6 +43,7 @@ class GenerationResponse(BaseModel):
     input_tokens: int | None = None
     output_tokens: int | None = None
     sources: list[SourceReference] = Field(default_factory=list)
+    citation_repaired: bool = False
 
 
 class HealthResponse(BaseModel):
