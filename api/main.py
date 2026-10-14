@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import logging
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 
 from silabs_ai import __version__
+from silabs_ai.auth import APIPrincipal, require_api_key
 from silabs_ai.config import get_settings
 from silabs_ai.engine import SilabsAIEngine
 from silabs_ai.schemas import ChatRequest, GenerateRequest, GenerationResponse, HealthResponse, ModelStatusResponse
@@ -54,7 +55,11 @@ def model_status() -> ModelStatusResponse:
 
 
 @app.post("/v1/chat", response_model=GenerationResponse)
-def chat(payload: ChatRequest) -> GenerationResponse:
+def chat(
+    payload: ChatRequest,
+    principal: APIPrincipal = Depends(require_api_key),
+) -> GenerationResponse:
+    logging.getLogger(__name__).info("chat request client=%s", principal.client_id)
     try:
         result = engine.chat(
             payload.message,
@@ -85,7 +90,11 @@ def chat(payload: ChatRequest) -> GenerationResponse:
 
 
 @app.post("/v1/generate", response_model=GenerationResponse)
-def generate(payload: GenerateRequest) -> GenerationResponse:
+def generate(
+    payload: GenerateRequest,
+    principal: APIPrincipal = Depends(require_api_key),
+) -> GenerationResponse:
+    logging.getLogger(__name__).info("generate request client=%s", principal.client_id)
     try:
         result = engine.generate(
             [message.model_dump() for message in payload.messages],
