@@ -3,7 +3,9 @@ title: Silabs AI
 emoji: 🧠
 colorFrom: blue
 colorTo: indigo
-sdk: docker
+sdk: gradio
+sdk_version: 5.49.1
+app_file: app.py
 app_port: 7860
 suggested_hardware: cpu-basic
 ---
