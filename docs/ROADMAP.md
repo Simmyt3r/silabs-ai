@@ -133,8 +133,9 @@ and valid citation output. **Complete.**
 - [x] streaming
 - [x] rate limiting
 - [x] observability
-- [ ] UniXpress integration
 - [x] reusable client/SDK
+- [ ] staging deployment
+- [ ] UniXpress integration
 - [ ] deployment benchmark and quantization
 
 ## Later
