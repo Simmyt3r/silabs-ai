@@ -191,3 +191,21 @@ def test_chat_stream_error_event(monkeypatch):
     assert response.status_code == 200
     assert "event: error" in response.text
     assert "boom" in response.text
+
+
+def test_root_deployment_landing():
+    response = client.get("/")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["name"] == "Silabs AI"
+    assert payload["status"] == "running"
+    assert payload["docs"] == "/docs"
+
+
+def test_readiness_endpoint():
+    response = client.get("/v1/ready")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "ready"
+    assert "model_loaded" in payload
+    assert "auth_enabled" in payload
