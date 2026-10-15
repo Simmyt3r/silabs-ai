@@ -49,9 +49,9 @@ Completed:
 
 Current task:
 
-**Staging deployment**
+**Modal staging deployment**
 
-We are now putting Silabs AI on a real staging server and testing the live API. UniXpress integration begins only after the staging deployment passes its checks.
+We are now deploying Silabs AI to Modal and testing the live API. UniXpress integration begins only after the Modal staging deployment passes its checks.
 
 ## Phase 7 — Deployment & Optimization ⏳
 
@@ -83,6 +83,6 @@ Every contribution should clearly answer:
 
 **Foundation ✅ → Data ✅ → Training 🟡 → Evaluation 🟡 → RAG ✅ → Product Integration 🟢 → Deployment ⏳ → Future Improvements ⏳**
 
-Right now, the main focus is **Phase 6: staging deployment**.
+Right now, the main focus is **Phase 6: Modal staging deployment**.
 
 Finish each stage properly before jumping ahead.
