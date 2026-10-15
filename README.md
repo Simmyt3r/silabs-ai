@@ -1,3 +1,13 @@
+---
+title: Silabs AI
+emoji: 🧠
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+suggested_hardware: cpu-basic
+---
+
 # Silabs AI
 
 Silabs AI is the shared AI engine for Silabs products. Version 1 moves the project from tiny from-scratch experiments to a reproducible pretrained-model fine-tuning architecture with inference, training, evaluation and future RAG behind one stable interface.
