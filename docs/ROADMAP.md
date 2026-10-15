@@ -134,7 +134,7 @@ and valid citation output. **Complete.**
 - [x] rate limiting
 - [x] observability
 - [x] reusable client/SDK
-- [ ] staging deployment
+- [ ] Modal staging deployment
 - [ ] UniXpress integration
 - [ ] deployment benchmark and quantization
 
