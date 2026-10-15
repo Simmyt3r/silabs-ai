@@ -78,7 +78,19 @@ Replace only `YOUR_UNIXPRESS_KEY_HASH`.
 
 Do not put the raw API key in this secret. The server needs only the hash.
 
-## Step 6 — Test the Modal definition
+## Step 6 — Prepare the persistent model cache
+
+Download Qwen once into the Modal Volume:
+
+```bash
+!modal run modal_app.py::prepare_model_cache
+```
+
+Wait for it to finish.
+
+This stores the model in the persistent `silabs-ai-model-cache` Volume so later containers can reuse it.
+
+## Step 7 — Test the Modal definition
 
 ```bash
 !modal serve modal_app.py
@@ -88,7 +100,7 @@ Modal builds the image and prints a temporary development URL.
 
 Keep this cell running while testing.
 
-## Step 7 — Test health
+## Step 8 — Test health
 
 Open a second Colab cell and replace `YOUR_MODAL_DEV_URL`:
 
@@ -108,7 +120,7 @@ Expected HTTP status:
 200
 ```
 
-## Step 8 — Test authentication
+## Step 9 — Test authentication
 
 With no credentials:
 
@@ -128,7 +140,7 @@ Expected:
 401
 ```
 
-## Step 9 — Test one real model response
+## Step 10 — Test one real model response
 
 Use the raw API key, not the hash:
 
@@ -157,7 +169,7 @@ The first model request can be slow because Qwen3-1.7B must download into the pe
 
 Later cold starts can reuse the cached model files.
 
-## Step 10 — Deploy the permanent staging URL
+## Step 11 — Deploy the permanent staging URL
 
 Stop `modal serve` after the development test passes.
 
@@ -177,7 +189,7 @@ SILABS_AI_URL=<your Modal URL>
 
 for future UniXpress staging integration.
 
-## Step 11 — Verify the deployed staging API
+## Step 12 — Verify the deployed staging API
 
 Check:
 
@@ -190,7 +202,7 @@ Check:
 
 Only after these pass should the staging-deployment roadmap item be marked complete.
 
-## Step 12 — RAG comes next
+## Step 13 — RAG comes next
 
 The initial Modal deployment intentionally uses:
 
