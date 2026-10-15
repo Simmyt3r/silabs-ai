@@ -34,6 +34,22 @@ image = (
 
 @app.function(
     image=image,
+    timeout=1200,
+    volumes={MODEL_CACHE: model_cache},
+)
+def prepare_model_cache():
+    from huggingface_hub import snapshot_download
+
+    path = snapshot_download(
+        repo_id="Qwen/Qwen3-1.7B",
+        cache_dir=f"{MODEL_CACHE}/hub",
+    )
+    model_cache.commit()
+    return {"status": "cached", "path": path}
+
+
+@app.function(
+    image=image,
     gpu="T4",
     timeout=1200,
     scaledown_window=300,
