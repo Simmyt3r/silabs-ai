@@ -1,284 +1,212 @@
-# Hugging Face Staging Deployment — Baby Steps
+# Hugging Face Gradio Staging Deployment — Baby Steps
 
-This guide deploys the current Silabs AI FastAPI service to a Hugging Face Docker Space.
+This is the fallback staging path for Silabs AI when Docker Space creation is not available.
 
-The first goal is simple:
+The goal is simple:
 
-**Get the Silabs AI API online and confirm that it can answer one request.**
+**Put Silabs AI online in a Gradio Space, prove the model can answer, then connect UniXpress later.**
 
-Do not enable the large RAG knowledge corpus during the first deployment. Add it after the basic API is confirmed working.
+The Docker files remain in the repository for future deployment options. The active Hugging Face Space configuration now uses Gradio.
 
-## Before you start
+## Step 1 — Create the Space
 
-You need:
+On Hugging Face, create a new Space with:
 
-1. A Hugging Face account.
-2. Access to create a Docker Space.
-3. A Hugging Face write token.
-4. The raw UniXpress Silabs AI API key that was generated earlier.
-5. The matching SHA-256 hash for that key.
+- **Owner:** `silabtechnologies`
+- **Space name:** `silabs-ai-staging`
+- **SDK:** Gradio
+- **Hardware:** Free tier / CPU Basic
+- **License:** Apache-2.0
+- **Visibility:** Private if available to you; otherwise Public for staging
 
-Current Hugging Face policy may require a paid account tier to create a new Docker/Gradio compute Space even though CPU Basic has no hourly hardware charge. If Docker Space creation is blocked on your account, do not change the Silabs AI code. The deployment target is the only thing that needs to change.
+If your account allows creation with those settings, continue.
 
----
+## Step 2 — Do not attach a bucket yet
 
-## Step 1 — Pull the latest Silabs AI code
+For the first deployment, leave the storage bucket out.
 
-In Colab:
+We first want to prove:
+
+1. the Space builds;
+2. Qwen3-1.7B loads;
+3. authentication works;
+4. one response can be generated.
+
+The 47,493-record RAG corpus comes after that.
+
+## Step 3 — Pull the latest repository in Colab
 
 ```bash
 %cd /content/silabs-ai
 !git pull origin main
 ```
 
-You should now have:
+The repository should now contain:
 
-- `Dockerfile`
-- `.dockerignore`
-- Hugging Face metadata at the top of `README.md`
+```text
+app.py
+README.md
+requirements.txt
+silabs_ai/
+```
 
----
+The top of `README.md` now tells Hugging Face to run:
 
-## Step 2 — Create the Hugging Face Space
+```text
+sdk: gradio
+sdk_version: 5.49.1
+app_file: app.py
+```
 
-Go to Hugging Face and create a new Space.
+## Step 4 — Create a Hugging Face write token
 
-Use:
+In Hugging Face:
 
-- **Space name:** `silabs-ai-staging`
-- **SDK:** Docker
-- **Hardware:** CPU Basic
-- **Visibility:** private if your account allows it; otherwise use the visibility you are comfortable testing with
+**Settings → Access Tokens → Create new token**
 
-Do not add application code manually in the browser.
+Give it write access to your Space.
 
-The Space is only the destination for the repository.
+Copy the token.
 
----
+Never commit the token to GitHub.
 
-## Step 3 — Create a Hugging Face write token
-
-In Hugging Face account settings:
-
-1. Open **Access Tokens**.
-2. Create a token with permission to write to the new Space.
-3. Copy the token.
-
-Do not commit this token to GitHub.
-
----
-
-## Step 4 — Log in from Colab
-
-Install/update the Hub CLI if needed:
+## Step 5 — Login from Colab
 
 ```bash
 !pip install -U huggingface_hub -q
-```
-
-Then:
-
-```bash
 !hf auth login
 ```
 
-Paste the Hugging Face token when prompted.
+Paste the token.
 
-If asked whether to save it as a Git credential, choose **yes**.
-
----
-
-## Step 5 — Add the Hugging Face Space as a Git remote
-
-Replace `YOUR_HF_USERNAME` with your Hugging Face username:
+## Step 6 — Add the Space as a Git remote
 
 ```bash
 %cd /content/silabs-ai
 !git remote remove hf 2>/dev/null || true
-!git remote add hf https://huggingface.co/spaces/YOUR_HF_USERNAME/silabs-ai-staging
-```
-
-Check:
-
-```bash
+!git remote add hf https://huggingface.co/spaces/silabtechnologies/silabs-ai-staging
 !git remote -v
 ```
 
-You should see both:
+You should see:
 
-- `origin` pointing to GitHub
-- `hf` pointing to the Hugging Face Space
+- `origin` → GitHub
+- `hf` → Hugging Face Space
 
----
-
-## Step 6 — Push Silabs AI to the Space
-
-Run:
+## Step 7 — Push the repository to Hugging Face
 
 ```bash
 !git push hf main
 ```
 
-Hugging Face will begin building the Docker image automatically.
+Then open the Space page and watch the build logs.
 
-Open the Space page and watch **Logs**.
-
-The first build can take several minutes because Python packages must be installed.
-
----
-
-## Step 7 — Add the Silabs AI server settings
+## Step 8 — Add Space variables
 
 Open:
 
 **Space → Settings → Variables and secrets**
 
-For the first staging deployment add:
-
-### Variable
+Add these Variables:
 
 ```text
+SILABS_MODEL_PATH=
+SILABS_ALLOW_REMOTE_MODEL_DOWNLOAD=true
+SILABS_DEVICE=cpu
+SILABS_DTYPE=float32
+SILABS_PRELOAD_MODEL=false
+SILABS_RAG_ENABLED=false
 SILABS_API_AUTH_ENABLED=true
 ```
 
-### Secret
+For the first staging deployment, RAG stays disabled.
 
-Use the API-key hash generated earlier:
+## Step 9 — Add the API-key hash as a Secret
 
-```text
-SILABS_API_KEY_HASHES={"unixpress":"YOUR_API_KEY_HASH"}
-```
-
-For the first deployment leave RAG disabled:
+Add:
 
 ```text
-SILABS_RAG_ENABLED=false
+SILABS_API_KEY_HASHES={"unixpress":"YOUR_UNIXPRESS_KEY_HASH"}
 ```
 
-The Docker image already tells Silabs AI to:
+Use the **hash**, not the raw API key.
 
-- download `Qwen/Qwen3-1.7B` from Hugging Face when needed;
-- run on CPU;
-- listen on port `7860`;
-- avoid loading the model until the first generation request.
+The raw key stays with the UniXpress/server-side client.
 
-Never place the raw UniXpress API key in the Space server settings. The server stores only its hash.
+## Step 10 — Wait for the Space to become Running
 
----
+When the Space finishes building, you should see the Silabs AI staging page.
 
-## Step 8 — Wait until the Space says Running
+It contains:
 
-When deployment succeeds, the Space URL will look similar to:
+- Client ID
+- API Key
+- Message box
+- Answer
+- Sources
+- Status
+
+The default Client ID is:
 
 ```text
-https://YOUR_HF_USERNAME-silabs-ai-staging.hf.space
+unixpress
 ```
 
-Open that URL.
+## Step 11 — Test authentication
 
-Expected response:
+First enter:
 
-```json
-{
-  "name": "Silabs AI",
-  "status": "running",
-  "docs": "/docs",
-  "health": "/v1/health",
-  "ready": "/v1/ready"
-}
-```
+- Client ID: `unixpress`
+- Wrong API key
+- Any message
 
-Also test:
+It should reject the request.
+
+Then use the real raw UniXpress key.
+
+That should be accepted.
+
+## Step 12 — Test the model
+
+Use a short message:
 
 ```text
-https://YOUR_HF_USERNAME-silabs-ai-staging.hf.space/v1/health
+Explain what a database is in one short paragraph.
 ```
 
-and:
+The first request may take a long time because:
 
-```text
-https://YOUR_HF_USERNAME-silabs-ai-staging.hf.space/docs
-```
+1. Qwen3-1.7B has to download;
+2. the weights have to load into memory;
+3. CPU generation is slow.
 
-If these work, the API container is online.
+That is acceptable for staging.
 
----
+## Step 13 — What success looks like
 
-## Step 9 — Test one real AI request from Colab
+Staging deployment is successful when:
 
-Use the **raw** UniXpress key here. Do not use the hash.
+- the Space builds;
+- the page opens;
+- bad credentials are rejected;
+- correct credentials work;
+- Qwen3-1.7B generates an answer;
+- the response streams into the interface;
+- status shows token counts;
+- no model crash occurs.
 
-```python
-import requests
+## Step 14 — Do not connect UniXpress yet
 
-SPACE_URL = "https://YOUR_HF_USERNAME-silabs-ai-staging.hf.space"
-RAW_API_KEY = "YOUR_RAW_UNIXPRESS_KEY"
+After the basic Space works, the next deployment task is:
 
-response = requests.post(
-    f"{SPACE_URL}/v1/chat",
-    headers={
-        "X-Silabs-Client": "unixpress",
-        "X-Silabs-API-Key": RAW_API_KEY,
-    },
-    json={
-        "message": "Explain what a database is in one short paragraph.",
-        "temperature": 0,
-        "max_new_tokens": 80,
-    },
-    timeout=1200,
-)
+**Add the verified RAG corpus to a deployment-accessible Hugging Face dataset/storage location.**
 
-print("status:", response.status_code)
-print(response.text)
-```
+Only after RAG is confirmed should UniXpress use the staging Space.
 
-The first request is the slowest because the model must download and load.
+## Important note about the Gradio Space
 
-CPU Basic will also generate slowly. This deployment is for **staging and integration testing**, not final production performance.
+This Gradio Space is a **staging deployment**, not the final production API.
 
-A successful response means:
+It reuses the same Silabs AI engine, authentication, guardrails, rate limiting, telemetry, streaming, and citation logic, but Gradio is the front door instead of our FastAPI endpoints.
 
-**GitHub code → Hugging Face Silabs AI server → authenticated API response**
-
-is working.
-
----
-
-## Step 10 — Only then add the knowledge corpus
-
-Do not enable RAG until the base staging API passes Step 9.
-
-The verified corpus currently lives outside Git in:
-
-```text
-verified-expanded.jsonl
-```
-
-It contains 47,493 verified chunks.
-
-The next deployment task is to place that corpus in an appropriate Hugging Face-hosted data location or other deployment-accessible storage, then configure:
-
-```text
-SILABS_RAG_ENABLED=true
-SILABS_KNOWLEDGE_PATH=<deployed corpus path>
-```
-
-Do not upload the corpus blindly into the GitHub repository just to make deployment easier.
-
----
-
-## What counts as successful staging deployment?
-
-Do not connect UniXpress yet unless all of these pass:
-
-- Space status is **Running**.
-- `/` works.
-- `/v1/health` returns HTTP 200.
-- `/docs` loads.
-- Missing API credentials return HTTP 401.
-- Correct UniXpress credentials return HTTP 200.
-- A real model response is generated.
-- Request IDs appear.
-- `/v1/usage` works for the UniXpress client.
-
-After these checks, staging deployment is complete and UniXpress integration can begin against a real URL.
+That is enough to prove remote model deployment before production hosting is chosen.
