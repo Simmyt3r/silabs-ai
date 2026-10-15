@@ -49,9 +49,9 @@ Completed:
 
 Current task:
 
-**UniXpress integration**
+**Staging deployment**
 
-We are now connecting Silabs AI to UniXpress in a controlled way and testing the real user experience.
+We are now putting Silabs AI on a real staging server and testing the live API. UniXpress integration begins only after the staging deployment passes its checks.
 
 ## Phase 7 — Deployment & Optimization ⏳
 
@@ -83,6 +83,6 @@ Every contribution should clearly answer:
 
 **Foundation ✅ → Data ✅ → Training 🟡 → Evaluation 🟡 → RAG ✅ → Product Integration 🟢 → Deployment ⏳ → Future Improvements ⏳**
 
-Right now, the main focus is **Phase 6: UniXpress integration**.
+Right now, the main focus is **Phase 6: staging deployment**.
 
 Finish each stage properly before jumping ahead.
