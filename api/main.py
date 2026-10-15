@@ -47,6 +47,17 @@ def startup() -> None:
         engine.load()
 
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {
+        "name": settings.app_name,
+        "status": "running",
+        "docs": "/docs",
+        "health": "/v1/health",
+        "ready": "/v1/ready",
+    }
+
+
 @app.get("/v1/health", response_model=HealthResponse)
 def health() -> HealthResponse:
     return HealthResponse(
@@ -55,6 +66,17 @@ def health() -> HealthResponse:
         version=__version__,
         model_loaded=engine.loaded,
     )
+
+
+@app.get("/v1/ready")
+def ready() -> dict[str, object]:
+    return {
+        "status": "ready",
+        "model_loaded": engine.loaded,
+        "rag_enabled": settings.rag_enabled,
+        "knowledge_path": settings.knowledge_path,
+        "auth_enabled": settings.api_auth_enabled,
+    }
 
 
 @app.get("/v1/model", response_model=ModelStatusResponse)
