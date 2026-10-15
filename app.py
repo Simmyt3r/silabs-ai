@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import time
 
+import spaces
 import gradio as gr
 
 from silabs_ai.auth import authenticate_api_key
@@ -30,6 +31,7 @@ def _source_rows(result) -> list[list[str]]:
     return rows
 
 
+@spaces.GPU(duration=120)
 def ask_silabs(
     message: str,
     client_id: str,
