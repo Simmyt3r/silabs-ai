@@ -134,16 +134,24 @@ and valid citation output. **Complete.**
 - [x] rate limiting
 - [x] observability
 - [x] reusable client/SDK
-- [ ] Modal staging deployment
+- [x] temporary remote staging validation
+- [ ] persistent staging deployment
 
 Temporary remote staging validation (Colab + ngrok): **PASS**
+
+RAG remote validation: **PASS**
+- verified corpus loaded: 47,493 chunks
+- remote source retrieval: PASS
+- citation-aware generation: PASS
+- streaming with citations: PASS
+- final/source/done SSE events: PASS
 - authenticated remote chat: PASS
 - warm inference: 2.82s for a 60-token response
 - usage telemetry: PASS
 - true SSE token streaming: PASS
 - request IDs/final reconciliation: PASS
 - persistent always-on hosting: still pending
-- [ ] UniXpress integration
+- [ ] UniXpress staging integration
 - [ ] deployment benchmark and quantization
 
 ## Later
