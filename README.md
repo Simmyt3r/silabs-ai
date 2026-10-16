@@ -217,3 +217,10 @@ If a paid/self-hosted GPU is not available, use the Colab notebook at
 
 See `docs/COLAB.md` for the baby-step setup. The trained adapter and reports
 are saved to Google Drive.
+
+
+## Products
+
+Silabs AI is the shared intelligence layer for specialized products.
+
+- [Silabs Humanizer](products/humanizer/README.md) — completely offline document rewriting and editing, with factual/citation preservation as a release requirement.
