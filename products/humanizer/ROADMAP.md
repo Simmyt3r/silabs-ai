@@ -8,12 +8,16 @@
 - [x] Style profile skeleton
 - [x] Implement local model adapters (GGUF + existing Transformers engine; device smoke test pending)
 - [x] Conservative DOCX/TXT/MD import (complex DOCX formatting read-only)
-- [ ] Rich-text desktop editor
-- [ ] Selection-based rewrite actions
-- [ ] Side-by-side diff
-- [ ] Accept/reject changes
+- [x] Tauri + React desktop workspace shell (engineering preview)
+- [ ] Full rich-text desktop editor
+- [x] Selected-paragraph rewrite actions in desktop preview
+- [ ] Selection within paragraphs and rich-text editing
+- [x] Side-by-side comparison with basic change highlighting
+- [ ] Full multi-change diff and rich-text editing
+- [x] Accept/reject/restore whole-paragraph suggestions in desktop preview
 - [x] Conservative DOCX export to a NEW file (simple single-run paragraphs only)
-- [ ] Offline installer
+- [ ] Offline installer with bundled local runtime and weights
+- [ ] Windows-native Tauri build and user testing
 - [x] Real Qwen3 local smoke-test runner implemented
 - [ ] Execute real Qwen3 benchmark and manually review rewrite quality
 - [ ] Rich DOCX run/hyperlink preservation
