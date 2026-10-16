@@ -1,28 +1,77 @@
-# Humanizer Desktop
+# Silabs Humanizer Desktop (Engineering Preview)
 
-Target stack:
+Tauri 2 + React + TypeScript workspace for the fully offline Humanizer product.
 
-- Tauri
-- React
-- TypeScript
-- local-only Humanizer service
-- packaged Qwen3-1.7B GGUF runtime
+## Current capabilities
 
-## v0.1 screens
+- Native picker for local DOCX, TXT and Markdown files
+- Paragraph outline including headings and table cells
+- Seven rewrite actions: Humanize, Academic, Grammar, Professional, Simplify, Shorten, Expand
+- Choose an existing local Qwen3 GGUF model
+- Side-by-side original/revision review
+- Accept, reject and restore whole-paragraph changes
+- Export accepted changes to a NEW file, never overwrite source
+- Reject edits if the source file changes outside the editor (SHA-256 fingerprint)
+- Persistent local model process across editing requests
 
-1. Document workspace
-2. Original/revised comparison panel
-3. Rewrite action toolbar
-4. Style controls
-5. Local model/settings page
+**Limits:** This preview edits one whole simple paragraph at a time. Complex
+Word formatting stays read-only. Real-model style and meaning validation
+are not complete.
 
-## Primary editing actions
+## Architecture
 
-- Humanize
-- Improve grammar
-- Academic rewrite
-- Simplify
-- Shorten
-- Expand
+~~~text
+React/TypeScript (local WebView)
+  -> Tauri IPC
+  -> Rust-managed persistent Python subprocess (JSON lines)
+  -> offline parser / preservation / GGUF model
+  -> proposed revision -> manual Accept/Reject -> export
+~~~
 
-The desktop client must never require an internet connection for document processing.
+No HTTP server, account, remote AI API, telemetry or cloud storage is required.
+
+## Development setup
+
+Prerequisites: Windows 10/11 with WebView2; Node.js 20+ and npm; Rust/MSVC
+and Tauri Windows development prerequisites; Python 3.11 recommended;
+an existing Qwen3-1.7B GGUF file and a compatible llama-cpp-python build.
+
+From the repository root:
+
+~~~powershell
+python -m pip install -r products/humanizer/requirements.txt
+python -m pip install llama-cpp-python
+cd products/humanizer/desktop
+npm install
+npm run tauri dev
+~~~
+
+If the correct Python executable has a different path:
+
+~~~powershell
+$env:SILABS_HUMANIZER_PYTHON="C:\path\to\python.exe"
+npm run tauri dev
+~~~
+
+Open the app, click Open document, choose a file, then Model settings >
+Choose GGUF. Select a paragraph and rewrite mode. First inference may be
+slow; subsequent edits reuse the same loaded process. Review proposals
+before accepting. Export only writes a separate output file.
+
+## Tests
+
+~~~powershell
+python -m pytest products/humanizer/tests -q
+cd products/humanizer/desktop
+npm run build
+~~~
+
+GitHub Actions checks Python regressions and React TypeScript builds.
+
+## Release blockers
+
+A standalone installer is not complete. The engineering preview requires
+Python, dependencies and the GGUF model installed or stored on the developer
+PC. Windows native compilation, Python/llama.cpp/model bundling, model
+licence review, installer signing, resource benchmarks and real-document
+quality testing remain outstanding.
