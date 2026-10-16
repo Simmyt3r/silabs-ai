@@ -14,7 +14,8 @@
 - [ ] Accept/reject changes
 - [x] Conservative DOCX export to a NEW file (simple single-run paragraphs only)
 - [ ] Offline installer
-- [ ] Real Qwen3 local inference benchmark and output review
+- [x] Real Qwen3 local smoke-test runner implemented
+- [ ] Execute real Qwen3 benchmark and manually review rewrite quality
 - [ ] Rich DOCX run/hyperlink preservation
 - [ ] Header/footer, footnote, track-changes and textbox handling
 
