@@ -135,6 +135,14 @@ and valid citation output. **Complete.**
 - [x] observability
 - [x] reusable client/SDK
 - [ ] Modal staging deployment
+
+Temporary remote staging validation (Colab + ngrok): **PASS**
+- authenticated remote chat: PASS
+- warm inference: 2.82s for a 60-token response
+- usage telemetry: PASS
+- true SSE token streaming: PASS
+- request IDs/final reconciliation: PASS
+- persistent always-on hosting: still pending
 - [ ] UniXpress integration
 - [ ] deployment benchmark and quantization
 
