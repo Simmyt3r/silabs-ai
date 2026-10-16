@@ -49,9 +49,9 @@ Completed:
 
 Current task:
 
-**Modal staging deployment**
+**UniXpress staging integration**
 
-Temporary remote staging through Colab + ngrok has now passed authentication, warm inference, usage telemetry and true streaming tests. Persistent always-on staging hosting is still pending before production integration.
+Temporary remote staging through Colab + ngrok has now passed authentication, warm inference, usage telemetry, true streaming, RAG retrieval and citation tests. The current task is now UniXpress staging integration. Persistent always-on hosting remains a later deployment requirement.
 
 ## Phase 7 — Deployment & Optimization ⏳
 
@@ -83,6 +83,6 @@ Every contribution should clearly answer:
 
 **Foundation ✅ → Data ✅ → Training 🟡 → Evaluation 🟡 → RAG ✅ → Product Integration 🟢 → Deployment ⏳ → Future Improvements ⏳**
 
-Right now, the main focus is **Phase 6: Modal staging deployment**.
+Right now, the main focus is **Phase 6: UniXpress staging integration**.
 
 Finish each stage properly before jumping ahead.
