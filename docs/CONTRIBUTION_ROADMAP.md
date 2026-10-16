@@ -51,7 +51,7 @@ Current task:
 
 **Modal staging deployment**
 
-We are now deploying Silabs AI to Modal and testing the live API. UniXpress integration begins only after the Modal staging deployment passes its checks.
+Temporary remote staging through Colab + ngrok has now passed authentication, warm inference, usage telemetry and true streaming tests. Persistent always-on staging hosting is still pending before production integration.
 
 ## Phase 7 — Deployment & Optimization ⏳
 
