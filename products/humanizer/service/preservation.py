@@ -1,5 +1,8 @@
-"""Protected-content handling for Silabs Humanizer."""
+"""Reversible protected-content masking for offline document rewriting.
 
+Only a conservative set of patterns is covered. Preservation checks are not
+a substitute for reviewing factual meaning before accepting a rewrite.
+"""
 from __future__ import annotations
 
 import re
@@ -12,32 +15,43 @@ class ProtectedText:
     values: dict[str, str]
 
 
+# Ordering matters. Citation patterns run before generic numbers so names and
+# publication years remain together. A single source-text pass avoids ever
+# matching numbers inside generated placeholders.
 _PATTERNS: tuple[tuple[str, str], ...] = (
-    ("URL", r"https?://[^\s)\]>]+"),
+    ("URL", r"https?://[^\s<>\]\)]+"),
     ("DOI", r"\b10\.\d{4,9}/[-._;()/:A-Z0-9]+\b"),
-    ("CITATION", r"\([A-Z][A-Za-z'’.-]+(?:\s+et\s+al\.)?,?\s+\d{4}[a-z]?\)"),
-    ("PERCENT", r"\b\d+(?:\.\d+)?%"),
-    ("NUMBER", r"\b\d+(?:\.\d+)?\b"),
+    (
+        "CITATION",
+        r"\([A-Z][^()]{0,110}?,?\s+\d{4}[a-z]?(?:;\s*[A-Z][^()]{0,110}?,?\s+\d{4}[a-z]?)*\)"
+        r"|"
+        r"\b[A-Z][A-Za-z'’.-]+(?:\s+(?:&|and)\s+[A-Z][A-Za-z'’.-]+|\s+et\s+al\.)?"
+        r"\s*\(\d{4}[a-z]?\)",
+    ),
+    ("PERCENT", r"(?<!\w)\d+(?:[.,]\d+)?%"),
+    ("NUMBER", r"(?<![\w])\d+(?:[.,]\d+)*(?!\w)"),
+)
+_COMBINED = re.compile(
+    "|".join(f"(?P<{name}>{pattern})" for name, pattern in _PATTERNS),
+    re.IGNORECASE,
 )
 
 
 def protect_text(text: str) -> ProtectedText:
     values: dict[str, str] = {}
-    masked = text
-
-    for label, pattern in _PATTERNS:
-        counter = 0
-
-        def replace(match: re.Match[str]) -> str:
-            nonlocal counter
-            counter += 1
-            token = f"__{label}_{counter:04d}__"
-            values[token] = match.group(0)
-            return token
-
-        masked = re.sub(pattern, replace, masked, flags=re.IGNORECASE)
-
-    return ProtectedText(masked_text=masked, values=values)
+    prefix = "__SILABS_KEEP_"
+    while prefix in text:
+        prefix = "_" + prefix
+    pieces: list[str] = []
+    previous = 0
+    for match in _COMBINED.finditer(text):
+        pieces.append(text[previous:match.start()])
+        token = f"{prefix}{len(values) + 1:04d}__"
+        values[token] = match.group(0)
+        pieces.append(token)
+        previous = match.end()
+    pieces.append(text[previous:])
+    return ProtectedText(masked_text="".join(pieces), values=values)
 
 
 def restore_text(text: str, values: dict[str, str]) -> str:
@@ -48,4 +62,4 @@ def restore_text(text: str, values: dict[str, str]) -> str:
 
 
 def missing_tokens(text: str, values: dict[str, str]) -> list[str]:
-    return [token for token in values if token not in text]
+    return [token for token in values if text.count(token) != 1]
