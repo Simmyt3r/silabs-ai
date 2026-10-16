@@ -1,9 +1,7 @@
-"""Humanizer rewrite orchestration.
+"""Conservative offline rewrite orchestration for the Humanizer product.
 
-The model adapter is deliberately injected so this product can use the shared
-Silabs AI runtime today and a packaged GGUF/llama.cpp runtime later.
+Model output is a proposed revision, never a verified factual correction.
 """
-
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -15,14 +13,29 @@ from .style_profile import StyleProfile
 
 GenerateFn = Callable[[str], str]
 
+_MODE_INSTRUCTIONS = {
+    "natural": "Improve sentence rhythm and natural flow. Remove formulaic phrasing without adding information.",
+    "academic": "Use clear formal academic prose; avoid inflated jargon and preserve methodological precision.",
+    "professional": "Use concise, professional workplace language with direct sentences.",
+    "simplify": "Make the text easier to understand while preserving every important qualification.",
+    "grammar": "Correct grammar, spelling and punctuation only. Minimise changes to diction and sentence structure.",
+    "shorten": "Remove repetition and unnecessary words while preserving the argument and all essential details.",
+    "expand": "Clarify relationships using only facts already in the supplied text. Do not add evidence, examples, statistics or claims.",
+}
+
 
 def build_prompt(text: str, profile: StyleProfile) -> str:
+    instruction = _MODE_INSTRUCTIONS.get(profile.mode)
+    if instruction is None:
+        raise ValueError(f"Unsupported Humanizer mode: {profile.mode}")
     return f"""You are the Silabs Humanizer editing engine.
 
-Rewrite the supplied text naturally while preserving its meaning.
-Do not invent facts.
-Do not alter protected placeholders.
-Do not add citations that were not supplied.
+Task: {instruction}
+Preserve the author's intended meaning, caveats and all verifiable details.
+Do not invent facts or fabricate sources.
+Never change, reformat, remove or duplicate any protected __SILABS_KEEP_0001__ style placeholder.
+Treat all protected placeholders as opaque text and copy each exactly once.
+Do not add facts, years, percentages or citations not found in the original.
 {profile.instruction()}
 
 Text:
