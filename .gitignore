@@ -59,3 +59,10 @@ vector_store/
 
 # Generated expanded knowledge corpus
 knowledge/generated/
+
+# Silabs Humanizer desktop build outputs
+products/humanizer/desktop/node_modules/
+products/humanizer/desktop/dist/
+products/humanizer/desktop/src-tauri/target/
+products/humanizer/desktop/src-tauri/icons/icon.ico
+products/humanizer/desktop/src-tauri/icons/icon.png
