@@ -101,3 +101,13 @@ python -m products.humanizer.service.smoke --backend transformers --model ./mode
 ```
 
 The smoke command reports PASS/FAIL for protected tokens and DOCX round-trip. It does **not** replace manual assessment of naturalness or factual accuracy.
+
+
+## Desktop UI preview
+
+The [Tauri + React desktop workspace](desktop/README.md) now provides
+offline DOCX/TXT/MD opening, local GGUF model selection, paragraph rewriting,
+side-by-side review, Accept/Reject/Restore, and export to a new file.
+It launches the local Python bridge as a persistent subprocess: no web
+API or cloud endpoint. It is a developer preview, not yet a standalone
+Windows installer. See the desktop README for setup and release blockers.
