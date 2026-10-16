@@ -5,6 +5,7 @@ download, or network request is involved. Model instances are cached in RAM.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import time
@@ -16,6 +17,16 @@ from .style_profile import StyleProfile
 
 _MODES = {"natural", "academic", "professional", "simplify", "grammar", "shorten", "expand"}
 _models: dict[tuple[str, str], object] = {}
+
+
+def _fingerprint(path: str | Path) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def _verify_source(payload: dict) -> None:
+    expected = payload.get("fingerprint")
+    if not isinstance(expected, str) or _fingerprint(payload["path"]) != expected:
+        raise ValueError("Source document changed since opening. Reopen it before applying edits.")
 
 
 def _get_model(backend: str, model_path: str):
@@ -39,6 +50,7 @@ def process(payload: dict) -> dict:
         return {
             "path": str(parsed.path.resolve()),
             "name": parsed.path.name,
+            "fingerprint": _fingerprint(parsed.path),
             "format": parsed.path.suffix.lower().lstrip("."),
             "blocks": [
                 {
@@ -50,6 +62,7 @@ def process(payload: dict) -> dict:
         }
 
     if action == "rewrite":
+        _verify_source(payload)
         path = payload["path"]
         block_index = payload["index"]
         mode = payload.get("mode", "natural")
@@ -74,6 +87,7 @@ def process(payload: dict) -> dict:
         }
 
     if action == "export":
+        _verify_source(payload)
         source = Path(payload["path"]).resolve()
         target = Path(payload["destination"]).resolve()
         if source == target or target.exists():
