@@ -1,0 +1,7 @@
+# Minimal document processing; does not require internet at runtime.
+python-docx>=1.2,<2
+pytest>=8,<10
+
+# GGUF inference is optional: install a platform-appropriate llama-cpp-python
+# build separately (CPU or GPU), then supply a locally stored Qwen3 GGUF file.
+# Transformers backend reuses the existing root requirements and local weights.
