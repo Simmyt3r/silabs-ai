@@ -5,7 +5,7 @@ import {
   FolderOpen, HardDrive, LockKeyhole, LoaderCircle,
   RotateCcw, Settings2, ShieldCheck, Sparkles, WandSparkles, X,
 } from "lucide-react";
-import { open, save } from "@tauri-apps/plugin-dialog";
+import { confirm, open, save } from "@tauri-apps/plugin-dialog";
 import { Block, localApi, OpenedDocument, RewriteMode, RewriteProposal } from "./ipc";
 
 const MODES: Array<{ id: RewriteMode; label: string; helper: string }> = [
@@ -73,6 +73,10 @@ export default function App() {
   const shownText = activeBlock ? (accepted[activeBlock.index] ?? activeBlock.text) : "";
 
   async function openDocument() {
+    if (acceptedCount > 0) {
+      const discard = await confirm("You have accepted revisions that have not been exported. Opening another document will discard them.", { title: "Unsaved revisions", kind: "warning" });
+      if (!discard) return;
+    }
     setError(""); setNotice("");
     try {
       const path = await open({ multiple: false, directory: false, filters: [
@@ -191,7 +195,7 @@ export default function App() {
                 {doc.blocks.map(block => (
                   <BlockListItem key={block.index} block={block}
                     active={selected === block.index} accepted={block.index in accepted}
-                    onClick={() => { setSelected(block.index); setProposal(null); setError(""); }} />
+                    onClick={() => { if (busy) return; setSelected(block.index); setProposal(null); setError(""); }} />
                 ))}
               </nav>
             </>
@@ -260,7 +264,7 @@ export default function App() {
                 <div className="mode-grid">
                   {MODES.map(item => <button key={item.id} type="button" title={item.helper}
                     className={"mode-chip " + (mode === item.id ? "selected" : "")}
-                    onClick={() => { setMode(item.id); setProposal(null); }}>
+                    onClick={() => { if (busy) return; setMode(item.id); setProposal(null); }}>
                     {mode === item.id ? <CircleCheck size={16} /> : <WandSparkles size={16} />}
                     {item.label}
                   </button>)}
