@@ -32,6 +32,14 @@ def main() -> int:
     if args.limit < 1:
         parser.error("--limit must be >= 1")
 
+    from pathlib import Path
+    source_path = Path(args.input).expanduser().resolve()
+    output_path = Path(args.output).expanduser().resolve()
+    if source_path == output_path:
+        parser.error("Output must be a different file; overwriting originals is forbidden.")
+    if output_path.exists():
+        parser.error(f"Output already exists: {output_path}")
+
     doc = parse_document(args.input)
     if doc.path.suffix.lower() != ".docx":
         parser.error("This pilot currently exports DOCX only.")
