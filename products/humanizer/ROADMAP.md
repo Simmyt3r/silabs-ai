@@ -6,14 +6,17 @@
 - [x] Rewrite pipeline skeleton
 - [x] Critic skeleton
 - [x] Style profile skeleton
-- [ ] Connect local model runtime
-- [ ] DOCX/TXT/MD parser
+- [x] Implement local model adapters (GGUF + existing Transformers engine; device smoke test pending)
+- [x] Conservative DOCX/TXT/MD import (complex DOCX formatting read-only)
 - [ ] Rich-text desktop editor
 - [ ] Selection-based rewrite actions
 - [ ] Side-by-side diff
 - [ ] Accept/reject changes
-- [ ] DOCX export
+- [x] Conservative DOCX export to a NEW file (simple single-run paragraphs only)
 - [ ] Offline installer
+- [ ] Real Qwen3 local inference benchmark and output review
+- [ ] Rich DOCX run/hyperlink preservation
+- [ ] Header/footer, footnote, track-changes and textbox handling
 
 ## v0.2 Quality
 - [ ] Naturalness scoring
