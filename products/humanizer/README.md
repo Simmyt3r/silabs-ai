@@ -91,3 +91,13 @@ quality evaluation and a reviewed desktop UI are separate release gates.
 
 The product must never present an automatically revised document as verified.
 Review text and citations before accepting changes.
+
+### Test with actual Qwen3 local weights
+
+```bash
+python -m products.humanizer.service.smoke --backend gguf --model ./models/qwen3-1.7b-q4.gguf
+# Or, if local Transformers weights already exist:
+python -m products.humanizer.service.smoke --backend transformers --model ./models/base/Qwen3-1.7B --device cpu
+```
+
+The smoke command reports PASS/FAIL for protected tokens and DOCX round-trip. It does **not** replace manual assessment of naturalness or factual accuracy.
