@@ -1,0 +1,25 @@
+name: Humanizer foundation tests
+
+on:
+  push:
+    paths:
+      - "products/humanizer/**"
+      - ".github/workflows/humanizer-tests.yml"
+  pull_request:
+    paths:
+      - "products/humanizer/**"
+      - ".github/workflows/humanizer-tests.yml"
+
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install lightweight test dependencies
+        run: python -m pip install -r products/humanizer/requirements.txt
+      - name: Test preservation, DOCX and offline adapters
+        run: python -m pytest products/humanizer/tests -q
