@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, FileText, LockKeyhole, Search, X } from "lucide-react";
 import type { OpenedDocument } from "../ipc";
 import { canEditBlock } from "../editor/review";
@@ -13,6 +13,7 @@ type Props = {
 
 export default function DocumentSidebar({ doc, selected, accepted, busy, onSelect }: Props) {
   const [query, setQuery] = useState("");
+  useEffect(() => { setQuery(""); }, [doc?.fingerprint]);
   const blocks = useMemo(() => {
     if (!doc) return [];
     const term = query.trim().toLocaleLowerCase();
