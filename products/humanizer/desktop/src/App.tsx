@@ -118,6 +118,7 @@ export default function App() {
       ] });
       if (typeof path === "string") {
         setModelPath(path);
+        setBundledModel(false);
         setNotice("Local model selected. No data will be uploaded.");
       }
     } catch (err) { setError(String(err)); }
