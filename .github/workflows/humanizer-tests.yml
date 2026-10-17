@@ -64,3 +64,34 @@ jobs:
             exit 1
           }
           Write-Host "Offline packaging script syntax: PASS"
+
+
+  frozen-bridge-windows:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install minimal bridge build requirements
+        run: python -m pip install pyinstaller python-docx
+      - name: Compile Python bridge into standalone Windows executable
+        shell: pwsh
+        run: |
+          python -m PyInstaller --clean --noconfirm --onefile --console --noupx --name silabs-humanizer-bridge --paths . --collect-submodules docx products/humanizer/service/bridge_executable.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Exercise frozen JSON protocol and DOCX import
+        shell: pwsh
+        run: |
+          python -c "from docx import Document; d=Document(); d.add_paragraph('Silabs offline document test.'); d.save('bridge-smoke.docx')"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $request = @{ action = 'open'; path = (Resolve-Path bridge-smoke.docx).Path } | ConvertTo-Json -Compress
+          $response = ($request | & ".\dist\silabs-humanizer-bridge.exe") -join ""
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $payload = $response | ConvertFrom-Json
+          if (-not $payload.ok -or $payload.data.blocks.Count -ne 1 -or
+              $payload.data.blocks[0].text -ne 'Silabs offline document test.') {
+            throw "Frozen Windows bridge DOCX smoke failed: $response"
+          }
+          Write-Host "Frozen Windows Python DOCX bridge: PASS"
