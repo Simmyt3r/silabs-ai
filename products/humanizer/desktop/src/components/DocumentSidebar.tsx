@@ -13,7 +13,7 @@ type Props = {
 
 export default function DocumentSidebar({ doc, selected, accepted, busy, onSelect }: Props) {
   const [query, setQuery] = useState("");
-  useEffect(() => { setQuery(""); }, [doc?.fingerprint]);
+  useEffect(() => { setQuery(""); }, [doc?.path, doc?.fingerprint]);
   const blocks = useMemo(() => {
     if (!doc) return [];
     const term = query.trim().toLocaleLowerCase();
