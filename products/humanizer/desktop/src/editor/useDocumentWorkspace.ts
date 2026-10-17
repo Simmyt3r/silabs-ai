@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { confirm, open, save } from "@tauri-apps/plugin-dialog";
 import type { OpenedDocument, RewriteMode, RewriteProposal } from "../ipc";
 import { localApi } from "../ipc";
@@ -52,6 +53,40 @@ export function useDocumentWorkspace() {
   const canRewrite = !!doc && canEditBlock(activeBlock) && !!modelPath && busy === null;
   const canExport = !!doc && hasUnexportedChanges && busy === null;
   const editables = doc?.blocks.filter(block => canEditBlock(block)).length ?? 0;
+
+  // Prevent silently losing accepted edits when the user closes the window.
+  // The handler must prevent the close synchronously, before showing dialog.
+  useEffect(() => {
+    const window = getCurrentWindow();
+    let disposed = false;
+    let unlisten: (() => void) | null = null;
+    let confirmedClose = false;
+    void window.onCloseRequested(async event => {
+      if (!hasUnexportedChanges || confirmedClose) return;
+      event.preventDefault();
+      try {
+        const discard = await confirm(
+          "You have accepted revisions that have not been exported. Exit without saving them?",
+          { title: "Unsaved changes", kind: "warning" },
+        );
+        if (discard) {
+          confirmedClose = true;
+          try { await window.close(); }
+          catch (error) {
+            confirmedClose = false;
+            setStatus({ kind: "error", message: "Could not close the window: " + String(error) });
+          }
+        }
+      } catch (error) {
+        setStatus({ kind: "error", message: "Close confirmation failed: " + String(error) });
+      }
+    }).then(stop => {
+      if (disposed) stop(); else unlisten = stop;
+    }).catch(error => {
+      if (!disposed) setStatus({ kind: "error", message: "Cannot protect unsaved edits: " + String(error) });
+    });
+    return () => { disposed = true; unlisten?.(); };
+  }, [hasUnexportedChanges]);
 
   function selectBlock(index: number) {
     if (operationLock.current) return;
