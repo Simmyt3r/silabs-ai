@@ -75,3 +75,16 @@ Python, dependencies and the GGUF model installed or stored on the developer
 PC. Windows native compilation, Python/llama.cpp/model bundling, model
 licence review, installer signing, resource benchmarks and real-document
 quality testing remain outstanding.
+
+
+## Standalone Windows installer preparation
+
+See [OFFLINE_RELEASE.md](OFFLINE_RELEASE.md). A Windows packaging script
+freezes the Python inference runtime, verifies the provided GGUF model by
+SHA-256, and configures an NSIS installer with offline WebView2 dependencies.
+The release app automatically discovers its bundled model and runtime.
+
+The code for producing a full offline installer is implemented. **No installer
+has been released yet.** The packaging step still needs a real authorised
+GGUF model, execution of the Windows script, and clean disconnected-PC
+acceptance testing.
