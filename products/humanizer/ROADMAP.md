@@ -48,3 +48,15 @@
 - No fabricated facts
 - Offline operation must not require account or network access
 - User can always review and reject model edits
+
+## Current priority: UI/UX and structure freeze
+- [x] Consolidate desktop workflow into one editing/review path
+- [x] Centralize shared document and proposal state
+- [x] Searchable document outline and clear read-only status
+- [x] Consistent writing-focused styles and word-level comparison
+- [x] Distinguish accepted versus exported revisions
+- [x] Prevent silent loss of accepted edits on opening/closing
+- [x] Add automated review/diff tests and UI audit checklist
+- [ ] Hands-on Windows keyboard, zoom, performance and accessibility QA
+- [ ] Review real GGUF output and document layout on a Windows laptop
+- [ ] Resolve all issues from [UI_UX_AUDIT.md](desktop/UI_UX_AUDIT.md) before feature additions
