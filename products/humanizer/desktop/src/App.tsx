@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import {
   AlertCircle, ArrowRight, BookOpen, Check, CheckCheck,
   ChevronRight, CircleCheck, Clock3, FileDown, FileText,
@@ -58,12 +59,28 @@ export default function App() {
   const [selected, setSelected] = useState<number | null>(null);
   const [mode, setMode] = useState<RewriteMode>("natural");
   const [modelPath, setModelPath] = useState("");
+  const [bundledModel, setBundledModel] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accepted, setAccepted] = useState<Record<number, string>>({});
   const [proposal, setProposal] = useState<RewriteProposal | null>(null);
   const [busy, setBusy] = useState<"open" | "rewrite" | "export" | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    invoke<{ packaged: boolean; model_path: string | null }>("runtime_info")
+      .then(info => {
+        if (!active) return;
+        setBundledModel(info.packaged && Boolean(info.model_path));
+        if (info.model_path) setModelPath(info.model_path);
+        if (info.packaged && !info.model_path) {
+          setError("The offline AI model is missing from this installation. Reinstall the full offline edition.");
+        }
+      })
+      .catch(err => { if (active) setError("Cannot inspect offline runtime: " + String(err)); });
+    return () => { active = false; };
+  }, []);
 
   const activeBlock = useMemo(() => doc?.blocks.find(block => block.index === selected) ?? null, [doc, selected]);
   const currentMode = MODES.find(entry => entry.id === mode)!;
@@ -212,9 +229,9 @@ export default function App() {
           {settingsOpen && (
             <section className="settings-panel" aria-label="Local model settings">
               <div><span className="eyebrow">LOCAL INFERENCE</span><h3>Qwen3 GGUF model</h3>
-                <p>Choose a model file already stored on your PC. The app never downloads weights.</p></div>
+                <p>The full offline edition includes Qwen locally. You can also select a compatible GGUF stored on this PC.</p></div>
               <div className="settings-controls">
-                <div className="model-path" title={modelPath}>{modelPath || "No model selected"}</div>
+                <div className="model-path" title={modelPath}>{bundledModel ? "Bundled Qwen3-1.7B (offline)" : (modelPath || "No model selected")}</div>
                 <button className="outline-button" type="button" onClick={chooseModel}>
                   <HardDrive size={16} /> Choose GGUF</button>
               </div>
