@@ -3,13 +3,12 @@ import {
   AlertCircle, ArrowRight, Check, ChevronRight, Clock3, FileCheck2,
   FileText, LockKeyhole, RotateCcw, ShieldCheck, Sparkles, WandSparkles, X,
 } from "lucide-react";
-import type { OpenedDocument, RewriteMode, RewriteProposal, Block } from "../ipc";
+import type { RewriteMode, RewriteProposal, Block } from "../ipc";
 import { MODES } from "../editor/modes";
 import { compareText, type DiffPart } from "../editor/diff";
 import { canEditBlock, wordCount } from "../editor/review";
 
 type Props = {
-  doc: OpenedDocument;
   activeBlock: Block | null;
   mode: RewriteMode;
   proposal: RewriteProposal | null;
@@ -37,7 +36,7 @@ function DiffText({ parts, direction }: { parts: DiffPart[]; direction: "before"
 }
 
 export default function ReviewWorkspace({
-  doc, activeBlock, mode, proposal, accepted, modelReady, busy, rewriting, canRewrite,
+  activeBlock, mode, proposal, accepted, modelReady, busy, rewriting, canRewrite,
   onMode, onRewrite, onAccept, onReject, onRestore, onShowSettings,
 }: Props) {
   const acceptedText = activeBlock ? accepted[activeBlock.index] : undefined;
