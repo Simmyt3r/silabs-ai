@@ -1,0 +1,12 @@
+# Local toolchain and installer artifacts; never commit the GGUF model.
+node_modules/
+dist/
+build/
+src-tauri/target/
+src-tauri/release-assets/
+src-tauri/tauri.release.conf.json
+*.gguf
+*.exe
+*.msi
+*.spec
+*.log
