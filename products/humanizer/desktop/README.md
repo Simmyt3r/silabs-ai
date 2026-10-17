@@ -88,3 +88,11 @@ The code for producing a full offline installer is implemented. **No installer
 has been released yet.** The packaging step still needs a real authorised
 GGUF model, execution of the Windows script, and clean disconnected-PC
 acceptance testing.
+
+## UI/UX architecture and acceptance
+
+The desktop workspace has been reorganized into a single app shell, searchable document outline,
+review component, dedicated state controller, and reusable review/diff helpers.
+See [UI_UX_AUDIT.md](UI_UX_AUDIT.md) for the workflow and manual acceptance checklist.
+Automated checks verify TypeScript compilation, review-state utilities and Windows build,
+but do not replace actual hands-on usability testing.
