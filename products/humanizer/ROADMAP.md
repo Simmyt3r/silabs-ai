@@ -16,8 +16,10 @@
 - [ ] Full multi-change diff and rich-text editing
 - [x] Accept/reject/restore whole-paragraph suggestions in desktop preview
 - [x] Conservative DOCX export to a NEW file (simple single-run paragraphs only)
-- [ ] Offline installer with bundled local runtime and weights
-- [ ] Windows-native Tauri build and user testing
+- [x] Offline packaging script, bundled-runtime paths, model verification and NSIS configuration
+- [ ] Build and verify a complete offline installer with real model weights
+- [x] Windows Tauri native CI compilation
+- [ ] Standalone Windows app testing on a clean offline machine
 - [x] Real Qwen3 local smoke-test runner implemented
 - [ ] Execute real Qwen3 benchmark and manually review rewrite quality
 - [ ] Rich DOCX run/hyperlink preservation
