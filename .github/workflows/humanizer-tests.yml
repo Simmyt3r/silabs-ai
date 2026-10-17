@@ -51,3 +51,16 @@ jobs:
           workspaces: products/humanizer/desktop/src-tauri
       - name: Check Tauri Windows native code
         run: cargo check --manifest-path products/humanizer/desktop/src-tauri/Cargo.toml
+      - name: Validate offline Windows packager PowerShell syntax
+        shell: pwsh
+        run: |
+          $errors = $null
+          $null = [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path "products/humanizer/desktop/build-offline-windows.ps1").Path,
+            [ref]$null, [ref]$errors
+          )
+          if ($errors.Count) {
+            $errors | ForEach-Object { Write-Error $_.ToString() }
+            exit 1
+          }
+          Write-Host "Offline packaging script syntax: PASS"
