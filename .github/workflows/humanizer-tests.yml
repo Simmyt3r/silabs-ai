@@ -37,6 +37,8 @@ jobs:
           node-version: "22"
       - name: Install desktop UI dependencies
         run: npm install --no-audit --no-fund
+      - name: Test paragraph review logic
+        run: npm test
       - name: Type-check and build Vite UI
         run: npm run build
 
