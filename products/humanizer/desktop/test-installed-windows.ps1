@@ -88,6 +88,15 @@ function Invoke-InstalledBridge([hashtable] $request) {
     return $reply.data
 }
 
+$checks = Invoke-InstalledBridge @{
+    action = "diagnostics"
+    model_path = $model
+}
+if (-not $checks.components_present -or -not $checks.gguf_header_valid) {
+    throw "Installed offline diagnostic probe failed: $($checks.issues -join '; ')"
+}
+Write-Host "PASS: Offline setup diagnostic reports bundled model and runtime."
+
 $opened = Invoke-InstalledBridge @{
     action = "open"
     path = $source
