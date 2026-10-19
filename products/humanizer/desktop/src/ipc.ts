@@ -24,12 +24,24 @@ export type RewriteProposal = {
   elapsed_seconds: number;
 };
 export type ExportResult = { destination: string; revised_count: number };
+export type LocalDiagnostics = {
+  components_present: boolean;
+  model_file_found: boolean;
+  gguf_header_valid: boolean;
+  model_bytes: number;
+  inference_installed: boolean;
+  word_support_installed: boolean;
+  issues: string[];
+  note: string;
+};
+
 
 async function command<T>(payload: Record<string, unknown>): Promise<T> {
   return invoke<T>("bridge", { payload });
 }
 
 export const localApi = {
+  diagnostics: (modelPath: string) => command<LocalDiagnostics>({ action: "diagnostics", model_path: modelPath }),
   open: (path: string) => command<OpenedDocument>({ action: "open", path }),
   rewrite: (doc: OpenedDocument, index: number, mode: RewriteMode, modelPath: string) =>
     command<RewriteProposal>({
