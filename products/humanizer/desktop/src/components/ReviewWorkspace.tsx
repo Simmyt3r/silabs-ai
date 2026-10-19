@@ -115,6 +115,13 @@ export default function ReviewWorkspace({
             <AlertCircle size={15} /> Select a local model before rewriting <ChevronRight size={15} />
           </button>
         )}
+        {rewriting && (
+          <div className="model-inference-note" role="status" aria-live="polite">
+            <Clock3 size={16} />
+            Qwen is rewriting locally. The first request may take longer on an older CPU.
+            Keep this window open until the suggestion appears.
+          </div>
+        )}
         {acceptedText !== undefined && (
           <div className="mode-note">
             <ShieldCheck size={15} /> Generating again uses the original paragraph. Your accepted revision stays until replaced.
