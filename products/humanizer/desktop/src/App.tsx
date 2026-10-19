@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { getWorkspaceShortcut } from "./editor/hotkeys";
 import {
   AlertCircle, CheckCircle2, FileDown, FileText, FolderOpen, HardDrive,
   LoaderCircle, LockKeyhole, Settings2, ShieldCheck, Sparkles, WandSparkles, X,
@@ -16,6 +18,35 @@ export default function App() {
     openDocument, chooseModel, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   } = workspace;
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const command = getWorkspaceShortcut(event);
+      if (!command || busy) return;
+      switch (command) {
+        case "open":
+          event.preventDefault();
+          void openDocument();
+          break;
+        case "export":
+          event.preventDefault();
+          if (canExport) void exportDocument();
+          break;
+        case "rewrite":
+          event.preventDefault();
+          if (canRewrite) void rewrite();
+          break;
+        case "reject":
+          if (proposal) {
+            event.preventDefault();
+            rejectProposal();
+          }
+          break;
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [busy, canExport, canRewrite, proposal, openDocument, exportDocument, rewrite, rejectProposal]);
 
   return (
     <div className="app-shell">
@@ -37,7 +68,7 @@ export default function App() {
             <Settings2 size={17} /> Model settings
           </button>
           <button type="button" className="button button-primary"
-            disabled={!!busy} onClick={openDocument}>
+            disabled={!!busy} onClick={openDocument} title="Open document (Ctrl+O)">
             {busy === "open" ? <LoaderCircle size={17} className="spinning" /> : <FolderOpen size={17} />}
             {busy === "open" ? "Opening…" : doc ? "Open another file" : "Open document"}
           </button>
@@ -79,7 +110,7 @@ export default function App() {
               <div className="export-controls">
                 <span className="export-count">{acceptedCount} accepted · {editables} editable</span>
                 <button type="button" className="button button-export"
-                  onClick={exportDocument} disabled={!canExport}>
+                  onClick={exportDocument} disabled={!canExport} title="Export revised file (Ctrl+Shift+S)">
                   {busy === "export" ? <LoaderCircle size={17} className="spinning" /> : <FileDown size={17} />}
                   {busy === "export" ? "Exporting…" : "Export revised file"}
                 </button>
