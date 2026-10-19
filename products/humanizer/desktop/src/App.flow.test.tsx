@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
 
@@ -80,7 +80,7 @@ describe("complete offline editing flow", () => {
       sample, 1, "natural", "C:\\Program Files\\Silabs\\model\\qwen3-1.7b.gguf",
     ));
     await screen.findByRole("button", { name: "Accept revision" });
-    expect(screen.getByText(/This sentence is clearer/)).toBeTruthy();
+    expect(screen.getByRole("article", { name: "Revised passage" }).textContent).toContain("This sentence is clearer.");
     fireEvent.click(screen.getByRole("button", { name: "Accept revision" }));
     expect(screen.getByText("1 accepted · 2 editable")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Export revised file/i }));
