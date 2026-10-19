@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, FileText, LockKeyhole, Search, X } from "lucide-react";
 import type { OpenedDocument } from "../ipc";
 import { canEditBlock } from "../editor/review";
+import { filterOutline, nextOutlineLimit, OUTLINE_PAGE_SIZE } from "../editor/outline";
 
 type Props = {
   doc: OpenedDocument | null;
@@ -13,15 +14,22 @@ type Props = {
 
 export default function DocumentSidebar({ doc, selected, accepted, busy, onSelect }: Props) {
   const [query, setQuery] = useState("");
-  useEffect(() => { setQuery(""); }, [doc?.path, doc?.fingerprint]);
-  const blocks = useMemo(() => {
-    if (!doc) return [];
-    const term = query.trim().toLocaleLowerCase();
-    return term
-      ? doc.blocks.filter(block => block.text.toLocaleLowerCase().includes(term) ||
-          block.style?.toLocaleLowerCase().includes(term))
-      : doc.blocks;
-  }, [doc, query]);
+  const [limit, setLimit] = useState(OUTLINE_PAGE_SIZE);
+  useEffect(() => {
+    setQuery("");
+    setLimit(OUTLINE_PAGE_SIZE);
+  }, [doc?.path, doc?.fingerprint]);
+  const matchingBlocks = useMemo(
+    () => filterOutline(doc?.blocks ?? [], query), [doc, query],
+  );
+  const blocks = useMemo(
+    () => matchingBlocks.slice(0, limit), [matchingBlocks, limit],
+  );
+
+  function updateSearch(value: string) {
+    setQuery(value);
+    setLimit(OUTLINE_PAGE_SIZE);
+  }
 
   return (
     <aside className="outline" aria-label="Document outline">
@@ -42,12 +50,12 @@ export default function DocumentSidebar({ doc, selected, accepted, busy, onSelec
           <label className="outline-search">
             <Search size={16} aria-hidden="true" />
             <span className="sr-only">Find in document outline</span>
-            <input value={query} onChange={e => setQuery(e.target.value)}
+            <input value={query} onChange={e => updateSearch(e.target.value)}
               placeholder="Find paragraph or heading..." autoComplete="off" />
-            {query && <button type="button" aria-label="Clear search" onClick={() => setQuery("")}><X size={15} /></button>}
+            {query && <button type="button" aria-label="Clear search" onClick={() => updateSearch("")}><X size={15} /></button>}
           </label>
           <div className="outline-meta">
-            <span>{blocks.length} shown</span>
+            <span>{blocks.length} of {matchingBlocks.length} shown</span>
             <span>{Object.keys(accepted).length} accepted</span>
           </div>
           <nav className="outline-list" aria-label="Paragraphs and headings">
@@ -81,6 +89,15 @@ export default function DocumentSidebar({ doc, selected, accepted, busy, onSelec
               <div className="outline-no-match">No matching paragraphs. Try a shorter search.</div>
             )}
           </nav>
+          {matchingBlocks.length > blocks.length && (
+            <div className="outline-pagination">
+              <button type="button" disabled={busy}
+                onClick={() => setLimit(current => nextOutlineLimit(current, matchingBlocks.length))}>
+                Show more paragraphs
+                <span>{matchingBlocks.length - blocks.length} remaining</span>
+              </button>
+            </div>
+          )}
           <div className="outline-legend"><LockKeyhole size={14} /> Some formatted blocks are read-only to protect document structure.</div>
         </>
       ) : (
