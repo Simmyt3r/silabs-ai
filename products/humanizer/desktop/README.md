@@ -104,3 +104,16 @@ The outline displays an initial page of 80 paragraphs, with Show more for the ne
 Windows editing shortcuts: Ctrl+O opens a document, Ctrl+Enter generates a suggestion for the selected paragraph, Ctrl+Shift+S exports reviewed revisions, and Escape rejects the current suggestion. Keyboard shortcuts are ignored while typing in a text field.
 
 Automated UI interaction tests exercise paging and search. Actual Windows usability, zoom, screen reader compatibility and performance checks remain open in [UI_UX_AUDIT.md](UI_UX_AUDIT.md).
+
+## v0.1.1 startup and installation checks
+
+The Windows desktop can use the bundled Qwen GGUF without asking users to
+locate it. Under **Model settings > Check local setup**, the app verifies that
+the model file has a GGUF header and that its local inference and Word document
+libraries are installed. This is an offline file/dependency inspection, not a
+full model load or a guarantee of rewrite quality.
+
+The first actual rewrite can take longer on an older CPU; a message explains
+the wait. UI integration tests cover the full Open > Rewrite > Accept/Reject >
+Export path using local IPC mocks. See [release notes](RELEASE_NOTES_0.1.1.md)
+for the scope and remaining release gates.
