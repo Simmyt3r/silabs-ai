@@ -96,3 +96,11 @@ review component, dedicated state controller, and reusable review/diff helpers.
 See [UI_UX_AUDIT.md](UI_UX_AUDIT.md) for the workflow and manual acceptance checklist.
 Automated checks verify TypeScript compilation, review-state utilities and Windows build,
 but do not replace actual hands-on usability testing.
+
+## Long-document navigation and shortcuts
+
+The outline displays an initial page of 80 paragraphs, with Show more for the next group. Search covers the full loaded document, not only visible entries.
+
+Windows editing shortcuts: Ctrl+O opens a document, Ctrl+Enter generates a suggestion for the selected paragraph, Ctrl+Shift+S exports reviewed revisions, and Escape rejects the current suggestion. Keyboard shortcuts are ignored while typing in a text field.
+
+Automated UI interaction tests exercise paging and search. Actual Windows usability, zoom, screen reader compatibility and performance checks remain open in [UI_UX_AUDIT.md](UI_UX_AUDIT.md).
