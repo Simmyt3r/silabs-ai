@@ -89,3 +89,28 @@ def test_plain_text_export_keeps_original(tmp_path):
     })
     assert source.read_bytes() == b"# Overview\r\n\r\nThis is somewhat awkward.\r\n\r\nClosing note."
     assert target.read_bytes() == b"# Overview\r\n\r\nThis is clearer.\r\n\r\nClosing note."
+
+
+def test_local_diagnostics_does_not_load_weights_or_documents(tmp_path, monkeypatch):
+    bogus = tmp_path / "tiny.gguf"
+    bogus.write_bytes(b"GGUF")
+    monkeypatch.setattr(
+        bridge, "_get_model",
+        lambda *args, **kwargs: pytest.fail("Diagnostics must not load the model"),
+    )
+    checks = bridge.process({"action": "diagnostics", "model_path": str(bogus)})
+    assert checks["model_file_found"]
+    assert checks["gguf_header_valid"]
+    assert not checks["components_present"]
+    assert checks["model_bytes"] == 4
+    assert "model load and rewrite quality are not tested" in checks["note"]
+
+
+def test_local_diagnostics_reports_missing_gguf(tmp_path):
+    result = bridge.process({
+        "action": "diagnostics",
+        "model_path": str(tmp_path / "missing.gguf"),
+    })
+    assert not result["model_file_found"]
+    assert not result["components_present"]
+    assert result["issues"]
