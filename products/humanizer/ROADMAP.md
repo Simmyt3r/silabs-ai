@@ -60,3 +60,13 @@
 - [ ] Hands-on Windows keyboard, zoom, performance and accessibility QA
 - [ ] Review real GGUF output and document layout on a Windows laptop
 - [ ] Resolve all issues from [UI_UX_AUDIT.md](desktop/UI_UX_AUDIT.md) before feature additions
+
+## Installer acceptance (2026-10-19)
+- [x] Complete NSIS release-candidate installer built and uploaded to GitHub Actions
+- [x] Frozen CPU Qwen inference passed in packaged runtime
+- [x] Fresh Windows runner installed the actual NSIS installer successfully
+- [x] Installed GGUF checksum, DOCX/TXT export and untouched original files verified
+- [ ] User's offline Windows desktop GUI acceptance and performance measurement
+- [ ] Installer signing and wider distribution clearance
+
+Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
