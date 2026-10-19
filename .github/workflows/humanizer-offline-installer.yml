@@ -1,0 +1,129 @@
+name: Humanizer full offline Windows installer
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/humanizer-offline-installer.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  offline-installer:
+    runs-on: windows-latest
+    timeout-minutes: 110
+    env:
+      MODEL_SHA256: d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5
+      MODEL_FILE: Qwen3-1.7B-Q4_K_M.gguf
+      CMAKE_ARGS: -DGGML_NATIVE=OFF -DGGML_CUDA=OFF
+      CMAKE_BUILD_PARALLEL_LEVEL: "2"
+      FORCE_CMAKE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: products/humanizer/desktop/src-tauri
+
+      - name: Install offline runtime build tools
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r products/humanizer/requirements.txt
+          python -m pip install pyinstaller cmake ninja huggingface_hub
+          python -m pip install --no-cache-dir llama-cpp-python
+          if ($LASTEXITCODE -ne 0) { throw "Cannot build the offline llama.cpp runtime" }
+          python -c "from llama_cpp import Llama; from docx import Document; print('Offline inference dependencies import successfully')"
+          if ($LASTEXITCODE -ne 0) { throw "Inference dependency import failed" }
+
+      - name: Download and verify Q4 model at build time
+        shell: pwsh
+        run: |
+          python products/humanizer/desktop/ci_fetch_pinned_model.py
+          if ($LASTEXITCODE -ne 0) { throw "Pinned model download or SHA-256 failed" }
+
+      - name: Test preservation and editing UI
+        shell: pwsh
+        run: |
+          python -m pytest products/humanizer/tests -q
+          if ($LASTEXITCODE -ne 0) { throw "Python tests failed" }
+          Push-Location products/humanizer/desktop
+          try {
+            npm install --no-audit --no-fund
+            if ($LASTEXITCODE -ne 0) { throw "npm install failed" }
+            npm test
+            if ($LASTEXITCODE -ne 0) { throw "UI tests failed" }
+            npm run build
+            if ($LASTEXITCODE -ne 0) { throw "Frontend build failed" }
+          } finally { Pop-Location }
+
+      - name: Package frozen AI bridge, model and offline WebView2
+        shell: pwsh
+        run: |
+          & ./products/humanizer/desktop/build-offline-windows.ps1 -ModelPath "_ci_weights/$env:MODEL_FILE" -ModelSha256 $env:MODEL_SHA256 -LicenseReviewed -Python python
+          if ($LASTEXITCODE -ne 0) { throw "Windows offline installer build failed" }
+
+      - name: Real frozen CPU Qwen rewrite smoke test
+        shell: pwsh
+        run: |
+          $dir = "products/humanizer/desktop/src-tauri/release-assets"
+          $bridge = Join-Path $dir "silabs-humanizer-bridge.exe"
+          $model = Join-Path $dir "qwen3-1.7b.gguf"
+          python -c "from docx import Document; d=Document(); d.add_paragraph('This sentences is not written clearly.'); d.save('_ci_sentence.docx')"
+          $path = (Resolve-Path "_ci_sentence.docx").Path
+          $request = @{
+            action = "rewrite"
+            path = $path
+            fingerprint = (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant()
+            index = 0
+            mode = "grammar"
+            backend = "gguf"
+            model_path = (Resolve-Path $model).Path
+          } | ConvertTo-Json -Compress
+          $response = ($request | & $bridge) -join ""
+          if ($LASTEXITCODE -ne 0) { throw "Frozen local model crashed" }
+          $parsed = $response | ConvertFrom-Json
+          if (-not $parsed.ok -or -not $parsed.data.passed -or [string]::IsNullOrWhiteSpace($parsed.data.proposal)) {
+            throw "Real offline Qwen rewrite did not pass: $response"
+          }
+          Write-Host "Real frozen Qwen CPU inference: PASS"
+          Write-Host $parsed.data.proposal
+
+      - name: Generate installer checksum and release notes
+        shell: pwsh
+        run: |
+          $folder = "products/humanizer/desktop/src-tauri/target/release/bundle/nsis"
+          $installers = @(Get-ChildItem $folder -Filter "*-setup.exe" -File)
+          if ($installers.Count -lt 1) { throw "Installer missing" }
+          $hashes = @()
+          foreach ($file in $installers) {
+            $digest = (Get-FileHash -LiteralPath $file.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+            $hashes += "$digest  $($file.Name)"
+          }
+          $hashes | Set-Content -Encoding utf8 (Join-Path $folder "SHA256SUMS.txt")
+          @(
+            "### Silabs Humanizer offline Windows release candidate"
+            ""
+            "Contains the local frozen Python + llama.cpp inference runtime, pinned Qwen3-1.7B Q4_K_M model, and offline WebView2 setup."
+            "Pinned GGUF SHA-256: $env:MODEL_SHA256"
+            ""
+            "Download from this run's Artifacts. Clean disconnected-PC acceptance remains necessary before a public production release."
+          ) | Add-Content $env:GITHUB_STEP_SUMMARY
+          Get-ChildItem $folder | Format-Table Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Silabs-Humanizer-Windows-Offline-Installer-RC
+          path: |
+            products/humanizer/desktop/src-tauri/target/release/bundle/nsis/*-setup.exe
+            products/humanizer/desktop/src-tauri/target/release/bundle/nsis/SHA256SUMS.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
