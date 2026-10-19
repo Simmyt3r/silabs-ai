@@ -6,6 +6,7 @@ download, or network request is involved. Model instances are cached in RAM.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 import sys
 import time
@@ -45,6 +46,39 @@ def _get_model(backend: str, model_path: str):
 
 def process(payload: dict) -> dict:
     action = payload.get("action")
+    if action == "diagnostics":
+        # Inspect only local files/dependencies; never load weights, download
+        # models, or inspect user documents during a setup check.
+        value = payload.get("model_path")
+        model = Path(value).expanduser() if isinstance(value, str) and value.strip() else None
+        file_exists = bool(model and model.is_file())
+        header_ok = False
+        model_bytes = 0
+        if file_exists and model is not None:
+            model_bytes = model.stat().st_size
+            with model.open("rb") as stream:
+                header_ok = stream.read(4) == b"GGUF"
+        gguf_valid = file_exists and header_ok and model_bytes >= 100_000_000
+        inference_installed = importlib.util.find_spec("llama_cpp") is not None
+        docs_installed = importlib.util.find_spec("docx") is not None
+        issues = []
+        if not gguf_valid:
+            issues.append("Local GGUF weights not found or invalid. Check Model settings.")
+        if not inference_installed:
+            issues.append("Local llama.cpp inference components are missing. Reinstall the offline edition.")
+        if not docs_installed:
+            issues.append("Word document support is missing. Reinstall the offline edition.")
+        return {
+            "components_present": bool(gguf_valid and inference_installed and docs_installed),
+            "model_file_found": file_exists,
+            "gguf_header_valid": header_ok,
+            "model_bytes": model_bytes,
+            "inference_installed": inference_installed,
+            "word_support_installed": docs_installed,
+            "issues": issues,
+            "note": "File and component checks only; model load and rewrite quality are not tested.",
+        }
+
     if action == "open":
         parsed = parse_document(payload["path"])
         return {
