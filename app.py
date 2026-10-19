@@ -2,8 +2,19 @@ from __future__ import annotations
 
 import time
 
-import spaces
 import gradio as gr
+
+try:
+    import spaces
+except ImportError:
+    # Hugging Face ZeroGPU provides 'spaces' in its hosted environment.
+    # Local/CI imports should not require a GPU allocation decorator.
+    class _LocalSpaces:
+        @staticmethod
+        def GPU(*args, **kwargs):
+            return lambda func: func
+
+    spaces = _LocalSpaces()
 
 from silabs_ai.auth import authenticate_api_key
 from silabs_ai.config import get_settings
