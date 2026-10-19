@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { confirm, open, save } from "@tauri-apps/plugin-dialog";
-import type { OpenedDocument, RewriteMode, RewriteProposal } from "../ipc";
+import type { LocalDiagnostics, OpenedDocument, RewriteMode, RewriteProposal } from "../ipc";
 import { localApi } from "../ipc";
 import { canEditBlock, snapshotOf, type ReviewStatus } from "./review";
 
-export type BusyState = "open" | "rewrite" | "export" | null;
+export type BusyState = "open" | "rewrite" | "export" | "diagnostics" | null;
 
 export function useDocumentWorkspace() {
   const [doc, setDoc] = useState<OpenedDocument | null>(null);
@@ -14,6 +14,7 @@ export function useDocumentWorkspace() {
   const [mode, setMode] = useState<RewriteMode>("natural");
   const [modelPath, setModelPath] = useState("");
   const [bundledModel, setBundledModel] = useState(false);
+  const [diagnostics, setDiagnostics] = useState<LocalDiagnostics | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accepted, setAccepted] = useState<Record<number, string>>({});
   const [proposal, setProposal] = useState<RewriteProposal | null>(null);
@@ -28,6 +29,7 @@ export function useDocumentWorkspace() {
       .then(info => {
         if (!mounted) return;
         if (info.model_path) {
+          setDiagnostics(null);
           setModelPath(info.model_path);
           setBundledModel(info.packaged);
         } else if (info.packaged) {
@@ -148,6 +150,7 @@ export function useDocumentWorkspace() {
       if (typeof path === "string") {
         setModelPath(path);
         setBundledModel(false);
+        setDiagnostics(null);
         setProposal(null);
         setStatus({ kind: "success", message: "Local GGUF selected. All writing remains on this computer." });
       }
@@ -155,6 +158,29 @@ export function useDocumentWorkspace() {
       setStatus({ kind: "error", message: String(error) });
     } finally {
       operationLock.current = false;
+    }
+  }
+
+  async function checkLocalSetup() {
+    if (!modelPath || operationLock.current) return;
+    operationLock.current = true;
+    setBusy("diagnostics");
+    setDiagnostics(null);
+    setStatus(null);
+    try {
+      const result = await localApi.diagnostics(modelPath);
+      setDiagnostics(result);
+      if (!result.components_present) {
+        setStatus({
+          kind: "error",
+          message: "Some offline components need attention. Review the checks below.",
+        });
+      }
+    } catch (error) {
+      setStatus({ kind: "error", message: "Local setup check failed: " + String(error) });
+    } finally {
+      operationLock.current = false;
+      setBusy(null);
     }
   }
 
@@ -237,11 +263,11 @@ export function useDocumentWorkspace() {
   }
 
   return {
-    doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen,
+    doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen, diagnostics,
     accepted, acceptedCount, proposal, busy, status, editables,
     hasUnexportedChanges, canRewrite, canExport,
     setSettingsOpen, selectBlock, changeMode, dismissStatus,
-    openDocument, chooseModel, rewrite, acceptProposal, rejectProposal,
+    openDocument, chooseModel, checkLocalSetup, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   };
 }
