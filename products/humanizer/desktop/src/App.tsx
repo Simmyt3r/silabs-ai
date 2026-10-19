@@ -11,11 +11,11 @@ import { useDocumentWorkspace } from "./editor/useDocumentWorkspace";
 export default function App() {
   const workspace = useDocumentWorkspace();
   const {
-    doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen,
+    doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen, diagnostics,
     accepted, acceptedCount, proposal, busy, status, editables,
     hasUnexportedChanges, canRewrite, canExport,
     setSettingsOpen, selectBlock, changeMode, dismissStatus,
-    openDocument, chooseModel, rewrite, acceptProposal, rejectProposal,
+    openDocument, chooseModel, checkLocalSetup, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   } = workspace;
 
@@ -88,14 +88,31 @@ export default function App() {
                 <span className="overline">OFFLINE MODEL</span>
                 <h2 id="settings-title">Local inference</h2>
                 <p>{bundledModel ?
-                  "The installed Qwen model is ready. You can choose another local GGUF file if necessary." :
+                  "The bundled model file was found. Run the local check to verify the required components, or choose another GGUF." :
                   "Choose a compatible GGUF model already saved on your computer. There are no server connections."}</p>
                 <span className="model-location" title={modelPath}>{bundledModel ?
                   "Included Qwen model" : modelPath || "No model selected"}</span>
               </div>
-              <button type="button" className="button button-secondary" disabled={!!busy} onClick={chooseModel}>
-                <HardDrive size={17} /> Choose GGUF
-              </button>
+              <div className="settings-controls">
+                <button type="button" className="button button-secondary" disabled={!!busy} onClick={chooseModel}>
+                  <HardDrive size={17} /> Choose GGUF
+                </button>
+                <button type="button" className="button button-primary"
+                  onClick={checkLocalSetup} disabled={!!busy || !modelPath}>
+                  {busy === "diagnostics" ? <LoaderCircle size={16} className="spinning" /> : <ShieldCheck size={16} />}
+                  {busy === "diagnostics" ? "Checking…" : "Check local setup"}
+                </button>
+                {diagnostics && (
+                  <div className="local-check-result" role="status">
+                    <strong>{diagnostics.components_present
+                      ? "Core offline files and libraries found"
+                      : "Offline setup requires attention"}</strong>
+                    <span>GGUF weights: {diagnostics.gguf_header_valid ? "Found" : "Missing/invalid"} · Inference engine: {diagnostics.inference_installed ? "Found" : "Missing"} · Word support: {diagnostics.word_support_installed ? "Found" : "Missing"}</span>
+                    {diagnostics.issues.map((issue, i) => <span key={i} className="diagnostic-issue">{issue}</span>)}
+                    <small>{diagnostics.note}</small>
+                  </div>
+                )}
+              </div>
             </section>
           )}
 
