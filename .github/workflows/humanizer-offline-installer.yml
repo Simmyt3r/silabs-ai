@@ -1,3 +1,4 @@
+# v0.1.1 offline UX quality candidate: local setup checks, first-run messaging, and full UI-flow regressions.
 name: Humanizer full offline Windows installer
 
 on:
@@ -109,7 +110,7 @@ jobs:
           }
           $hashes | Set-Content -Encoding utf8 (Join-Path $folder "SHA256SUMS.txt")
           @(
-            "### Silabs Humanizer offline Windows release candidate"
+            "### Silabs Humanizer v0.1.1 offline Windows release candidate"
             ""
             "Contains the local frozen Python + llama.cpp inference runtime, pinned Qwen3-1.7B Q4_K_M model, and offline WebView2 setup."
             "Pinned GGUF SHA-256: $env:MODEL_SHA256"
