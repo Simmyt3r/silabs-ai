@@ -44,6 +44,8 @@ src/
     useDocumentWorkspace.ts  # one owner of app state, dialogs, document actions
     review.ts                 # revision snapshot, editable guard, word count
     diff.ts                   # capped word-level comparison
+    outline.ts                # bounded list and full-document search
+    hotkeys.ts                # keyboard shortcut guards
     modes.ts                  # one source for the seven rewriting labels
   styles.css                 # tokens, layout, typography and accessibility
 ~~~
@@ -53,6 +55,10 @@ src/
 - Consistent header, outline, and paper-like editorial workspace.
 - Single, numbered Select > Refine > Review journey.
 - Searchable outline, headings and clearly labelled read-only paragraphs.
+- Bounded outline rendering (80 entries at a time) to keep long-document navigation responsive.
+- Complete-document search remains available even for paragraphs not yet rendered.
+- Keyboard shortcuts: Ctrl+O open, Ctrl+Enter rewrite, Ctrl+Shift+S export, Escape reject.
+- Keyboard shortcuts do not intercept text-input typing or repeat events.
 - Selected paragraph details and word count.
 - One set of seven modes with user-facing explanations.
 - Disabled Generate when no local model or when selected block is read-only.
@@ -82,8 +88,9 @@ Test on Windows x64 with local GGUF and DOCX/TXT/MD samples.
 
 - [ ] Welcome screen, open-file dialog and local model setup are obvious.
 - [ ] Keyboard Tab and Shift+Tab reach controls in a logical order.
+- [ ] Verify Ctrl+O, Ctrl+Enter, Ctrl+Shift+S and Escape on Windows without interfering with native dialogs.
 - [ ] Focus indicators stay visible and buttons have adequate contrast.
-- [ ] Large document outline scrolls, search finds a heading and paragraph.
+- [ ] Large document outline scrolls, paging remains discoverable, and search finds a heading and paragraph.
 - [ ] Opening a different document clears old search, proposal and selections.
 - [ ] Heading and richly formatted blocks show an accurate read-only reason.
 - [ ] Generate is blocked without a model or while another operation runs.
@@ -112,3 +119,12 @@ These checks are intentionally not marked complete without real desktop QA.
 5. Keep destructive actions explicit and original files non-destructive.
 6. Run UI tests, TypeScript build, Python regression and Windows-native CI.
 7. Fix defects before adding new design components.
+
+## UI testing added in this iteration
+
+- Pure tests for multi-term outline search and capped pagination.
+- Pure tests for guarded keyboard shortcuts and text-input exclusions.
+- DOM interaction tests for 230-paragraph outlines, Show more, and searching beyond the initial page.
+- GitHub Actions runs UI tests, React/TypeScript build, Python regression and native Windows checks.
+
+These are automation gates, not a substitute for manual usability or accessibility testing on the actual desktop build.
