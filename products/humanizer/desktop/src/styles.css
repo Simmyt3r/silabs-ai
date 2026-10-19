@@ -218,3 +218,32 @@ h1, h2, h3, p { margin-top: 0; }
   font-weight: 500;
   font-size: 10px;
 }
+
+
+/* Human-readable local setup checks: no cloud/telemetry required. */
+.settings-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
+.settings-controls .button { width: 100%; }
+.local-check-result {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  max-width: 470px;
+  padding: 11px 13px;
+  background: #f8fbff;
+  border: 1px solid #c7d6ef;
+  border-radius: 9px;
+  color: #364c6d;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.local-check-result strong { color: #183f81; }
+.local-check-result small { font-size: 10px; color: #687f9d; }
+.local-check-result .diagnostic-issue { color: #9a2834; }
+@media (max-width: 900px) {
+  .settings-controls { width: 100%; align-items: stretch; }
+}
