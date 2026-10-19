@@ -1,9 +1,11 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import DocumentSidebar from "./DocumentSidebar";
 import type { OpenedDocument } from "../ipc";
 import { OUTLINE_PAGE_SIZE } from "../editor/outline";
+
+afterEach(cleanup);
 
 function sampleDocument(count: number): OpenedDocument {
   return {
