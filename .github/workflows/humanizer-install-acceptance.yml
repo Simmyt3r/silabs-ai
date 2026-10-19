@@ -1,0 +1,75 @@
+name: Humanizer clean-install acceptance
+
+on:
+  push:
+    paths:
+      - ".github/workflows/humanizer-install-acceptance.yml"
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Humanizer full offline Windows installer"
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  install-test:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install fixture tool only, NOT an app dependency
+        run: python -m pip install "python-docx>=1.2,<2"
+      - name: Retrieve full offline installer artifact from successful build
+        uses: actions/download-artifact@v4
+        with:
+          name: Silabs-Humanizer-Windows-Offline-Installer-RC
+          path: _install_candidate
+          run-id: ${{ github.event.workflow_run.id || 39261178457 }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify the actual installer checksum
+        shell: pwsh
+        run: |
+          $folder = "_install_candidate"
+          $file = @(Get-ChildItem $folder -Filter "*-setup.exe" -File)
+          if ($file.Count -ne 1) { throw "Expected exactly one candidate NSIS installer." }
+          $sumPath = Join-Path $folder "SHA256SUMS.txt"
+          if (-not (Test-Path $sumPath)) { throw "Missing checksum file." }
+          $sum = Get-Content -LiteralPath $sumPath -Raw
+          $expectedLine = [regex]::Match($sum, "(?im)^([0-9a-f]{64})\s+(.+setup\.exe)\s*$")
+          if (-not $expectedLine.Success) { throw "Invalid checksum manifest." }
+          if ($expectedLine.Groups[2].Value.Trim() -ne $file[0].Name) {
+            throw "Checksum manifest does not name the downloaded installer."
+          }
+          $actual = (Get-FileHash -LiteralPath $file[0].FullName -Algorithm SHA256).Hash
+          if ($actual -ine $expectedLine.Groups[1].Value) {
+            throw "Downloaded setup executable failed SHA-256 verification."
+          }
+          Write-Host "PASS: Installer checksum $actual"
+      - name: Install app and validate frozen local model and documents
+        shell: pwsh
+        run: |
+          $file = @(Get-ChildItem "_install_candidate" -Filter "*-setup.exe" -File)[0]
+          & ./products/humanizer/desktop/test-installed-windows.ps1 -InstallerPath $file.FullName -ExpectedModelSha256 "d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5"
+          if ($LASTEXITCODE -ne 0) { throw "Installed runtime acceptance failed" }
+      - name: Publish acceptance report
+        shell: pwsh
+        run: |
+          @(
+            "### Clean installation acceptance"
+            ""
+            "- NSIS silent installation on a fresh Windows runner: PASS"
+            "- Installed model and runtime resources present: PASS"
+            "- Installed GGUF SHA-256 integrity: PASS"
+            "- Installed offline Qwen inference: PASS"
+            "- Installed DOCX and TXT export, source unchanged: PASS"
+            ""
+            "**Manual work still required:** Launch/use the graphical UI on a disconnected physical Windows PC. Check WebView, file dialogs, keyboard support, and performance. No public production approval yet."
+          ) | Add-Content $env:GITHUB_STEP_SUMMARY
