@@ -128,3 +128,9 @@ These checks are intentionally not marked complete without real desktop QA.
 - GitHub Actions runs UI tests, React/TypeScript build, Python regression and native Windows checks.
 
 These are automation gates, not a substitute for manual usability or accessibility testing on the actual desktop build.
+
+## Clean installation automation (2026-10-19)
+
+The separately downloaded full-model installer passed fresh-runner NSIS installation, installed-file and Qwen checksum checks, actual offline CPU inference, DOCX export and TXT export. Original files remained unchanged. The graphical WebView, accessibility, scaling, file dialogs and completely disconnected machine must still be tested interactively.
+
+Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
