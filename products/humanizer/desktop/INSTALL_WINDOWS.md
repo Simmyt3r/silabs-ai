@@ -1,7 +1,19 @@
 # Install Silabs Humanizer on Windows: offline release candidate
 
-This guide applies only after the complete-model Windows installer workflow
-finishes successfully and publishes the installer artifact.
+**Release candidate build: PASS. Automated clean Windows installation: PASS.**
+Graphical desktop usage on a physically disconnected Windows PC is not yet
+validated. The installer remains an engineering release candidate.
+
+Built artifact and checksums:
+https://github.com/Simmyt3r/silabs-ai/actions/runs/39261178457
+
+Fresh Windows installer acceptance evidence:
+https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
+
+The acceptance workflow downloaded this exact installer, verified its SHA-256,
+installed it into a new folder, confirmed the local model and Tauri executable
+were installed, generated a real CPU-only Qwen rewrite, and verified DOCX and
+TXT exports without changing original files.
 
 Build status and downloadable artifact:
 https://github.com/Simmyt3r/silabs-ai/actions/workflows/humanizer-offline-installer.yml
@@ -66,3 +78,19 @@ d2387ca2dbfee2ffabce7120d3770dadca0b293052bc2f0e138fdc940d9bc7b5
 
 Local inference runs with llama-cpp-python / llama.cpp.
 Review other dependency licensing and notices before distributing.
+
+## Confirmed automated clean-install checks (2026-10-19)
+
+- [x] Installer SHA-256 verified against included SHA256SUMS.txt.
+- [x] NSIS silent installation succeeded on a fresh Windows GitHub runner.
+- [x] The Tauri executable, frozen bridge, local GGUF and manifest were installed.
+- [x] Installed model SHA-256 matches the trusted published digest.
+- [x] Installed GGUF actually produced an offline CPU rewrite.
+- [x] DOCX export opened successfully and preserved a heading and unchanged citation paragraph.
+- [x] TXT export succeeded without overwriting its original file.
+- [ ] Interactive desktop UI acceptance on a user's PC.
+- [ ] Disconnect Wi-Fi and verify installation and desktop inference manually.
+- [ ] Low-memory / slow-CPU performance and Windows Defender review.
+
+This CI runner did not simulate a disconnected network interface.
+Use the checklist above to complete the real offline acceptance gate.
