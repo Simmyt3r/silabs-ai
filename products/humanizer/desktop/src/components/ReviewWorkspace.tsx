@@ -103,14 +103,15 @@ export default function ReviewWorkspace({
             <span>{modeName.detail}</span>
           </div>
           <button type="button" className="button button-primary rewrite-button"
-            onClick={onRewrite} disabled={!canRewrite} aria-busy={rewriting}>
+            onClick={onRewrite} disabled={!canRewrite} aria-busy={rewriting}
+            title="Generate suggestion (Ctrl+Enter)">
             <Sparkles size={16} />
             {rewriting ? "Rewriting locally…" : "Generate suggestion"}
             {!rewriting && <ArrowRight size={16} />}
           </button>
         </div>
         {!modelReady && (
-          <button type="button" className="model-help" onClick={onShowSettings}>
+          <button type="button" className="model-help" disabled={busy} onClick={onShowSettings}>
             <AlertCircle size={15} /> Select a local model before rewriting <ChevronRight size={15} />
           </button>
         )}
@@ -130,7 +131,7 @@ export default function ReviewWorkspace({
               <h2 id="review-title">Compare and decide</h2>
             </div>
           </div>
-          <span className="review-state">
+          <span className="review-state" aria-live="polite">
             {showingProposal && proposal?.passed ? "Suggestion needs your approval" :
               acceptedText !== undefined ? "Revision accepted" : "No change proposed yet"}
           </span>
@@ -187,7 +188,7 @@ export default function ReviewWorkspace({
             )}
             {showingProposal && (
               <>
-                <button type="button" className="button button-secondary" disabled={busy} onClick={onReject}>
+                <button type="button" className="button button-secondary" disabled={busy} onClick={onReject} title="Reject suggestion (Esc)">
                   <X size={16} /> Reject
                 </button>
                 <button type="button" className="button button-accept" disabled={busy || !proposal?.passed} onClick={onAccept}>
