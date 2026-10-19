@@ -247,3 +247,19 @@ h1, h2, h3, p { margin-top: 0; }
 @media (max-width: 900px) {
   .settings-controls { width: 100%; align-items: stretch; }
 }
+
+
+.model-inference-note {
+  margin-top: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px 13px;
+  border: 1px solid #b3c8ed;
+  background: #eef4ff;
+  color: #315487;
+  font-size: 11px;
+  line-height: 1.6;
+  border-radius: 8px;
+}
+.model-inference-note svg { flex: 0 0 16px; margin-top: 1px; }
