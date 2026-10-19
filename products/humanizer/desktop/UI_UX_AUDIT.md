@@ -134,3 +134,14 @@ These are automation gates, not a substitute for manual usability or accessibili
 The separately downloaded full-model installer passed fresh-runner NSIS installation, installed-file and Qwen checksum checks, actual offline CPU inference, DOCX export and TXT export. Original files remained unchanged. The graphical WebView, accessibility, scaling, file dialogs and completely disconnected machine must still be tested interactively.
 
 Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
+
+## v0.1.1 workflow polish
+
+- [x] Test realistic UI flow: open document > run rewrite > review > accept >
+  export, including unsaved document switching.
+- [x] Add first-run offline component diagnostics in Model settings.
+- [x] Warn that file checks do not certify real inference or text quality.
+- [x] Show a visible first-rewrite CPU wait explanation.
+- [ ] Run manual interactive GUI checks on a physical Windows computer.
+- [ ] Rebuild v0.1.1 installer and verify its installed resources and real
+  bundled Qwen inference.
