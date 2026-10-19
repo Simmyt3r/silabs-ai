@@ -70,3 +70,13 @@
 - [ ] Installer signing and wider distribution clearance
 
 Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
+
+## v0.1.1 UX validation
+
+- [x] Realistic full desktop UI workflow tests with mocked Tauri file dialogs
+  and local IPC, including blocked rewrites and unsaved-change cancellation.
+- [x] On-device GGUF/header and inference/document-library diagnostic path.
+- [x] CPU warm-up/first generation explanation in the editing interface.
+- [ ] v0.1.1 full offline installer build and fresh Windows install acceptance.
+- [ ] Manual interactive GUI testing, resource usage, and disconnected-PC
+  acceptance before production sign-off.
