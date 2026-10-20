@@ -243,8 +243,27 @@ DOMAIN_TERMS = frozenset({
     "defence", "catalogue", "modelling", "modelled", "travelling",
     "enrolment", "fulfil", "fulfilment", "judgement", "civilisation",
     "mobilisation", "sensitisation", "specialisation", "standardisation",
+    "standardise", "standardised", "standardising",
     "silabs", "qwen", "unixpress", "humanizer",
 })
+
+# Frequent typo forms can appear in frequency corpora because real people
+# make mistakes. These are high-confidence corrections, not unknown jargon.
+COMMON_TYPOS = {
+    "goverment": "government",
+    "recieve": "receive",
+    "recieved": "received",
+    "adress": "address",
+    "acheive": "achieve",
+    "acheived": "achieved",
+    "seperate": "separate",
+    "occassion": "occasion",
+    "succesful": "successful",
+    "enviroment": "environment",
+    "sentnce": "sentence",
+    "reserach": "research",
+    "conculsion": "conclusion",
+}
 
 # Dictionary absence alone is not proof of an error.
 MIN_SIMILARITY = 78.0
@@ -269,6 +288,8 @@ def _spelling_candidates(term: str) -> tuple[str, ...]:
     from rapidfuzz import fuzz, process
     from wordfreq import zipf_frequency
     known, buckets = _english_index()
+    if term in COMMON_TYPOS:
+        return (COMMON_TYPOS[term],)
     if term in DOMAIN_TERMS or term in known or zipf_frequency(term, "en") > 2.5:
         return ()
     if len(term) < 4 or len(term) > 24:
@@ -307,7 +328,7 @@ def _spelling(text: str) -> list[Issue]:
         if len(term) < 4 or len(term) > 24 or term[0].isupper() or "'" in term or "’" in term:
             continue
         lower = term.lower()
-        if lower in DOMAIN_TERMS or zipf_frequency(lower, "en") > 2.5:
+        if lower in DOMAIN_TERMS or (lower not in COMMON_TYPOS and zipf_frequency(lower, "en") > 2.5):
             continue
         replacements = list(_spelling_candidates(lower))
         if not replacements:
