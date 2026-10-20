@@ -9,7 +9,7 @@ export function snapshotOf(revisions: Record<number, string>): string {
 }
 
 export function canEditBlock(block: { editable: boolean; kind: string } | null): boolean {
-  return !!block && block.editable && block.kind !== "heading";
+  return !!block && block.editable;
 }
 
 export function wordCount(text: string): number {
