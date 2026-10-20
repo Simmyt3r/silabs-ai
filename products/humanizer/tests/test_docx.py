@@ -81,7 +81,8 @@ def test_hyperlinks_and_inline_objects_remain_read_only(tmp_path):
     source = tmp_path / "complex.docx"
     document = Document()
     p = document.add_paragraph("Open ")
-    p.add_hyperlink("example", "https://example.com")
+    from docx.oxml import OxmlElement
+    p._p.append(OxmlElement("w:hyperlink"))
     document.save(source)
     block = parse_document(source).blocks[0]
     assert not block.editable
