@@ -1,3 +1,4 @@
+# v0.3.2 Windows RC: enforce actual frozen wordfreq English msgpack and Qwen installation acceptance.
 # v0.3.1: QA-gated Nigerian/British academic language coverage and complete offline Windows acceptance.
 # v0.3.0 final candidate: additional grammar rules and installed spell-check/source-matching acceptance.
 # v0.3.0: package bundled wordfreq corpus and RapidFuzz for private English analysis and local reference similarity.
@@ -114,7 +115,7 @@ jobs:
           }
           $hashes | Set-Content -Encoding utf8 (Join-Path $folder "SHA256SUMS.txt")
           @(
-            "### Silabs Humanizer v0.3.1 offline Windows release candidate"
+            "### Silabs Humanizer v0.3.2 offline Windows release candidate"
             ""
             "Contains the local frozen Python + llama.cpp inference runtime, pinned Qwen3-1.7B Q4_K_M model, and offline WebView2 setup."
             "Pinned GGUF SHA-256: $env:MODEL_SHA256"
