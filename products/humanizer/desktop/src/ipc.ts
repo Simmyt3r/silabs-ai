@@ -43,10 +43,10 @@ async function command<T>(payload: Record<string, unknown>): Promise<T> {
 export const localApi = {
   diagnostics: (modelPath: string) => command<LocalDiagnostics>({ action: "diagnostics", model_path: modelPath }),
   open: (path: string) => command<OpenedDocument>({ action: "open", path }),
-  rewrite: (doc: OpenedDocument, index: number, mode: RewriteMode, modelPath: string) =>
+  rewrite: (doc: OpenedDocument, index: number, mode: RewriteMode, modelPath: string, text?: string) =>
     command<RewriteProposal>({
       action: "rewrite", path: doc.path, fingerprint: doc.fingerprint, index, mode,
-      backend: "gguf", model_path: modelPath,
+      backend: "gguf", model_path: modelPath, text,
     }),
   export: (doc: OpenedDocument, destination: string, revisions: Record<number, string>) =>
     command<ExportResult>({ action: "export", path: doc.path, fingerprint: doc.fingerprint, destination, revisions }),
