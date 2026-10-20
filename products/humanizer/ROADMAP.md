@@ -11,15 +11,18 @@
 - [x] Tauri + React desktop workspace shell (engineering preview)
 - [ ] Full rich-text desktop editor
 - [x] Selected-paragraph rewrite actions in desktop preview
-- [ ] Selection within paragraphs and rich-text editing
+- [x] Selection-based rewriting and in-place editing of text-only paragraphs
+- [ ] Full rich-text character-level editing of Word objects
 - [x] Side-by-side comparison with basic change highlighting
 - [ ] Full multi-change diff and rich-text editing
 - [x] Accept/reject/restore whole-paragraph suggestions in desktop preview
-- [x] Conservative DOCX export to a NEW file (simple single-run paragraphs only)
+- [x] DOCX export to a NEW file with run-aware changes for plain text-only multi-run paragraphs
 - [x] Offline packaging script, bundled-runtime paths, model verification and NSIS configuration
-- [ ] Build and verify a complete offline installer with real model weights
+- [x] v0.1.x model-bundled installer successfully built and tested on clean Windows runner
+- [ ] v0.2.0 model-bundled installer successfully built and tested
 - [x] Windows Tauri native CI compilation
-- [ ] Standalone Windows app testing on a clean offline machine
+- [x] Automated clean Windows installer validation for v0.1.x
+- [ ] v0.2.0 real Windows GUI acceptance
 - [x] Real Qwen3 local smoke-test runner implemented
 - [ ] Execute real Qwen3 benchmark and manually review rewrite quality
 - [ ] Rich DOCX run/hyperlink preservation
@@ -80,3 +83,14 @@ Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
 - [ ] v0.1.1 full offline installer build and fresh Windows install acceptance.
 - [ ] Manual interactive GUI testing, resource usage, and disconnected-PC
   acceptance before production sign-off.
+
+## Screenshot-driven v0.2.0 recovery (2026-10-20)
+- [x] Fix CP1252/UTF-8 JSON protocol errors on Windows.
+- [x] Reject leaked LLM instructions such as "Return only the rewritten text."
+- [x] Support normal multi-run DOCX paragraphs, headings, and table text safely.
+- [x] Permit structural list numbering without allowing invented numeric facts.
+- [x] Continuous editing workspace with selected-text rewrites.
+- [x] Immediate local correctness/clarity hints and one-click corrections.
+- [x] Automated tests for Unicode, draft selection, hints and run preservation.
+- [ ] v0.2.0 full offline build and installed runtime check.
+- [ ] Positive user evaluation and real-document UX sign-off.
