@@ -151,3 +151,19 @@ See [OFFLINE_LANGUAGE_AND_SIMILARITY.md](OFFLINE_LANGUAGE_AND_SIMILARITY.md)
 for scope, tests, privacy safeguards and third-party redistribution notices.
 This functionality requires the **v0.3.0 Windows installer**. Earlier
 installers do not contain its dictionary or source-checking features.
+
+## Current v0.3.2 Windows quality gate (2026-10-20)
+
+v0.3.0/0.3.1 had a reported **installed** spelling failure: English
+wordfreq data were unavailable in the frozen Python runtime. The v0.3.2
+packaging script now explicitly adds English msgpack resources and refuses
+to publish an installer if frozen grammar and spelling checks fail.
+Local Model settings also reports the English dictionary health.
+
+The [v0.3.2 installer workflow](https://github.com/Simmyt3r/silabs-ai/actions/runs/39387821038)
+must finish successfully and trigger a successful **clean-install** test
+before downloading a candidate for use. Do not reuse older installers.
+
+A [safe local Windows smoke script](TEST_ON_YOUR_WINDOWS_PC.ps1) and the
+[acceptance checklist](RELEASE_NOTES_0.3.2.md) are provided for
+actual-laptop validation; neither remotely controls the user's PC.
