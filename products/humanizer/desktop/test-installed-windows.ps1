@@ -97,6 +97,28 @@ if (-not $checks.components_present -or -not $checks.gguf_header_valid) {
 }
 Write-Host "PASS: Offline setup diagnostic reports bundled model and runtime."
 
+$language = Invoke-InstalledBridge @{
+    action = "analyse_writing"
+    text = "This sentences contains a sentnce."
+}
+if ($language.language -ne "en" -or $language.issues.Count -lt 2) {
+    throw "Installed offline language checker did not include its dictionary and grammar rules."
+}
+$sourceReference = Join-Path $workspace "reference.txt"
+$matchText = "Satellite observations require careful manual checking before final reporting."
+[IO.File]::WriteAllText($sourceReference, $matchText, [Text.UTF8Encoding]::new($false))
+$comparison = Invoke-InstalledBridge @{
+    action = "compare_local_sources"
+    path = $source
+    fingerprint = $sourceSha
+    revisions = @{ "1" = $matchText }
+    sources = @($sourceReference)
+}
+if ($comparison.scope -ne "selected-local-files-only" -or $comparison.coverage_percent -le 0) {
+    throw "Installed local reference comparison failed."
+}
+Write-Host "PASS: Bundled spelling lexicon, grammar rules and selected-file source similarity."
+
 $opened = Invoke-InstalledBridge @{
     action = "open"
     path = $source
