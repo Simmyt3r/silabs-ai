@@ -13,6 +13,8 @@ const mocks = vi.hoisted(() => ({
   localRewrite: vi.fn(),
   localExport: vi.fn(),
   localDiagnostics: vi.fn(),
+  localAnalyse: vi.fn(),
+  localCompare: vi.fn(),
 }));
 
 vi.mock("@tauri-apps/api/core", () => ({ invoke: mocks.invoke }));
@@ -33,6 +35,8 @@ vi.mock("./ipc", () => ({
     rewrite: mocks.localRewrite,
     export: mocks.localExport,
     diagnostics: mocks.localDiagnostics,
+    analyseWriting: mocks.localAnalyse,
+    compareSources: mocks.localCompare,
   },
 }));
 
@@ -60,6 +64,18 @@ beforeEach(() => {
     index: 1, proposal: "This sentence is clearer.", passed: true, issues: [], elapsed_seconds: 4.2,
   });
   mocks.localExport.mockResolvedValue({ destination: "C:\\tests\\paper-revised.docx", revised_count: 1 });
+  mocks.localAnalyse.mockResolvedValue({
+    language: "en", engine: "offline-rules-and-word-frequency",
+    issues: [], text_length: 26, limitations: "English-only, suggestive not exhaustive.",
+  });
+  mocks.localCompare.mockResolvedValue({
+    scope: "selected-local-files-only", status: "compared",
+    source_count: 1, draft_words: 40, coverage_percent: 20,
+    explanation: "Only user-selected files searched", sources: [{
+      name: "reference.docx", matched_words: 8, draft_coverage_percent: 20,
+      match_excerpts: [{ draft_excerpt: "an example phrase", source_excerpt: "an example phrase" }],
+    }],
+  });
   mocks.localDiagnostics.mockResolvedValue({
     components_present: true,
     model_file_found: true,
@@ -181,6 +197,39 @@ describe("complete offline editing flow", () => {
     ));
     fireEvent.click(await screen.findByRole("button", { name: "Accept" }));
     expect(editor.value).toBe("These sentences is unclear.");
+  });
+
+  it("applies approved local grammar suggestion without any cloud call", async () => {
+    mocks.localAnalyse.mockResolvedValue({
+      language: "en", engine: "offline-rules-and-word-frequency", text_length: 26,
+      limitations: "English-only, suggestive not exhaustive.",
+      issues: [{
+        category: "grammar", rule_id: "demonstrative-plural",
+        title: "Grammar agreement", message: "Plural noun",
+        start: 0, end: 14, original: "This sentences",
+        replacements: ["These sentences"], confidence: "high",
+      }],
+    });
+    render(<App />);
+    await openDocument();
+    fireEvent.click(screen.getByRole("tab", { name: "Grammar" }));
+    expect(await screen.findByText("Grammar agreement")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /These sentences/i }));
+    expect((screen.getByRole("textbox", { name: "Edit selected passage" }) as HTMLTextAreaElement).value)
+      .toBe("These sentences is unclear.");
+  });
+
+  it("compares only explicitly selected local references and shows matched excerpt", async () => {
+    render(<App />);
+    await openDocument();
+    mocks.openDialog.mockResolvedValueOnce(["C:\\tests\\reference.docx"]);
+    fireEvent.click(screen.getByRole("tab", { name: "Sources" }));
+    fireEvent.click(screen.getByRole("button", { name: /Select reference documents/i }));
+    await waitFor(() => expect(mocks.localCompare).toHaveBeenCalledWith(
+      sample, {}, ["C:\\tests\\reference.docx"],
+    ));
+    expect(await screen.findByText("reference.docx")).toBeTruthy();
+    expect(screen.getByText(/Only user-selected files searched/i)).toBeTruthy();
   });
 
   it("keeps accepted changes when reopening is cancelled", async () => {
