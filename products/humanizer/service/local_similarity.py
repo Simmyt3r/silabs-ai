@@ -41,6 +41,14 @@ def compare_local_sources(
     words = _words(draft)
     if len(words) > MAX_WORDS_PER_FILE:
         raise ValueError("Document too long for this local comparison.")
+    # Validate selected sources even when a draft is too short to score.
+    self_path = Path(source_document).resolve() if source_document else None
+    for selected in sources:
+        if not isinstance(selected, str):
+            raise ValueError("Reference paths must be local filenames.")
+        candidate = Path(selected).expanduser().resolve()
+        if self_path is not None and candidate == self_path:
+            raise ValueError("A document cannot be compared with itself.")
     if len(words) < SHINGLE:
         return {
             "scope": "selected-local-files-only",
