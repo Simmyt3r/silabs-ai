@@ -62,6 +62,48 @@ GRAMMAR_RULES = (
         "Use 'there is' before a single countable noun.",
     ),
     (
+        "modal-have",
+        re.compile(r"\b(could|would|should|might|must)\s+of\b", re.I),
+        lambda m: m.group(1) + " have",
+        "Use 'have' after modal verbs, not 'of'.",
+    ),
+    (
+        "agreement-has",
+        re.compile(r"\b(i|we|you|they)\s+has\b", re.I),
+        lambda m: m.group(1) + " have",
+        "Use 'have' after I, we, you or they.",
+    ),
+    (
+        "agreement-was",
+        re.compile(r"\b(we|you|they)\s+was\b", re.I),
+        lambda m: m.group(1) + " were",
+        "In standard written English, use 'were' with we, you or they.",
+    ),
+    (
+        "agreement-dont",
+        re.compile(r"\b(he|she|it)\s+don't\b", re.I),
+        lambda m: m.group(1) + " doesn't",
+        "Use 'doesn't' with he, she or it.",
+    ),
+    (
+        "comparative-duplication",
+        re.compile(r"\bmore\s+(better|worse|easier|faster)\b", re.I),
+        lambda m: m.group(1),
+        "This comparative already expresses comparison, so 'more' is unnecessary.",
+    ),
+    (
+        "superlative-duplication",
+        re.compile(r"\bmost\s+(best|worst|fastest|easiest)\b", re.I),
+        lambda m: m.group(1),
+        "This superlative already expresses the highest degree.",
+    ),
+    (
+        "possessive-its-own",
+        re.compile(r"\bit's\s+own\b", re.I),
+        lambda m: "its own",
+        "Use the possessive 'its' before 'own', without an apostrophe.",
+    ),
+    (
         "uncountable-information",
         re.compile(r"\b(informations|equipments|advices)\b", re.I),
         lambda m: {
