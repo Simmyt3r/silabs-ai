@@ -95,3 +95,14 @@ def test_grammar_and_spelling_still_work_in_bridge_json():
     outcome = process({"action": "analyse_writing", "text": "This sentences contains a sentnce."})
     assert outcome["language"] == "en"
     assert any(x["category"] == "grammar" for x in outcome["issues"])
+
+
+
+def test_broader_agreement_and_modal_grammar_rules():
+    text = "They was late. She don't know. We should of left. More better data."
+    results = analyse_writing(text, spelling=False)["issues"]
+    proposals = {item["original"].lower(): item["replacements"][0].lower() for item in results}
+    assert proposals["they was"] == "they were"
+    assert proposals["she don't"] == "she doesn't"
+    assert proposals["should of"] == "should have"
+    assert proposals["more better"] == "better"
