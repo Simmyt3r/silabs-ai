@@ -148,6 +148,41 @@ describe("complete offline editing flow", () => {
     expect(screen.getByText(/Local GGUF weights not found or invalid/i)).toBeTruthy();
   });
 
+  it("allows typing directly into the document and fixing local grammar hints", async () => {
+    render(<App />);
+    await openDocument();
+    const editor = screen.getByRole("textbox", { name: "Edit selected passage" });
+    fireEvent.change(editor, { target: { value: "This this sentence is unclear." } });
+    expect(await screen.findByText("Repeated word")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Apply correction/i }));
+    expect((editor as HTMLTextAreaElement).value).toBe("This sentence is unclear.");
+    expect(screen.getByText("1 accepted · 2 editable")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Export revised file/i }));
+    await waitFor(() => expect(mocks.localExport).toHaveBeenCalledWith(
+      sample, "C:\\tests\\paper-revised.docx", { 1: "This sentence is unclear." },
+    ));
+  });
+
+  it("rewrites only selected words and preserves the rest of a paragraph", async () => {
+    mocks.localRewrite.mockResolvedValue({
+      index: 1, proposal: "These sentences", passed: true,
+      issues: [], elapsed_seconds: 2,
+    });
+    render(<App />);
+    await openDocument();
+    const editor = screen.getByRole("textbox", { name: "Edit selected passage" }) as HTMLTextAreaElement;
+    editor.setSelectionRange(0, 14);
+    fireEvent.select(editor);
+    fireEvent.click(screen.getByRole("tab", { name: /Rewrite/i }));
+    fireEvent.click(screen.getByRole("button", { name: /Generate suggestion/i }));
+    await waitFor(() => expect(mocks.localRewrite).toHaveBeenCalledWith(
+      sample, 1, "natural",
+      "C:\\Program Files\\Silabs\\model\\qwen3-1.7b.gguf", "This sentences",
+    ));
+    fireEvent.click(await screen.findByRole("button", { name: "Accept" }));
+    expect(editor.value).toBe("These sentences is unclear.");
+  });
+
   it("keeps accepted changes when reopening is cancelled", async () => {
     render(<App />);
     await openDocument();
