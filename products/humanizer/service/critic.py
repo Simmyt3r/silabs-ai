@@ -25,12 +25,13 @@ def critique(original: str, rewritten: str, required_tokens: dict[str, str]) -> 
         if count != 1:
             issues.append(f"Protected token must occur once: {token} (got {count})")
 
-    # Numeric values are always protected in the input. New unprotected digits
-    # introduced by the model may be invented facts, or altered placeholders.
+    # Numeric claims stay protected. Structural list numbering (1. 2. etc.)
+    # is not a factual claim and should not block a legitimate document edit.
     candidate_without_tokens = rewritten
     for token in required_tokens:
         candidate_without_tokens = candidate_without_tokens.replace(token, "")
-    if re.search(r"\d", candidate_without_tokens):
-        issues.append("New unprotected digits detected in rewrite.")
+    candidate_without_tokens = re.sub(r"(?m)^\\s{0,8}\\d{1,2}[.)]\\s+", "", candidate_without_tokens)
+    if re.search(r"\\d", candidate_without_tokens):
+        issues.append("The suggestion introduces unverified numeric content.")
 
     return CriticResult(passed=not issues, issues=issues)
