@@ -69,6 +69,16 @@ jobs:
             exit 1
           }
           Write-Host "Offline packaging script syntax: PASS"
+          $selfTestErrors = $null
+          $null = [System.Management.Automation.Language.Parser]::ParseFile(
+            (Resolve-Path "products/humanizer/desktop/TEST_ON_YOUR_WINDOWS_PC.ps1").Path,
+            [ref]$null, [ref]$selfTestErrors
+          )
+          if ($selfTestErrors.Count) {
+            $selfTestErrors | ForEach-Object { Write-Error $_.ToString() }
+            exit 1
+          }
+          Write-Host "End-user Windows offline diagnostic script syntax: PASS"
 
 
   frozen-bridge-windows:
