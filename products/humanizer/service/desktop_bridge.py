@@ -79,6 +79,33 @@ def process(payload: dict) -> dict:
             "note": "File and component checks only; model load and rewrite quality are not tested.",
         }
 
+    if action == "analyse_writing":
+        from .offline_review import analyse_writing
+        return analyse_writing(payload.get("text", ""), spelling=payload.get("spelling", True))
+
+    if action == "compare_local_sources":
+        from .local_similarity import compare_local_sources
+        _verify_source(payload)
+        parsed = parse_document(payload["path"])
+        overrides = payload.get("revisions", {})
+        if not isinstance(overrides, dict):
+            raise ValueError("Document revisions must be an object.")
+        blocks = []
+        valid = {b.index for b in parsed.blocks if b.editable}
+        for key, replacement in overrides.items():
+            index = int(key)
+            if index not in valid or not isinstance(replacement, str):
+                raise ValueError("Invalid working-copy revision.")
+        for block in parsed.blocks:
+            value = overrides.get(str(block.index), block.text)
+            if value.strip():
+                blocks.append(value)
+        return compare_local_sources(
+            "\n".join(blocks),
+            payload.get("sources", []),
+            source_document=payload["path"],
+        )
+
     if action == "open":
         parsed = parse_document(payload["path"])
         return {
