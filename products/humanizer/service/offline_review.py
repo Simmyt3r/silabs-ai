@@ -104,6 +104,38 @@ GRAMMAR_RULES = (
         "Use the possessive 'its' before 'own', without an apostrophe.",
     ),
     (
+        "third-person-present",
+        re.compile(r"\b(the\s+(study|analysis|report|research|model|method|system|platform|author))\s+(show|suggest|indicate|demonstrate|provide|require)\b", re.I),
+        lambda m: m.group(1) + " " + {
+            "show": "shows", "suggest": "suggests", "indicate": "indicates",
+            "demonstrate": "demonstrates", "provide": "provides",
+            "require": "requires",
+        }[m.group(3).lower()],
+        "A singular subject normally takes the -s verb form in the present tense.",
+    ),
+    (
+        "plural-results-verb",
+        re.compile(r"\b(the\s+(results|findings|participants|students|authors|respondents|methods))\s+(shows|suggests|indicates|demonstrates|provides|requires)\b", re.I),
+        lambda m: m.group(1) + " " + {
+            "shows": "show", "suggests": "suggest", "indicates": "indicate",
+            "demonstrates": "demonstrate", "provides": "provide",
+            "requires": "require",
+        }[m.group(3).lower()],
+        "A plural subject normally takes the base verb form in the present tense.",
+    ),
+    (
+        "research-has-agreement",
+        re.compile(r"\b(the\s+(study|analysis|report|model|system|platform|research))\s+(have|were)\b", re.I),
+        lambda m: m.group(1) + " " + {"have": "has", "were": "was"}[m.group(3).lower()],
+        "The named subject is singular; check the helping verb.",
+    ),
+    (
+        "one-of-are",
+        re.compile(r"\bone of the\s+(students|participants|respondents|papers|results|reasons|methods)\s+(are|have)\b", re.I),
+        lambda m: "one of the " + m.group(1) + " " + {"are": "is", "have": "has"}[m.group(2).lower()],
+        "The head of 'one of the' is singular when it is the sentence subject.",
+    ),
+    (
         "uncountable-information",
         re.compile(r"\b(informations|equipments|advices)\b", re.I),
         lambda m: {
@@ -139,10 +171,34 @@ def _preserve_case(original: str, revised: str) -> str:
     return revised
 
 
+def _protected_intervals(text: str) -> list[tuple[int, int]]:
+    """Skip quoted material and markup/URL spans to avoid destructive edits."""
+    patterns = (
+        r'"[^"\n]*"',
+        r'“[^”\n]*”',
+        r'‘[^’\n]*’',
+        r'\x60[^\x60\n]*\x60',
+        r'https?://[^\s<>()]+',
+        r'\b(?:doi:|10\.\d{4,9}/)[^\s,;]+',
+        r'\b[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}\b',
+    )
+    spans = []
+    for pattern in patterns:
+        spans.extend((m.start(), m.end()) for m in re.finditer(pattern, text, re.I))
+    return spans
+
+
+def _overlaps(start: int, end: int, spans: list[tuple[int, int]]) -> bool:
+    return any(start < stop and end > first for first, stop in spans)
+
+
 def _grammar(text: str) -> list[Issue]:
     issues = []
+    protected = _protected_intervals(text)
     for rule_id, regex, replace, message in GRAMMAR_RULES:
         for match in regex.finditer(text):
+            if _overlaps(match.start(), match.end(), protected):
+                continue
             revised = _preserve_case(match.group(0), replace(match))
             if match.group(0) == revised:
                 continue
@@ -152,6 +208,8 @@ def _grammar(text: str) -> list[Issue]:
             ))
     # Article errors should use narrow, defensible spelling contexts.
     for match in re.finditer(r"\b(a|an)\s+(apple|orange|umbrella|egg|idea|university|uniform|user)\b", text, re.I):
+        if _overlaps(match.start(), match.end(), protected):
+            continue
         word = match.group(2).lower()
         expected = "a" if word in {"university", "uniform", "user"} else "an"
         if match.group(1).lower() != expected:
@@ -160,6 +218,36 @@ def _grammar(text: str) -> list[Issue]:
                 "Choose a/an according to the following word's sound.",
                 match.start(), match.end(), match.group(0), [revised]))
     return issues
+
+
+# Curated legitimate terms in Nigerian education, public services,
+# geography, agriculture and academic research; non-exhaustive.
+DOMAIN_TERMS = frozenset({
+    "naira", "kobo", "harmattan", "okada", "keke", "garri", "egusi", "suya",
+    "amala", "fufu", "borehole", "corper", "corpers", "matric",
+    "siwes", "nysc", "waec", "neco", "jamb", "utme", "postutme", "lga",
+    "lgas", "inec", "nema", "nigerian", "nigerians", "ppas",
+    "makurdi", "ibadan", "kano", "jos", "otukpo", "benue", "abuja",
+    "yoruba", "hausa", "igbo", "tiv", "idoma", "kanuri", "fulfulde",
+    "georeferencing", "georeferenced", "geospatial", "postgis",
+    "ndvi", "ndwi", "landsat", "sentinel", "qgis", "arcgis",
+    "multicollinearity", "heteroscedasticity", "autocorrelation",
+    "biochar", "agroforestry", "landcover", "landuse", "anthropogenic",
+    "radiometric", "photogrammetry", "geostatistics", "univariate",
+    "multivariate", "spss", "stata", "api", "apis", "pwa", "sql",
+    "datasets", "dataset", "metadata", "waterlogging",
+    "programme", "programmes", "organise", "organised",
+    "organisation", "organisational", "optimise", "optimisation",
+    "analyse", "analysed", "behaviour", "behavioural", "labour",
+    "colour", "favour", "centre", "centres", "theatre", "licence",
+    "defence", "catalogue", "modelling", "modelled", "travelling",
+    "enrolment", "fulfil", "fulfilment", "judgement", "civilisation",
+    "mobilisation", "sensitisation", "specialisation", "standardisation",
+    "silabs", "qwen", "unixpress", "humanizer",
+})
+
+# Dictionary absence alone is not proof of an error.
+MIN_SIMILARITY = 78.0
 
 
 @lru_cache(maxsize=1)
@@ -181,7 +269,7 @@ def _spelling_candidates(term: str) -> tuple[str, ...]:
     from rapidfuzz import fuzz, process
     from wordfreq import zipf_frequency
     known, buckets = _english_index()
-    if term in known or zipf_frequency(term, "en") > 2.5:
+    if term in DOMAIN_TERMS or term in known or zipf_frequency(term, "en") > 2.5:
         return ()
     if len(term) < 4 or len(term) > 24:
         return ()
@@ -190,7 +278,7 @@ def _spelling_candidates(term: str) -> tuple[str, ...]:
         choices.extend(buckets.get((term[0], len(term) + delta), ()))
     # Avoid best matches from very different spellings.
     found = process.extract(term, choices, scorer=fuzz.ratio,
-        limit=12, score_cutoff=65.0)
+        limit=16, score_cutoff=MIN_SIMILARITY)
     ranked = sorted(
         (
             (candidate, score, zipf_frequency(candidate, "en"))
@@ -206,13 +294,20 @@ def _spelling_candidates(term: str) -> tuple[str, ...]:
 def _spelling(text: str) -> list[Issue]:
     from wordfreq import zipf_frequency
     issues = []
+    protected = _protected_intervals(text)
     for token in WORD_RE.finditer(text):
+        if _overlaps(token.start(), token.end(), protected):
+            continue
+        # Do not split mixed-script words, identifiers, or numbers into false positives.
+        if (token.start() > 0 and (text[token.start()-1].isalnum() or text[token.start()-1] == "_")
+            or token.end() < len(text) and (text[token.end()].isalnum() or text[token.end()] == "_")):
+            continue
         term = token.group()
         # English-only support and proper names should not be silently flagged.
         if len(term) < 4 or len(term) > 24 or term[0].isupper() or "'" in term or "’" in term:
             continue
         lower = term.lower()
-        if zipf_frequency(lower, "en") > 2.5:
+        if lower in DOMAIN_TERMS or zipf_frequency(lower, "en") > 2.5:
             continue
         replacements = list(_spelling_candidates(lower))
         if not replacements:
