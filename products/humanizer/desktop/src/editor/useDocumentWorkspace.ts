@@ -18,6 +18,8 @@ export function useDocumentWorkspace() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accepted, setAccepted] = useState<Record<number, string>>({});
   const [proposal, setProposal] = useState<RewriteProposal | null>(null);
+  const [selection, setSelection] = useState<{ start: number; end: number } | null>(null);
+  const [proposalContext, setProposalContext] = useState<{ base: string; start: number; end: number } | null>(null);
   const [exportedSnapshot, setExportedSnapshot] = useState<string | null>(null);
   const [busy, setBusy] = useState<BusyState>(null);
   const [status, setStatus] = useState<ReviewStatus>(null);
@@ -49,11 +51,17 @@ export function useDocumentWorkspace() {
     () => doc?.blocks.find(block => block.index === selected) ?? null,
     [doc, selected],
   );
+  const workingText = activeBlock ? (accepted[activeBlock.index] ?? activeBlock.text) : "";
+  const previewText = proposal?.passed && proposalContext && activeBlock &&
+    proposal.index === activeBlock.index
+      ? proposalContext.base.slice(0, proposalContext.start) +
+        proposal.proposal + proposalContext.base.slice(proposalContext.end)
+      : null;
   const revisionSnapshot = useMemo(() => snapshotOf(accepted), [accepted]);
   const acceptedCount = Object.keys(accepted).length;
   const hasUnexportedChanges = acceptedCount > 0 && revisionSnapshot !== exportedSnapshot;
   const canRewrite = !!doc && canEditBlock(activeBlock) && !!modelPath && busy === null;
-  const canExport = !!doc && hasUnexportedChanges && busy === null;
+  const canExport = !!doc && hasUnexportedChanges && Object.values(accepted).every(value => !!value.trim()) && busy === null;
   const editables = doc?.blocks.filter(block => canEditBlock(block)).length ?? 0;
 
   // Prevent silently losing accepted edits when the user closes the window.
@@ -94,13 +102,33 @@ export function useDocumentWorkspace() {
     if (operationLock.current) return;
     setSelected(index);
     setProposal(null);
+    setProposalContext(null);
+    setSelection(null);
     setStatus(null);
+  }
+
+  function updateDraft(text: string) {
+    if (!activeBlock || !canEditBlock(activeBlock) || operationLock.current) return;
+    setAccepted(previous => {
+      const next = { ...previous };
+      if (text === activeBlock.text) delete next[activeBlock.index];
+      else next[activeBlock.index] = text;
+      return next;
+    });
+    setProposal(null);
+    setProposalContext(null);
+  }
+
+  function updateSelection(start: number, end: number) {
+    if (start < 0 || end <= start || end > workingText.length) setSelection(null);
+    else setSelection({ start, end });
   }
 
   function changeMode(next: RewriteMode) {
     if (operationLock.current) return;
     setMode(next);
     setProposal(null);
+    setProposalContext(null);
   }
 
   function dismissStatus() { setStatus(null); }
@@ -130,6 +158,8 @@ export function useDocumentWorkspace() {
       setAccepted({});
       setExportedSnapshot(null);
       setProposal(null);
+      setProposalContext(null);
+      setSelection(null);
       setStatus({ kind: "success", message: "Opened " + result.name + ". Choose a paragraph to begin." });
     } catch (error) {
       setStatus({ kind: "error", message: String(error) });
@@ -152,6 +182,7 @@ export function useDocumentWorkspace() {
         setBundledModel(false);
         setDiagnostics(null);
         setProposal(null);
+        setProposalContext(null);
         setStatus({ kind: "success", message: "Local GGUF selected. All writing remains on this computer." });
       }
     } catch (error) {
@@ -187,11 +218,20 @@ export function useDocumentWorkspace() {
   async function rewrite() {
     if (!doc || selected === null || !canRewrite || operationLock.current) return;
     operationLock.current = true;
+    const currentText = workingText;
+    const start = selection && selection.end <= currentText.length ? selection.start : 0;
+    const end = selection && selection.end <= currentText.length ? selection.end : currentText.length;
+    const chosen = currentText.slice(start, end);
+    if (!chosen.trim()) {
+      setStatus({ kind: "error", message: "Select some text to improve." });
+      return;
+    }
     setBusy("rewrite");
     setProposal(null);
+    setProposalContext({ base: currentText, start, end });
     setStatus(null);
     try {
-      const result = await localApi.rewrite(doc, selected, mode, modelPath);
+      const result = await localApi.rewrite(doc, selected, mode, modelPath, chosen);
       setProposal(result);
       if (!result.passed) {
         setStatus({
@@ -209,14 +249,18 @@ export function useDocumentWorkspace() {
 
   function acceptProposal() {
     if (operationLock.current || !proposal?.passed || !activeBlock || proposal.index !== activeBlock.index) return;
-    setAccepted(previous => ({ ...previous, [activeBlock.index]: proposal.proposal }));
+    if (previewText === null) return;
+    setAccepted(previous => ({ ...previous, [activeBlock.index]: previewText }));
     setProposal(null);
+    setProposalContext(null);
+    setSelection(null);
     setStatus({ kind: "success", message: "Revision accepted in your working copy. Export when ready." });
   }
 
   function rejectProposal() {
     if (operationLock.current) return;
     setProposal(null);
+    setProposalContext(null);
     setStatus({ kind: "info", message: "Suggestion rejected; your current draft is unchanged." });
   }
 
@@ -228,6 +272,8 @@ export function useDocumentWorkspace() {
       return next;
     });
     setProposal(null);
+    setProposalContext(null);
+    setSelection(null);
     setStatus({ kind: "info", message: "This paragraph has been restored to its original wording." });
   }
 
@@ -264,9 +310,9 @@ export function useDocumentWorkspace() {
 
   return {
     doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen, diagnostics,
-    accepted, acceptedCount, proposal, busy, status, editables,
+    accepted, acceptedCount, proposal, previewText, workingText, selection, busy, status, editables,
     hasUnexportedChanges, canRewrite, canExport,
-    setSettingsOpen, selectBlock, changeMode, dismissStatus,
+    setSettingsOpen, selectBlock, updateDraft, updateSelection, changeMode, dismissStatus,
     openDocument, chooseModel, checkLocalSetup, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   };
