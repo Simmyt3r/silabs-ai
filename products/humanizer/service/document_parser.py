@@ -1,14 +1,16 @@
 """Structure-aware document import and conservative DOCX export.
 
-DOCX rewriting currently permits only plain, single-run paragraphs; complex
-multi-run, hyperlink, image, field and nested-table content remains unchanged.
-This deliberately avoids the formatting loss caused by Paragraph.text = ....
+DOCX rewriting permits text-only paragraphs containing multiple formatting
+runs. Hyperlinks, fields, drawings and other complex structures remain
+read-only. Revisions maintain untouched runs and paragraph structure.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Mapping, Iterator
+
+from .run_edit import replace_run_text
 
 
 SUPPORTED_EXTENSIONS = {".txt", ".md", ".docx"}
@@ -66,17 +68,17 @@ def _docx_paragraphs(document) -> Iterator[tuple[object, bool]]:
 
 
 def _is_safely_editable(paragraph) -> bool:
-    if len(paragraph.runs) != 1 or not paragraph.text.strip():
+    if not paragraph.runs or not paragraph.text.strip():
         return False
-    # Preserve paragraph layout, styling and all structured/inline content.
-    # Only a single text run with no field, drawing, break, hyperlink, etc.
+    # Plain text runs may differ in formatting; only their text is edited.
+    # Keep structural content (hyperlinks, breaks, drawings, fields) untouched.
     from docx.oxml.ns import qn
 
     if any(element.tag not in {qn("w:pPr"), qn("w:r")} for element in paragraph._p):
         return False
-    run = paragraph.runs[0]
-    if any(element.tag not in {qn("w:rPr"), qn("w:t")} for element in run._r):
-        return False
+    for run in paragraph.runs:
+        if any(element.tag not in {qn("w:rPr"), qn("w:t")} for element in run._r):
+            return False
     return True
 
 
@@ -117,7 +119,7 @@ def export_docx_revisions(
 ) -> Path:
     """Write reviewed replacements to a NEW DOCX; never overwrite source.
 
-    Only text-only single-run paragraphs are allowed. Reject all invalid
+    Text-only paragraphs with multiple runs are allowed. Reject all invalid
     changes before saving so the original document remains untouched.
     """
     from docx import Document
@@ -144,7 +146,7 @@ def export_docx_revisions(
 
     for index, revised_text in revisions.items():
         paragraph = paragraphs[index][0]
-        paragraph.runs[0].text = revised_text
+        replace_run_text(paragraph, revised_text)
 
     dst.parent.mkdir(parents=True, exist_ok=True)
     document.save(str(dst))
