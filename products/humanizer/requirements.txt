@@ -5,3 +5,8 @@ pytest>=8,<10
 # GGUF inference is optional: install a platform-appropriate llama-cpp-python
 # build separately (CPU or GPU), then supply a locally stored Qwen3 GGUF file.
 # Transformers backend reuses the existing root requirements and local weights.
+
+# Bundled local English spelling lexicon, and ranked approximate matches.
+# Install and package at build time; no internet needed in the shipped app.
+wordfreq>=3.1.1,<4
+rapidfuzz>=3.9,<4
