@@ -108,13 +108,16 @@ def process(payload: dict) -> dict:
             raise ValueError("Unknown rewrite mode.")
         parsed = parse_document(path)
         block = next((b for b in parsed.blocks if b.index == block_index), None)
-        if block is None or not block.editable or block.kind == "heading":
+        if block is None or not block.editable:
             raise ValueError("Selected block cannot be safely rewritten.")
-        if len(block.text) > 5000:
-            raise ValueError("Paragraph too long for safe rewriting (5000 characters maximum).")
+        working_text = payload.get("text", block.text)
+        if not isinstance(working_text, str) or not working_text.strip():
+            raise ValueError("Select or type text before requesting a suggestion.")
+        if len(working_text) > 5000:
+            raise ValueError("Selection too long for a single rewrite (5000 characters maximum).")
         generate = _get_model(backend, model_path)
         start = time.perf_counter()
-        proposal, review = rewrite_text(block.text, generate, StyleProfile(mode=mode))
+        proposal, review = rewrite_text(working_text, generate, StyleProfile(mode=mode))
         return {
             "index": block_index, "proposal": proposal, "passed": review.passed,
             "issues": review.issues, "elapsed_seconds": round(time.perf_counter() - start, 2),
@@ -131,7 +134,7 @@ def process(payload: dict) -> dict:
             raise ValueError("Revisions must be an object.")
         revisions = {int(k): v for k, v in raw_revisions.items()}
         original = parse_document(source)
-        allowed = {b.index for b in original.blocks if b.editable and b.kind != "heading"}
+        allowed = {b.index for b in original.blocks if b.editable}
         for index, value in revisions.items():
             if index not in allowed or not isinstance(value, str) or not value.strip():
                 raise ValueError(f"Invalid revision for block {index}.")
@@ -157,13 +160,19 @@ def process(payload: dict) -> dict:
 
 
 def serve() -> None:
+    if hasattr(sys.stdin, "reconfigure"):
+        sys.stdin.reconfigure(encoding="utf-8", errors="strict")
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="strict")
     for line in sys.stdin:
         try:
             payload = json.loads(line)
             result = {"ok": True, "data": process(payload)}
         except Exception as exc:
             result = {"ok": False, "error": str(exc)}
-        sys.stdout.write(json.dumps(result, ensure_ascii=False) + "\n")
+        # Escape non-ASCII on the protocol. This stays valid UTF-8 even on
+        # Windows computers with legacy console code pages (e.g. CP1252).
+        sys.stdout.write(json.dumps(result, ensure_ascii=True) + "\n")
         sys.stdout.flush()
 
 
