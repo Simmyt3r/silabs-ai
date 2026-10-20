@@ -83,6 +83,7 @@ beforeEach(() => {
     model_bytes: 1282439264,
     inference_installed: true,
     word_support_installed: true,
+    english_dictionary_installed: true,
     issues: [],
     note: "File and component checks only; model load and rewrite quality are not tested.",
   });
@@ -152,7 +153,7 @@ describe("complete offline editing flow", () => {
   it("explains failed local dependencies without claiming the model is ready", async () => {
     mocks.localDiagnostics.mockResolvedValueOnce({
       components_present: false, model_file_found: false, gguf_header_valid: false,
-      model_bytes: 0, inference_installed: true, word_support_installed: true,
+      model_bytes: 0, inference_installed: true, word_support_installed: true, english_dictionary_installed: true,
       issues: ["Local GGUF weights not found or invalid. Check Model settings."],
       note: "File and component checks only; model load and rewrite quality are not tested.",
     });
