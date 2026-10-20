@@ -64,6 +64,7 @@ export type LocalDiagnostics = {
   model_bytes: number;
   inference_installed: boolean;
   word_support_installed: boolean;
+  english_dictionary_installed: boolean;
   issues: string[];
   note: string;
 };
