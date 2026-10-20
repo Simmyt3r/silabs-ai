@@ -61,7 +61,10 @@ impl BridgeProcess {
                 .arg("-m")
                 .arg("products.humanizer.service.desktop_bridge")
                 .current_dir(&root)
-                .env("PYTHONPATH", &root);
+                .env("PYTHONPATH", &root)
+                .env("PYTHONUTF8", "1")
+                .env("PYTHONIOENCODING", "utf-8")
+                .env("PYTHONUNBUFFERED", "1");
             process
         } else {
             // Installer: the frozen interpreter, dependencies, and GGUF are
@@ -84,7 +87,10 @@ impl BridgeProcess {
             }
             let mut process = Command::new(executable);
             process.current_dir(&resources)
-                .env("SILABS_HUMANIZER_MODEL_PATH", model);
+                .env("SILABS_HUMANIZER_MODEL_PATH", model)
+                .env("PYTHONUTF8", "1")
+                .env("PYTHONIOENCODING", "utf-8")
+                .env("PYTHONUNBUFFERED", "1");
             process
         };
 
