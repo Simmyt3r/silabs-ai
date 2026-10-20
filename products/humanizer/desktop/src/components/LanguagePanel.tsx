@@ -9,10 +9,11 @@ type Props = {
   editable: boolean;
   busy: boolean;
   onEdit: (text: string) => void;
+  onDeepGrammar: () => void;
 };
 
 export default function LanguagePanel({
-  text, analysis, pending, error, editable, busy, onEdit,
+  text, analysis, pending, error, editable, busy, onEdit, onDeepGrammar,
 }: Props) {
   const issues = analysis?.text_length === text.length ? analysis.issues : [];
   const grammar = issues.filter(x => x.category === "grammar").length;
@@ -60,6 +61,10 @@ export default function LanguagePanel({
               </div>
             </article>
           ))}
+          <button type="button" className="assistant-switch"
+            disabled={busy || !editable} onClick={onDeepGrammar}>
+            Review sentence structure with local Qwen (slower)
+          </button>
           <div className="language-disclaimer"><ShieldCheck size={15} />
             {analysis.limitations} Suggestions change nothing until you select one.
           </div>
