@@ -13,10 +13,11 @@ export default function App() {
   const workspace = useDocumentWorkspace();
   const {
     doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen, diagnostics,
+    analysis, analysisError, analysisPending, sourceReport,
     accepted, acceptedCount, proposal, previewText, workingText, selection, busy, status, editables,
     hasUnexportedChanges, canRewrite, canExport,
     setSettingsOpen, selectBlock, updateDraft, updateSelection, changeMode, dismissStatus,
-    openDocument, chooseModel, checkLocalSetup, rewrite, acceptProposal, rejectProposal,
+    openDocument, chooseModel, checkLocalSetup, compareSources, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   } = workspace;
 
@@ -169,10 +170,14 @@ export default function App() {
               <WritingAssistant activeBlock={activeBlock} workingText={workingText}
                 previewText={previewText} selection={selection}
                 mode={mode} proposal={proposal} accepted={accepted}
-                modelReady={!!modelPath} busy={busy === "rewrite"} canRewrite={canRewrite}
+                modelReady={!!modelPath} busy={busy === "rewrite"} compareBusy={busy === "compare"}
+                analysis={analysis} analysisError={analysisError}
+                analysisPending={analysisPending} sourceReport={sourceReport}
+                canRewrite={canRewrite}
                 onMode={changeMode} onRewrite={rewrite} onEdit={updateDraft}
                 onAccept={acceptProposal} onReject={rejectProposal}
                 onRestore={restoreOriginal}
+                onCompareSources={compareSources}
                 onShowSettings={() => setSettingsOpen(true)} />
             </div>
           )}
