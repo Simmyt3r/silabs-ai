@@ -100,3 +100,22 @@ jobs:
             throw "Frozen Windows bridge DOCX smoke failed: $response"
           }
           Write-Host "Frozen Windows Python DOCX bridge: PASS"
+          $analyze = @{ action = 'analyse_writing'; text = "This sentences contains a sentnce." } | ConvertTo-Json -Compress
+          $language = (($analyze | & ".\dist\silabs-humanizer-bridge.exe") -join "") | ConvertFrom-Json
+          if (-not $language.ok -or $language.data.issues.Count -lt 2) {
+            throw "Frozen Windows grammar and spelling checks failed."
+          }
+          $source = Join-Path $PWD "offline-source.txt"
+          [IO.File]::WriteAllText($source, "Satellite observations require careful manual checking before final reporting.")
+          $comparisonRequest = @{
+            action = 'compare_local_sources'
+            path = (Resolve-Path bridge-smoke.docx).Path
+            fingerprint = (Get-FileHash bridge-smoke.docx -Algorithm SHA256).Hash.ToLowerInvariant()
+            revisions = @{ '0' = 'Satellite observations require careful manual checking before final reporting.' }
+            sources = @($source)
+          } | ConvertTo-Json -Compress
+          $similarity = (($comparisonRequest | & ".\dist\silabs-humanizer-bridge.exe") -join "") | ConvertFrom-Json
+          if (-not $similarity.ok -or $similarity.data.coverage_percent -ne 100) {
+            throw "Frozen Windows selected-file comparison failed."
+          }
+          Write-Host "Frozen Windows offline grammar, spelling and local similarity: PASS"
