@@ -94,3 +94,16 @@ Review other dependency licensing and notices before distributing.
 
 This CI runner did not simulate a disconnected network interface.
 Use the checklist above to complete the real offline acceptance gate.
+
+## Update for the v0.3.2 language-fix preview
+
+**Important:** A previous v0.3.x installer passed packaging but failed the
+fresh Windows **installed** spelling check because its English frequency
+wordlist was inaccessible. The v0.3.2 build now includes an explicit
+wordlist copy and a frozen-executable smoke test. Wait for the
+[v0.3.2 workflow](https://github.com/Simmyt3r/silabs-ai/actions/runs/39387821038)
+and its subsequent Windows clean-install workflow to both pass before
+installing this replacement.
+
+See [RELEASE_NOTES_0.3.2.md](RELEASE_NOTES_0.3.2.md) and
+[TEST_ON_YOUR_WINDOWS_PC.ps1](TEST_ON_YOUR_WINDOWS_PC.ps1).
