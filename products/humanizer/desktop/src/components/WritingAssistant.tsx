@@ -3,7 +3,9 @@ import {
   AlertCircle, BookOpenCheck, Check, CheckCircle2, ChevronDown,
   Clock3, Lightbulb, RotateCcw, ShieldCheck, Sparkles, WandSparkles, X,
 } from "lucide-react";
-import type { RewriteMode, RewriteProposal, Block } from "../ipc";
+import type { RewriteMode, RewriteProposal, Block, OfflineAnalysis, LocalSimilarityReport } from "../ipc";
+import LanguagePanel from "./LanguagePanel";
+import SimilarityPanel from "./SimilarityPanel";
 import { MODES } from "../editor/modes";
 import { inspectWriting, applyWritingHint } from "../editor/writingHints";
 import { compareText } from "../editor/diff";
@@ -17,7 +19,12 @@ type Props = {
   mode: RewriteMode;
   accepted: Record<number, string>;
   modelReady: boolean;
+  analysis: OfflineAnalysis | null;
+  analysisError: string | null;
+  analysisPending: boolean;
+  sourceReport: LocalSimilarityReport | null;
   busy: boolean;
+  compareBusy: boolean;
   canRewrite: boolean;
   onMode: (mode: RewriteMode) => void;
   onRewrite: () => void;
@@ -26,14 +33,16 @@ type Props = {
   onRestore: () => void;
   onEdit: (text: string) => void;
   onShowSettings: () => void;
+  onCompareSources: () => void;
 };
 
 export default function WritingAssistant({
   activeBlock, workingText, previewText, selection, proposal, mode, accepted,
-  modelReady, busy, canRewrite, onMode, onRewrite, onAccept,
-  onReject, onRestore, onEdit, onShowSettings,
+  modelReady, analysis, analysisError, analysisPending, sourceReport,
+  busy, compareBusy, canRewrite, onMode, onRewrite, onAccept,
+  onReject, onRestore, onEdit, onShowSettings, onCompareSources,
 }: Props) {
-  const [tab, setTab] = useState<"suggestions" | "rewrite">("suggestions");
+  const [tab, setTab] = useState<"suggestions" | "language" | "rewrite" | "sources">("suggestions");
   const hints = useMemo(() => inspectWriting(workingText), [workingText]);
   const proposalActive = !!proposal && proposal.index === activeBlock?.index;
   const diff = useMemo(
@@ -58,10 +67,20 @@ export default function WritingAssistant({
           onClick={() => setTab("suggestions")}>
           <Lightbulb size={15} /> Suggestions
         </button>
+        <button type="button" role="tab" aria-selected={tab === "language"}
+          className={tab === "language" ? "is-selected" : ""}
+          onClick={() => setTab("language")}>
+          Grammar
+        </button>
         <button type="button" role="tab" aria-selected={tab === "rewrite"}
           className={tab === "rewrite" ? "is-selected" : ""}
           onClick={() => setTab("rewrite")}>
           <WandSparkles size={15} /> Rewrite
+        </button>
+        <button type="button" role="tab" aria-selected={tab === "sources"}
+          className={tab === "sources" ? "is-selected" : ""}
+          onClick={() => setTab("sources")}>
+          Sources
         </button>
       </div>
       <div className="assistant-scroll">
@@ -108,6 +127,16 @@ export default function WritingAssistant({
                   <Sparkles size={15} /> Improve style or tone with local AI
                 </button>
               </section>
+            )}
+
+            {tab === "language" && (
+              <LanguagePanel text={workingText} analysis={analysis}
+                pending={analysisPending} error={analysisError}
+                busy={busy} editable={activeBlock.editable} onEdit={onEdit} />
+            )}
+            {tab === "sources" && (
+              <SimilarityPanel report={sourceReport}
+                busy={compareBusy} onCompare={onCompareSources} />
             )}
 
             {tab === "rewrite" && (
