@@ -109,7 +109,7 @@ export default function App() {
                     <strong>{diagnostics.components_present
                       ? "Core offline files and libraries found"
                       : "Offline setup requires attention"}</strong>
-                    <span>GGUF weights: {diagnostics.gguf_header_valid ? "Found" : "Missing/invalid"} · Inference engine: {diagnostics.inference_installed ? "Found" : "Missing"} · Word support: {diagnostics.word_support_installed ? "Found" : "Missing"}</span>
+                    <span>GGUF weights: {diagnostics.gguf_header_valid ? "Found" : "Missing/invalid"} · Inference engine: {diagnostics.inference_installed ? "Found" : "Missing"} · Word support: {diagnostics.word_support_installed ? "Found" : "Missing"} · English dictionary: {diagnostics.english_dictionary_installed ? "Found" : "Missing"}</span>
                     {diagnostics.issues.map((issue, i) => <span key={i} className="diagnostic-issue">{issue}</span>)}
                     <small>{diagnostics.note}</small>
                   </div>
