@@ -110,3 +110,15 @@ Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
 - [ ] Human user acceptance, installer signing and final redistribution licence review.
 
 See [OFFLINE_LANGUAGE_AND_SIMILARITY.md](desktop/OFFLINE_LANGUAGE_AND_SIMILARITY.md).
+
+## 2026-10-20: grammar QA and Windows remediation
+
+- [x] Added academic subject-verb checks and quotation/URL/DOI protection.
+- [x] Added protected Nigerian/British/academic vocabulary and explicit common typos.
+- [x] Curated QA: 0/35 valid samples flagged, 6/6 typo and 7/7 grammar examples.
+- [x] Discovered actual installed-v0.3.x missing-wordlist failure on Windows.
+- [x] Explicitly bundle English wordfreq msgpack and fail release if frozen spelling fails.
+- [x] Add real dictionary diagnostics in desktop Model settings.
+- [x] Add local Windows private smoke script and test instructions.
+- [ ] Verify patched v0.3.2 installer in **fresh installed** Windows runtime.
+- [ ] Run full GUI usability and scaling evaluation on user's physical laptop.
