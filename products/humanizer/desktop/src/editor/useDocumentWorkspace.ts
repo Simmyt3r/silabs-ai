@@ -60,7 +60,7 @@ export function useDocumentWorkspace() {
   const revisionSnapshot = useMemo(() => snapshotOf(accepted), [accepted]);
   const acceptedCount = Object.keys(accepted).length;
   const hasUnexportedChanges = acceptedCount > 0 && revisionSnapshot !== exportedSnapshot;
-  const canRewrite = !!doc && canEditBlock(activeBlock) && !!modelPath && busy === null;
+  const canRewrite = !!doc && canEditBlock(activeBlock) && !!modelPath && !!workingText.trim() && busy === null;
   const canExport = !!doc && hasUnexportedChanges && Object.values(accepted).every(value => !!value.trim()) && busy === null;
   const editables = doc?.blocks.filter(block => canEditBlock(block)).length ?? 0;
 
@@ -217,7 +217,6 @@ export function useDocumentWorkspace() {
 
   async function rewrite() {
     if (!doc || selected === null || !canRewrite || operationLock.current) return;
-    operationLock.current = true;
     const currentText = workingText;
     const start = selection && selection.end <= currentText.length ? selection.start : 0;
     const end = selection && selection.end <= currentText.length ? selection.end : currentText.length;
@@ -226,6 +225,7 @@ export function useDocumentWorkspace() {
       setStatus({ kind: "error", message: "Select some text to improve." });
       return;
     }
+    operationLock.current = true;
     setBusy("rewrite");
     setProposal(null);
     setProposalContext({ base: currentText, start, end });
