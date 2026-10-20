@@ -22,7 +22,7 @@ def critique(original: str, rewritten: str, required_tokens: dict[str, str]) -> 
 
     # Small local models occasionally echo prompt instructions, which must
     # never be offered as an edit (observed in desktop acceptance testing).
-    if re.search(r"(?im)^\\s*(?:Return only the rewritten text\\.?|Task:|Rewrite mode:|Text:|You are the Silabs Humanizer editing engine\\.?|<\\|im_start\\|>)\\s*$", rewritten):
+    if re.search(r"(?im)^\s*(?:Return only the rewritten text\.?|Task:|Rewrite mode:|Text:|You are the Silabs Humanizer editing engine\.?|<\|im_start\|>)\s*$", rewritten):
         issues.append("Model echoed editing instructions instead of providing a clean revision.")
 
     for token in required_tokens:
@@ -35,8 +35,8 @@ def critique(original: str, rewritten: str, required_tokens: dict[str, str]) -> 
     candidate_without_tokens = rewritten
     for token in required_tokens:
         candidate_without_tokens = candidate_without_tokens.replace(token, "")
-    candidate_without_tokens = re.sub(r"(?m)^\\s{0,8}\\d{1,2}[.)]\\s+", "", candidate_without_tokens)
-    if re.search(r"\\d", candidate_without_tokens):
+    candidate_without_tokens = re.sub(r"(?m)^\s{0,8}\d{1,2}[.)]\s+", "", candidate_without_tokens)
+    if re.search(r"\d", candidate_without_tokens):
         issues.append("The suggestion introduces unverified numeric content.")
 
     return CriticResult(passed=not issues, issues=issues)
