@@ -1,3 +1,4 @@
+# v0.3.0 final candidate: additional grammar rules and installed spell-check/source-matching acceptance.
 # v0.3.0: package bundled wordfreq corpus and RapidFuzz for private English analysis and local reference similarity.
 # v0.2.0 writer overhaul: direct editing, local suggestions, Windows UTF-8 and multi-run DOCX fixes.
 # v0.1.1 offline UX quality candidate: local setup checks, first-run messaging, and full UI-flow regressions.
