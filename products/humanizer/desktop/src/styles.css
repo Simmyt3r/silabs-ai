@@ -413,3 +413,49 @@ h1, h2, h3, p { margin-top: 0; }
   .document-stage { min-height: 500px; }
   .writing-assistant { min-height: 370px; max-height: 520px; }
 }
+
+
+/* Local grammar, dictionary suggestions and user-scoped source comparison */
+.assistant-tabs {
+  gap: 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.assistant-tabs button {
+  min-width: 65px;
+  padding: 12px 5px;
+  font-size: 10.5px;
+  flex: 1 0 auto;
+}
+.language-counts { display: flex; flex-wrap: wrap; gap: 8px; }
+.language-counts span {
+  display: flex; align-items: center; gap: 6px; padding: 7px 9px;
+  background: #edf3ff; border: 1px solid #d6e3f8; border-radius: 7px;
+  font-weight: 650; font-size: 11px; color: #315d9b;
+}
+.language-pending { font-size: 11px; color: #53749b; line-height: 1.5; }
+.language-original { font-size: 11px; color: #60748c; overflow-wrap: anywhere; }
+.language-original strong { color: #8a3e46; }
+.language-options { display: flex; flex-direction: column; gap: 5px; }
+.language-options .hint-apply { text-align: left; }
+.language-disclaimer, .similarity-privacy, .similarity-warning {
+  display: flex; gap: 8px; align-items: flex-start;
+  font-size: 10.5px; line-height: 1.6; color: #6b7e96;
+  padding: 9px; border-radius: 8px;
+}
+.language-disclaimer svg, .similarity-privacy svg, .similarity-warning svg {
+  flex: 0 0 15px;
+  margin-top: 1px;
+}
+.similarity-privacy { background: #f0f6fd; border: 1px solid #dce9f5; }
+.similarity-results { display: grid; gap: 12px; margin-top: 7px; }
+.similarity-score { background: #ecf3ff; border: 1px solid #cadaf2; border-radius: 9px;
+  padding: 15px; display: grid; gap: 6px; color: #34527f; }
+.similarity-score strong { font-size: 26px; color: #2358a8; }
+.similarity-score span { font-size: 11px; line-height: 1.6; }
+.similarity-explainer { font-size: 10.5px; line-height: 1.6; color: #627995; margin: 0; }
+.source-match { display: grid; gap: 4px; padding-top: 8px; border-top: 1px solid #e5edf5; }
+.source-match > span { text-transform: uppercase; color: #61799b; font-size: 9px; font-weight: 800; }
+.source-match p { overflow-wrap: anywhere; font-size: 11px; line-height: 1.65; }
+.similarity-warning { color: #8d5c20; background: #fff7eb; border: 1px solid #efdcbf; }
+.assistant-section-heading strong { display: flex; align-items: center; gap: 6px; }
