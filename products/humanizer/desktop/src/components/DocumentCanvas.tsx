@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FileText, PencilLine, ShieldCheck } from "lucide-react";
-import type { Block, OpenedDocument } from "../ipc";
+import type { OpenedDocument } from "../ipc";
 
 type Props = {
   doc: OpenedDocument;
