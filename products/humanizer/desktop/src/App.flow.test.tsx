@@ -83,7 +83,7 @@ describe("complete offline editing flow", () => {
     render(<App />);
     await waitFor(() => expect(mocks.invoke).toHaveBeenCalledWith("runtime_info"));
     await openDocument();
-    expect(screen.getByText("Chapter One")).toBeTruthy();
+    expect(screen.getAllByText("Chapter One").length).toBeGreaterThan(0);
     expect(screen.getByText("0 accepted · 2 editable")).toBeTruthy();
     fireEvent.click(screen.getByRole("tab", { name: /Rewrite/i }));
     const generate = screen.getByRole("button", { name: /generate suggestion/i });
