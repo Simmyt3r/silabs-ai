@@ -77,7 +77,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install minimal bridge build requirements
-        run: python -m pip install pyinstaller python-docx
+        run: python -m pip install pyinstaller -r products/humanizer/requirements.txt
       - name: Compile Python bridge into standalone Windows executable
         shell: pwsh
         run: |
