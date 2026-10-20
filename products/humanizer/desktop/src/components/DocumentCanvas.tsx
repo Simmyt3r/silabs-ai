@@ -28,7 +28,9 @@ export default function DocumentCanvas({
   useEffect(() => {
     if (selected === null) return;
     const active = scrollRoot.current?.querySelector('[data-block-index="' + selected + '"]');
-    active?.scrollIntoView({ block: "nearest", behavior: "auto" });
+    if (active && typeof active.scrollIntoView === "function") {
+      active.scrollIntoView({ block: "nearest", behavior: "auto" });
+    }
   }, [selected, limit]);
 
   return (
