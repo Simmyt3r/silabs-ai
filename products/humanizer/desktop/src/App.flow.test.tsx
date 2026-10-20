@@ -85,15 +85,16 @@ describe("complete offline editing flow", () => {
     await openDocument();
     expect(screen.getByText("Chapter One")).toBeTruthy();
     expect(screen.getByText("0 accepted · 2 editable")).toBeTruthy();
+    fireEvent.click(screen.getByRole("tab", { name: /Rewrite/i }));
     const generate = screen.getByRole("button", { name: /generate suggestion/i });
     expect(generate.hasAttribute("disabled")).toBe(false);
     fireEvent.click(generate);
     await waitFor(() => expect(mocks.localRewrite).toHaveBeenCalledWith(
-      sample, 1, "natural", "C:\\Program Files\\Silabs\\model\\qwen3-1.7b.gguf",
+      sample, 1, "natural", "C:\\Program Files\\Silabs\\model\\qwen3-1.7b.gguf", "This sentences is unclear.",
     ));
-    await screen.findByRole("button", { name: "Accept revision" });
+    await screen.findByRole("button", { name: "Accept" });
     expect(screen.getByRole("article", { name: "Revised passage" }).textContent).toContain("This sentence is clearer.");
-    fireEvent.click(screen.getByRole("button", { name: "Accept revision" }));
+    fireEvent.click(screen.getByRole("button", { name: "Accept" }));
     expect(screen.getByText("1 accepted · 2 editable")).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Export revised file/i }));
     await waitFor(() => expect(mocks.localExport).toHaveBeenCalledWith(
@@ -110,13 +111,14 @@ describe("complete offline editing flow", () => {
     });
     render(<App />);
     await openDocument();
+    fireEvent.click(screen.getByRole("tab", { name: /Rewrite/i }));
     fireEvent.click(screen.getByRole("button", { name: /Generate suggestion/i }));
-    const rejected = await screen.findByText("Suggestion blocked");
+    const rejected = await screen.findByText("Suggestion needs attention");
     expect(rejected).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Accept revision" }).hasAttribute("disabled")).toBe(true);
+    expect(screen.getByRole("button", { name: "Accept" }).hasAttribute("disabled")).toBe(true);
     expect(screen.getByRole("button", { name: /Export revised file/i }).hasAttribute("disabled")).toBe(true);
     fireEvent.click(screen.getByRole("button", { name: /Reject/i }));
-    expect(screen.queryByText("Suggestion blocked")).toBeNull();
+    expect(screen.queryByText("Suggestion needs attention")).toBeNull();
   });
 
   it("runs a fully local, informative first-run setup check", async () => {
@@ -149,9 +151,10 @@ describe("complete offline editing flow", () => {
   it("keeps accepted changes when reopening is cancelled", async () => {
     render(<App />);
     await openDocument();
+    fireEvent.click(screen.getByRole("tab", { name: /Rewrite/i }));
     fireEvent.click(screen.getByRole("button", { name: /Generate suggestion/i }));
-    await screen.findByRole("button", { name: "Accept revision" });
-    fireEvent.click(screen.getByRole("button", { name: "Accept revision" }));
+    await screen.findByRole("button", { name: "Accept" });
+    fireEvent.click(screen.getByRole("button", { name: "Accept" }));
     mocks.confirmDialog.mockResolvedValueOnce(false);
     fireEvent.click(screen.getByRole("button", { name: "Open another file" }));
     await waitFor(() => expect(mocks.confirmDialog).toHaveBeenCalled());
