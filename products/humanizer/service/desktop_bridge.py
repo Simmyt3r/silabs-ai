@@ -61,6 +61,14 @@ def process(payload: dict) -> dict:
         gguf_valid = file_exists and header_ok and model_bytes >= 100_000_000
         inference_installed = importlib.util.find_spec("llama_cpp") is not None
         docs_installed = importlib.util.find_spec("docx") is not None
+        # An installed Python package does not guarantee its data survived
+        # PyInstaller. Exercise a real lookup in the extracted wordfreq list.
+        english_dictionary_installed = False
+        try:
+            from wordfreq import zipf_frequency
+            english_dictionary_installed = zipf_frequency("language", "en") > 0
+        except (ImportError, LookupError, OSError, ValueError):
+            english_dictionary_installed = False
         issues = []
         if not gguf_valid:
             issues.append("Local GGUF weights not found or invalid. Check Model settings.")
@@ -68,13 +76,16 @@ def process(payload: dict) -> dict:
             issues.append("Local llama.cpp inference components are missing. Reinstall the offline edition.")
         if not docs_installed:
             issues.append("Word document support is missing. Reinstall the offline edition.")
+        if not english_dictionary_installed:
+            issues.append("Offline English spelling dictionary is unavailable. Reinstall the complete edition.")
         return {
-            "components_present": bool(gguf_valid and inference_installed and docs_installed),
+            "components_present": bool(gguf_valid and inference_installed and docs_installed and english_dictionary_installed),
             "model_file_found": file_exists,
             "gguf_header_valid": header_ok,
             "model_bytes": model_bytes,
             "inference_installed": inference_installed,
             "word_support_installed": docs_installed,
+            "english_dictionary_installed": english_dictionary_installed,
             "issues": issues,
             "note": "File and component checks only; model load and rewrite quality are not tested.",
         }
