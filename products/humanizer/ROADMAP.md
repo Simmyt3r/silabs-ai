@@ -94,3 +94,19 @@ Evidence: https://github.com/Simmyt3r/silabs-ai/actions/runs/39268760789
 - [x] Automated tests for Unicode, draft selection, hints and run preservation.
 - [ ] v0.2.0 full offline build and installed runtime check.
 - [ ] Positive user evaluation and real-document UX sign-off.
+
+
+## v0.3.0 offline writing intelligence
+- [x] Explainable English grammar/usage checks and direct apply controls.
+- [x] Ranked English spelling suggestions using an embedded frequency lexicon.
+- [x] Optional Qwen-driven deeper grammar rewriting within existing review workflow.
+- [x] Explicitly selected local document source comparison using 8-word sequences.
+- [x] Match excerpts, per-source and aggregate match coverage, no plagiarism verdict.
+- [x] No network connection, external index, document upload or background folder scan.
+- [x] Python API, desktop integration and local-source validation tests.
+- [x] Package wordfreq and RapidFuzz dependencies into offline builder.
+- [ ] v0.3 full Windows offline installer and installed-runtime acceptance checks.
+- [ ] Grammar precision/recall evaluation for British English and technical texts.
+- [ ] Human user acceptance, installer signing and final redistribution licence review.
+
+See [OFFLINE_LANGUAGE_AND_SIMILARITY.md](desktop/OFFLINE_LANGUAGE_AND_SIMILARITY.md).
