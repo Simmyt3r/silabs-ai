@@ -5,16 +5,17 @@ import {
   LoaderCircle, LockKeyhole, Settings2, ShieldCheck, Sparkles, WandSparkles, X,
 } from "lucide-react";
 import DocumentSidebar from "./components/DocumentSidebar";
-import ReviewWorkspace from "./components/ReviewWorkspace";
+import DocumentCanvas from "./components/DocumentCanvas";
+import WritingAssistant from "./components/WritingAssistant";
 import { useDocumentWorkspace } from "./editor/useDocumentWorkspace";
 
 export default function App() {
   const workspace = useDocumentWorkspace();
   const {
     doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen, diagnostics,
-    accepted, acceptedCount, proposal, busy, status, editables,
+    accepted, acceptedCount, proposal, previewText, workingText, selection, busy, status, editables,
     hasUnexportedChanges, canRewrite, canExport,
-    setSettingsOpen, selectBlock, changeMode, dismissStatus,
+    setSettingsOpen, selectBlock, updateDraft, updateSelection, changeMode, dismissStatus,
     openDocument, chooseModel, checkLocalSetup, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   } = workspace;
@@ -119,8 +120,8 @@ export default function App() {
           <div className="page-heading">
             <div>
               <span className="overline">{doc ? "DOCUMENT WORKSPACE" : "WELCOME"}</span>
-              <h1>{doc ? "Refine your writing" : "Writing, with you in control."}</h1>
-              <p>{doc ? "Work through one paragraph at a time. Review every proposed change." :
+              <h1>{doc ? "Refine your writing" : "Write clearly. Stay in control."}</h1>
+              <p>{doc ? "Edit your document directly, review writing suggestions, and export only approved changes." :
                 "Open your document, improve its wording, and decide what gets saved."}</p>
             </div>
             {doc && (
@@ -161,16 +162,19 @@ export default function App() {
               </div>
             </section>
           ) : (
-            <ReviewWorkspace
-              activeBlock={activeBlock}
-              mode={mode} proposal={proposal} accepted={accepted}
-              modelReady={!!modelPath}
-              busy={!!busy} rewriting={busy === "rewrite"} canRewrite={canRewrite}
-              onMode={changeMode} onRewrite={rewrite}
-              onAccept={acceptProposal} onReject={rejectProposal}
-              onRestore={restoreOriginal}
-              onShowSettings={() => setSettingsOpen(true)}
-            />
+            <div className="writing-workspace">
+              <DocumentCanvas doc={doc} selected={selected} accepted={accepted}
+                busy={!!busy} onSelect={selectBlock} onEdit={updateDraft}
+                onSelection={updateSelection} />
+              <WritingAssistant activeBlock={activeBlock} workingText={workingText}
+                previewText={previewText} selection={selection}
+                mode={mode} proposal={proposal} accepted={accepted}
+                modelReady={!!modelPath} busy={busy === "rewrite"} canRewrite={canRewrite}
+                onMode={changeMode} onRewrite={rewrite} onEdit={updateDraft}
+                onAccept={acceptProposal} onReject={rejectProposal}
+                onRestore={restoreOriginal}
+                onShowSettings={() => setSettingsOpen(true)} />
+            </div>
           )}
         </main>
       </div>
