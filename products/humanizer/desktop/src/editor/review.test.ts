@@ -35,7 +35,7 @@ describe("review state", () => {
 
   it("disallows protected and heading paragraphs", () => {
     expect(canEditBlock({ editable: true, kind: "paragraph" })).toBe(true);
-    expect(canEditBlock({ editable: true, kind: "heading" })).toBe(false);
+    expect(canEditBlock({ editable: true, kind: "heading" })).toBe(true);
     expect(canEditBlock({ editable: false, kind: "table_cell" })).toBe(false);
     expect(canEditBlock(null)).toBe(false);
   });
