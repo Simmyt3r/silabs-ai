@@ -117,6 +117,7 @@ export function useDocumentWorkspace() {
     });
     setProposal(null);
     setProposalContext(null);
+    setSelection(null);
   }
 
   function updateSelection(start: number, end: number) {
