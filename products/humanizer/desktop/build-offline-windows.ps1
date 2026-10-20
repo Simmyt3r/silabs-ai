@@ -57,6 +57,22 @@ if ($ActualHash -ne $ModelSha256.ToLowerInvariant()) {
 }
 
 Write-Host "Model verified: $($ModelInfo.Length) bytes, SHA-256 $ActualHash"
+# PyInstaller's generic collect-all can miss wordfreq's gzip wordlists
+# because locate.this_dir() resolves data relative to the frozen module.
+# Explicitly bundle the required English wordlist files at the expected
+# wordfreq/data resource path, independently of the other package assets.
+$WordfreqData = (& $Python -c "from wordfreq.util import data_path; print(data_path())") -join ""
+Assert-Exit "Offline wordfreq dictionary location"
+$WordfreqData = $WordfreqData.Trim()
+if (-not (Test-Path -LiteralPath $WordfreqData -PathType Container)) {
+    throw "English dictionary source directory is missing: $WordfreqData"
+}
+$EnglishLists = @(Get-ChildItem -LiteralPath $WordfreqData -Filter "*_en.msgpack.gz" -File)
+if ($EnglishLists.Count -lt 1) {
+    throw "No English wordfreq data files were installed. Refusing incomplete packaging."
+}
+Write-Host "Bundling $($EnglishLists.Count) English offline dictionaries explicitly."
+
 & $Python -m PyInstaller --version
 Assert-Exit "PyInstaller prerequisite check"
 & npm --version
@@ -73,11 +89,20 @@ $PyArguments = @(
     "--paths", $Root,
     "--collect-all", "llama_cpp",
     "--collect-submodules", "docx",
+    "--hidden-import", "wordfreq",
     "--distpath", $Assets,
     "--workpath", $PyInstallerWork,
     "--specpath", (Join-Path $PSScriptRoot "build"),
     $Entrypoint
 )
+
+# Add before the Python entrypoint, preserving the PyInstaller command layout.
+$Main = $PyArguments[-1]
+$PyArguments = @($PyArguments[0..($PyArguments.Count - 2)])
+foreach ($Lexicon in $EnglishLists) {
+    $PyArguments += @("--add-data", "$($Lexicon.FullName);wordfreq/data")
+}
+$PyArguments += $Main
 
 Push-Location $Root
 try {
@@ -96,6 +121,17 @@ if ($Probe.ok -ne $false -or $Probe.error -notmatch "Unknown action") {
     throw "Packaged bridge returned unexpected JSON. Check dependencies."
 }
 Write-Host "Frozen Python bridge: PASS"
+
+# Hard release gate: spelling must work in the actual frozen EXE.
+$GrammarProbe = ('{"action":"analyse_writing","text":"This sentences contains a sentnce."}' | & $Bridge) -join ""
+Assert-Exit "Frozen bridge language dictionary smoke test"
+$GrammarJson = $GrammarProbe | ConvertFrom-Json
+if (-not $GrammarJson.ok -or @($GrammarJson.data.issues | Where-Object { $_.category -eq "grammar" }).Count -lt 1 -or
+    @($GrammarJson.data.issues | Where-Object { $_.category -eq "spelling" }).Count -lt 1) {
+    throw "Frozen English wordlist or grammar rules not operational. Do not release installer: $GrammarProbe"
+}
+Write-Host "Frozen offline English wordfreq, grammar and spelling: PASS"
+
 
 $TargetModel = Join-Path $Assets "qwen3-1.7b.gguf"
 Copy-Item -LiteralPath $Model -Destination $TargetModel -Force
