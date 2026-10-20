@@ -1,4 +1,21 @@
-# Silabs Humanizer Desktop (Engineering Preview)
+# Silabs Humanizer Desktop (v0.2.0 engineering preview)
+
+**Latest desktop UI:** Continuous document canvas, in-place paragraph editing,
+selected-text AI rewrites, offline correctness/clarity hints, local model checks
+and reviewed export into a new file. Ordinary Word multi-run paragraphs and
+text-only headings/table cells are now editable. Complex Word objects remain
+protected.
+
+The detailed screenshot-based remediation and limitations are in
+[UI_FEEDBACK_FIXES_2026-10-20.md](UI_FEEDBACK_FIXES_2026-10-20.md) and
+[RELEASE_NOTES_0.2.0.md](RELEASE_NOTES_0.2.0.md).
+
+**Do not confuse source changes with an installed upgrade.** Reinstall the
+v0.2.0 release candidate from a successful GitHub Actions build to get them.
+Previous v0.1.x installers still contain the original UX and bridge defects.
+
+## Legacy implementation notes (v0.1.x)
+
 
 Tauri 2 + React + TypeScript workspace for the fully offline Humanizer product.
 
