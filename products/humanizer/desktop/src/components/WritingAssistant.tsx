@@ -132,7 +132,8 @@ export default function WritingAssistant({
             {tab === "language" && (
               <LanguagePanel text={workingText} analysis={analysis}
                 pending={analysisPending} error={analysisError}
-                busy={busy} editable={activeBlock.editable} onEdit={onEdit} />
+                busy={busy} editable={activeBlock.editable} onEdit={onEdit}
+                onDeepGrammar={() => { onMode("grammar"); setTab("rewrite"); }} />
             )}
             {tab === "sources" && (
               <SimilarityPanel report={sourceReport}
