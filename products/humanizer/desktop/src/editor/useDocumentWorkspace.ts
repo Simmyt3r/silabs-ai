@@ -2,11 +2,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { confirm, open, save } from "@tauri-apps/plugin-dialog";
-import type { LocalDiagnostics, OpenedDocument, RewriteMode, RewriteProposal } from "../ipc";
+import type { LocalDiagnostics, LocalSimilarityReport, OfflineAnalysis, OpenedDocument, RewriteMode, RewriteProposal } from "../ipc";
 import { localApi } from "../ipc";
 import { canEditBlock, snapshotOf, type ReviewStatus } from "./review";
 
-export type BusyState = "open" | "rewrite" | "export" | "diagnostics" | null;
+export type BusyState = "open" | "rewrite" | "export" | "diagnostics" | "compare" | null;
 
 export function useDocumentWorkspace() {
   const [doc, setDoc] = useState<OpenedDocument | null>(null);
@@ -15,6 +15,10 @@ export function useDocumentWorkspace() {
   const [modelPath, setModelPath] = useState("");
   const [bundledModel, setBundledModel] = useState(false);
   const [diagnostics, setDiagnostics] = useState<LocalDiagnostics | null>(null);
+  const [analysis, setAnalysis] = useState<OfflineAnalysis | null>(null);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [analysisPending, setAnalysisPending] = useState(false);
+  const [sourceReport, setSourceReport] = useState<LocalSimilarityReport | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [accepted, setAccepted] = useState<Record<number, string>>({});
   const [proposal, setProposal] = useState<RewriteProposal | null>(null);
@@ -58,11 +62,37 @@ export function useDocumentWorkspace() {
         proposal.proposal + proposalContext.base.slice(proposalContext.end)
       : null;
   const revisionSnapshot = useMemo(() => snapshotOf(accepted), [accepted]);
+  useEffect(() => { setSourceReport(null); }, [doc?.fingerprint, doc?.path, revisionSnapshot]);
   const acceptedCount = Object.keys(accepted).length;
   const hasUnexportedChanges = acceptedCount > 0 && revisionSnapshot !== exportedSnapshot;
   const canRewrite = !!doc && canEditBlock(activeBlock) && !!modelPath && !!workingText.trim() && busy === null;
   const canExport = !!doc && hasUnexportedChanges && Object.values(accepted).every(value => !!value.trim()) && busy === null;
   const editables = doc?.blocks.filter(block => canEditBlock(block)).length ?? 0;
+
+  // Debounced offline analysis; ignore stale results when selection/text changes.
+  useEffect(() => {
+    if (!activeBlock?.editable || !workingText.trim()) {
+      setAnalysis(null);
+      setAnalysisPending(false);
+      setAnalysisError(null);
+      return;
+    }
+    let alive = true;
+    setAnalysis(null);
+    setAnalysisError(null);
+    setAnalysisPending(true);
+    const timer = setTimeout(() => {
+      void localApi.analyseWriting(workingText).then(result => {
+        if (alive) setAnalysis(result);
+      }).catch(error => {
+        if (alive) setAnalysisError("The local language checker is unavailable: " + String(error));
+      }).finally(() => {
+        if (alive) setAnalysisPending(false);
+      });
+    }, 400);
+    return () => { alive = false; clearTimeout(timer); };
+  }, [activeBlock?.index, activeBlock?.editable, workingText]);
+
 
   // Prevent silently losing accepted edits when the user closes the window.
   // The handler must prevent the close synchronously, before showing dialog.
@@ -278,6 +308,31 @@ export function useDocumentWorkspace() {
     setStatus({ kind: "info", message: "This paragraph has been restored to its original wording." });
   }
 
+  async function compareSources() {
+    if (!doc || operationLock.current) return;
+    operationLock.current = true;
+    try {
+      const selectedFiles = await open({
+        multiple: true, directory: false,
+        filters: [{ name: "Local reference documents", extensions: ["docx", "txt", "md"] }],
+      });
+      const sources = typeof selectedFiles === "string" ? [selectedFiles] :
+        Array.isArray(selectedFiles) ? selectedFiles : [];
+      if (sources.length === 0) return;
+      setBusy("compare");
+      setSourceReport(null);
+      setStatus(null);
+      const report = await localApi.compareSources(doc, accepted, sources);
+      setSourceReport(report);
+      setStatus({ kind: "info", message: "Local reference comparison finished. Results cover only selected files." });
+    } catch (error) {
+      setStatus({ kind: "error", message: "Source comparison failed: " + String(error) });
+    } finally {
+      operationLock.current = false;
+      setBusy(null);
+    }
+  }
+
   async function exportDocument() {
     if (!doc || !canExport || operationLock.current) return;
     operationLock.current = true;
@@ -311,10 +366,11 @@ export function useDocumentWorkspace() {
 
   return {
     doc, selected, activeBlock, mode, modelPath, bundledModel, settingsOpen, diagnostics,
+    analysis, analysisError, analysisPending, sourceReport,
     accepted, acceptedCount, proposal, previewText, workingText, selection, busy, status, editables,
     hasUnexportedChanges, canRewrite, canExport,
     setSettingsOpen, selectBlock, updateDraft, updateSelection, changeMode, dismissStatus,
-    openDocument, chooseModel, checkLocalSetup, rewrite, acceptProposal, rejectProposal,
+    openDocument, chooseModel, checkLocalSetup, compareSources, rewrite, acceptProposal, rejectProposal,
     restoreOriginal, exportDocument,
   };
 }
