@@ -84,7 +84,7 @@ jobs:
       - name: Compile Python bridge into standalone Windows executable
         shell: pwsh
         run: |
-          python -m PyInstaller --clean --noconfirm --onefile --console --noupx --name silabs-humanizer-bridge --paths . --collect-submodules docx products/humanizer/service/bridge_executable.py
+          python -m PyInstaller --clean --noconfirm --onefile --console --noupx --name silabs-humanizer-bridge --paths . --collect-submodules docx --collect-all wordfreq --collect-all rapidfuzz products/humanizer/service/bridge_executable.py
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Exercise frozen JSON protocol and DOCX import
         shell: pwsh
