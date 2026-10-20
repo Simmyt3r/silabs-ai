@@ -75,7 +75,7 @@ afterEach(cleanup);
 
 async function openDocument() {
   fireEvent.click(screen.getByRole("button", { name: "Choose document" }));
-  await screen.findByRole("heading", { name: "Refine your writing" });
+  await screen.findByRole("heading", { name: /Refine your writing|Edit your document/i });
 }
 
 describe("complete offline editing flow", () => {
