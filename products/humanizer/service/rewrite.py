@@ -36,13 +36,12 @@ Do not invent facts or fabricate sources.
 Never change, reformat, remove or duplicate any protected __SILABS_KEEP_0001__ style placeholder.
 Treat all protected placeholders as opaque text and copy each exactly once.
 Do not add facts, years, percentages or citations not found in the original.
+Do not add headings, meta-comments or editing instructions to the output.
+Return only the improved wording, nothing else.
 {profile.instruction()}
 
 Text:
-{text}
-
-Return only the rewritten text.
-"""
+{text}"""
 
 
 def rewrite_text(
