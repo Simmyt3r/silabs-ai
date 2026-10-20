@@ -134,3 +134,20 @@ The first actual rewrite can take longer on an older CPU; a message explains
 the wait. UI integration tests cover the full Open > Rewrite > Accept/Reject >
 Export path using local IPC mocks. See [release notes](RELEASE_NOTES_0.1.1.md)
 for the scope and remaining release gates.
+
+## v0.3.0 offline writing intelligence
+
+**Grammar:** High-confidence, explainable English agreement, tense, auxiliary,
+article and usage checks, with an optional Qwen-driven deeper grammar rewrite.
+
+**Spelling:** User-reviewable suggestions from bundled word-frequency data,
+plus ranked approximate matches. Unknown technical vocabulary may be valid.
+
+**Source similarity:** Only the DOCX/TXT/MD reference documents the user selects.
+It reports matching 8-word sequences, source names and overlap excerpts.
+It is NOT an internet plagiarism detector or a misconduct classifier.
+
+See [OFFLINE_LANGUAGE_AND_SIMILARITY.md](OFFLINE_LANGUAGE_AND_SIMILARITY.md)
+for scope, tests, privacy safeguards and third-party redistribution notices.
+This functionality requires the **v0.3.0 Windows installer**. Earlier
+installers do not contain its dictionary or source-checking features.
